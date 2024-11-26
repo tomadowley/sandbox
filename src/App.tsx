@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
@@ -20,7 +20,14 @@ function App() {
         </a>
       </header>
     </div>
+    useCustomTitle();
   );
 }
 
 export default App;
+
+function useCustomTitle() {
+  useEffect(() => {
+    document.title = 'yo';
+  }, []);
+}
