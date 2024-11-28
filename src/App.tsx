@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
+function App() {
+  useEffect(() => {
+    document.title = "hi";
+  }, []);
+
+  return (
 function App() {
   return (
     <div className="App">
