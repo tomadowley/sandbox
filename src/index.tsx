@@ -4,6 +4,10 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 
+useEffect(() => {
+  document.title = "hello";
+}, []);
+
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
