@@ -3,6 +3,12 @@ import logo from './logo.svg';
 import './App.css';
 
 function App() {
+  useEffect(() => {
+    document.title = "hey";
+  }, []);
+
+  return (
+function App() {
   return (
     <div className="App">
       <header className="App-header">
