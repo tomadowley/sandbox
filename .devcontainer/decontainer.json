@@ -1,0 +1,23 @@
+{
+  "name": "React TypeScript Dev Container",
+  "dockerFile": "Dockerfile",
+  "context": "..",
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.formatOnSave": true
+  },
+  "extensions": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "ms-vscode.vscode-typescript-next",
+    "formulahendry.auto-close-tag",
+    "formulahendry.auto-rename-tag"
+  ],
+  "postCreateCommand": "npm install",
+  "remoteUser": "node",
+  "ports": [3000],
+  "forwardPorts": [3000],
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ]
+}
