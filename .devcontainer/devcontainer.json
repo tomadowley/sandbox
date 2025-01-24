@@ -18,7 +18,6 @@
     }
   },
   "postCreateCommand": "npm install",
-  "remoteUser": "node",
   "forwardPorts": [3000],
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
