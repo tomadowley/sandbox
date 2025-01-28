@@ -39,5 +39,51 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
-}
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.0",
+    "@types/enzyme-adapter-react-16": "^1.0.6",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin-tslint": "^5.x.x-dev20230109153300_8a6d8b6"
+  },
+  "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+   {
+     "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+     {
+       "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+       {
+         "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+         {
+           "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+           {
+             "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+             {
+               "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+               {
+                 "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                 {
+                   "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                   {
+                     "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                     {
+                       "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                       {
+                         "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                         {
+                           "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                           {
+                             "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                             {
+                               "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                               {
+                                 "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                                 {
+                                   "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                                   {
+                                     "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                                     {
+                                       "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                                       {
+                                         "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a6d8b6":
+                                         {
+                                           "@types/enzyme-adapter-react-16@^1.x.x-dev20230109153300_8a
