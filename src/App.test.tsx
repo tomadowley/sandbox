@@ -1,5 +1,5 @@
 import React from "react";
-import { act } from "react";
+import { act, render } from "react";
 import App from "./App";
 
 test("renders learn react link", () => {
