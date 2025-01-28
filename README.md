@@ -38,3 +38,47 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+
+## Love Song
+
+I see your face in every sunrise,
+A beauty that takes me by surprise.
+Your smile lights up my darkest days,
+In your arms, I want to stay always.
+
+Chorus:
+Oh darling, you're my heart's delight,
+With you, everything feels so right.
+Together we'll face each stormy night,
+In your love's embrace, I'll hold on tight.
+
+Verse 2:
+Your laughter's like a melody,
+A song that sets my spirit free.
+With every word and every touch,
+I fall deeper; I love you so much.
+
+Chorus:
+Oh darling, you're my heart's delight,
+With you, everything feels so right.
+Together we'll face each stormy night,
+In your love's embrace, I'll hold on tight.
+
+Bridge:
+Through highs and lows, we'll find our way,
+Hand in hand, come what may.
+Our love's a journey without end,
+You're my lover and my best friend.
+
+Chorus:
+Oh darling, you're my heart's delight,
+With you, everything feels so right.
+Together we'll face each stormy night,
+In your love's embrace, I'll hold on tight.
+
+Outro:
+So here's my heart; it's yours alone,
+In your love I've found my home.
+Forevermore we'll write our song,
+With you by my side where I belong.
