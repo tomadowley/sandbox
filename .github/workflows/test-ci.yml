@@ -34,4 +34,4 @@ jobs:
 
       # Step 5: Build the application
       - name: Build
-        run: npm build
+        run: npm run build
