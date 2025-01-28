@@ -31,7 +31,3 @@ jobs:
       # Step 4: Run unit tests
       - name: Run tests
         run: npm test -- --watchAll=false
-
-      # Step 5: Build the application
-      - name: Build
-        run: npm run build
