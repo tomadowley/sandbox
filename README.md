@@ -1,3 +1,47 @@
+# Love Song
+
+## Verse 1
+In your eyes, I see my future bright,
+A love so pure, it feels just right.
+With every heartbeat, I know it's true,
+My heart belongs forever to you.
+
+## Chorus
+Oh, my love, you're my guiding star,
+No matter where you are,
+I'll follow you near or far,
+Together we'll go far.
+
+## Verse 2
+In your arms, I find my peace,
+A love so strong, it will never cease.
+With every kiss, I feel alive,
+With you by my side, I can thrive.
+
+## Chorus
+Oh, my love, you're my guiding star,
+No matter where you are,
+I'll follow you near or far,
+Together we'll go far.
+
+## Bridge
+Through every storm and darkest night,
+We'll hold each other tight.
+With you, my world feels so complete,
+Our love's a melody so sweet.
+
+## Chorus
+Oh, my love, you're my guiding star,
+No matter where you are,
+I'll follow you near or far,
+Together we'll go far.
+
+## Outro
+In this journey of life we share,
+I'll always be there.
+With you, my heart's forever true,
+My endless love belongs to you.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
