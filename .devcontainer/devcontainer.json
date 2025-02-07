@@ -1,7 +1,6 @@
 {
   "name": "React TypeScript Dev Container",
-  "dockerFile": "Dockerfile",
-  "context": "..",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
   "customizations": {
     "vscode": {
       "extensions": [
@@ -17,7 +16,6 @@
       }
     }
   },
-  "postCreateCommand": "npm install",
   "forwardPorts": [3000],
   "mounts": [
     "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
