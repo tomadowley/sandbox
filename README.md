@@ -1,6 +1,7 @@
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Created by Rajivation and inspired by Real estate dealer problems. Lol
 
 ## Available Scripts
 
