@@ -1,23 +1,30 @@
 {
-  "name": "React TypeScript Dev Container",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
+  "name": "React App - Test Container",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "args": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
         "dbaeumer.vscode-eslint",
-        "esbenp.prettier-vscode",
-        "ms-vscode.vscode-typescript-next",
-        "formulahendry.auto-close-tag",
-        "formulahendry.auto-rename-tag"
-      ],
-      "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
-        "editor.formatOnSave": true
-      }
+        "esbenp.prettier-vscode"
+      ]
     }
   },
-  "forwardPorts": [3000],
-  "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "bash.format.terminal.shellIntegration": true,
+    "editor.formatOnSave": false
+  },
+  "postCreateCommand": "yarn install",
+  "remoteUser": "node",
+  "runArgs": [],
+  "forwardPorts": [
+    {
+      "hostPort": "4000",
+      "containerPort": 3000,
+      "label": "3000"
+    }
   ]
 }
