@@ -1,5 +1,8 @@
 # Getting Started with Create React App
 
+*Did you hear about the JavaScript developer who backed up all of their files to the cloud?*
+> *Yeah, now they use TypeScript.*
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
