@@ -6,8 +6,8 @@ import ReactDOMTestUtils from 'react-dom/test-utils';
 
 
 describe('simple', () => {
-  it('renders learn react link', () => {
-    ReactDOMTestUtils.act(() => {
+  it('renders learn react link', async () => {
+    await act( async () => {
       render(<App />);
     })
   
