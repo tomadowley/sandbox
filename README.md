@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+_Why did the scarecrow become a successful software engineer? Because he was outstanding in his field! 🌾👨‍💻_
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
