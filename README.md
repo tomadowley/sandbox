@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+*Why was the JavaScript developer sad? Because they didn’t know how to ‘null’ his feelings.*
+
 ## Available Scripts
 
 In the project directory, you can run:
