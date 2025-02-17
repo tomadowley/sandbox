@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+A few React developers walked into a bar because they saw a useRef sign.
+
 ## Available Scripts
 
 In the project directory, you can run:
