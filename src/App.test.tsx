@@ -4,10 +4,8 @@ import { BrowserRouter, Link } from "react-router-dom";
 
 describe("renders", () => {
 	test("renders learn react link", async () => {
-		render(<App />);
+	render(<App />);
 
 		expect(screen.getByText("Learn React")).toBeTruthy();
-
-		expect(true).toBe(true);
 	});
 });
