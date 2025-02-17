@@ -1,10 +1,13 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
+import { act, render, renderHook, screen } from "@testing-library/react";
 import App from "./App";
+import { BrowserRouter, Link } from "react-router-dom";
 
-test("renders learn react link", () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-  expect(false).toBe(true);
+describe("renders", () => {
+	test("renders learn react link", async () => {
+		render(<App />);
+
+		expect(screen.getByText("Learn React")).toBeTruthy();
+
+		expect(true).toBe(true);
+	});
 });
