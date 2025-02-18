@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+**Why couldn't the React developer create a new component? Because they didn't know JSX!** 
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
