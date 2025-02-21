@@ -38,3 +38,86 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Learn More
+
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+
+To learn React, check out the [React documentation](https://reactjs.org/).
+
+### Code Splitting
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+
+### Analyzing the Bundle Size
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+
+### Making a Progressive Web App
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+
+### Advanced Configuration
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+
+### Deployment
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+
+### `npm run build` fails to minify
+
+This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+
+### Developer Joke
+```
+> Hear about the JavaScript novel? I thought the garden scene was a little heavy handed, but I really liked the Vue at the end.
+```
+<sup><sub>Taken from <https://endler.dev/2020/javascript-jokes/></sub></sup>
+
+
+## Resources:
+
+### Website colour scheme:
+
+https://coolors.co/ef6262-7fcdff-d7ffab-f0ffce-58b368-ffffff
+
+### How to get more details from the signal
+
+```javascript
+// Locations saved as [latitude, longitude]
+// The list can be set from ENV variables as 'LOCATIONS'
+let locations = [
+    [53.77867866776527, -1.5595644295742778] // Leeds
+]
+const messageDelays = 100;
+var area_incidents = new Set();
+
+setInterval(async function(){
+    let loc;
+    for (let idx in locations){
+        loc = locations[idx];
+        let query = `location_id=custom&bounds=[${loc[0]-.1},${loc[1]-.1},${loc[0]+.1},${loc[1]+.1}]`
+        response = await fetch(`https://content.signalfire.app/api/v1/incidents?sig=ios&${query}`);
+        let data = await response.json()
+        
+        for (const key of Object.keys(data["objects"])){
+            let incident = data["objects"][key]
+
+            if (incident["is_building_fire"] && !area_incidents.has(incident['incident_number'])) {
+                callJsFunction(Action.ADD_ALERT, {  
+                        title: incident['street'] + " " + incident['incident_description'], 
+                        category: incident["incident_date"], 
+                        action: area,
+                        data: loc,
+                        entry: {title: incident["street"], url: `https://what3words.com/${incident["what3words"]}`}
+                    } )
+                
+                area_incidents.add(incident['incident_number'])
+            }    
+        }
+    }
+
+}, messageDelays)
+```
