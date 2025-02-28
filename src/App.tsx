@@ -235,7 +235,7 @@ function Game() {
         // Display score and health
         p.fill(255);
         p.textSize(24);
-        p.textAlign(p.LEFT);
+        p.textAlign('left');
         p.text(`Score: ${player.score}`, 20, 30);
         p.text(`Health: ${player.health}`, 20, 60);
         
