@@ -133,6 +133,7 @@ function Game() {
     let lastEnemySpawn = 0;
     let isGameOver = false;
     let gameStarted = false;
+    let p5Instance: any = null;
     
     const sketch = (p: p5) => {
       p.setup = () => {
@@ -258,10 +259,31 @@ function Game() {
       };
     };
     
-    const p5Instance = new p5(sketch);
+    p5Instance = new p5(sketch);
     
     return () => {
-      p5Instance.remove();
+      // Proper cleanup for p5 instance
+      if (p5Instance) {
+        // Access the internal _onunload method which properly cleans up resources
+        // This is a safer approach than using remove()
+        if (typeof p5Instance._onunload === 'function') {
+          p5Instance._onunload();
+        }
+        
+        // Clean up any additional resources
+        const canvas = document.querySelector('canvas');
+        if (canvas && canvas.parentNode) {
+          canvas.parentNode.removeChild(canvas);
+        }
+        
+        // Remove any global event listeners that p5 might have added
+        window.removeEventListener('keydown', p5Instance._events?.keydown);
+        window.removeEventListener('keyup', p5Instance._events?.keyup);
+        window.removeEventListener('resize', p5Instance._events?.resize);
+        
+        // Set to null to allow garbage collection
+        p5Instance = null;
+      }
     };
   }, []);
   
