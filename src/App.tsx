@@ -249,7 +249,7 @@ function Game() {
         p.vertex(600, p.height - 250);
         p.vertex(p.width, p.height - 100);
         p.vertex(p.width, p.height);
-        p.endShape(p.CLOSE);
+        p.endShape('close');
       };
       
       p.keyPressed = () => {
