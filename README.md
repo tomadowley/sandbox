@@ -1,6 +1,33 @@
-# Getting Started with Create React App
+# Project Name
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Overview
+
+[Brief description of the project - what it does, who it's for, and why it exists]
+
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and uses TypeScript for type safety.
+
+## Installation
+
+1. Clone the repository
+   ```
+   git clone [repository URL]
+   cd [project directory]
+   ```
+
+2. Install dependencies
+   ```
+   npm install
+   ```
+
+3. Setup environment variables (if applicable)
+   ```
+   cp .env.example .env
+   ```
+   Then edit `.env` with your configuration.
+
+## Usage
+
+[Describe how to use the application, including any important features or functionality]
 
 ## Available Scripts
 
@@ -8,7 +35,7 @@ In the project directory, you can run:
 
 ### `npm start`
 
-Runs the app in the development mode.\
+Runs the app in development mode.\
 Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 The page will reload if you make edits.\
@@ -27,14 +54,43 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
 ### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Development Container
+
+This project includes a devcontainer configuration for use with VS Code Remote Containers or GitHub Codespaces. This provides a consistent development environment for all contributors.
+
+To use it:
+1. Install the [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension in VS Code
+2. Open the project folder in VS Code
+3. When prompted, click "Reopen in Container"
+
+## Contributing
+
+Contributions are welcome! Please follow these steps:
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/your-feature-name`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add some feature'`)
+5. Push to the branch (`git push origin feature/your-feature-name`)
+6. Open a Pull Request
+
+Please ensure your code follows the project's style guidelines and includes appropriate tests.
+
+## License
+
+[Specify the license under which the project is distributed]
+
+## Contact
+
+[Provide contact information or links to where users can get help or submit feedback]
+
+- Project Link: [repository URL]
+- Issue Tracker: [issue tracker URL]
