@@ -35,6 +35,11 @@ export const jokes: Joke[] = [
     id: 6,
     setup: "Why did the JavaScript developer wear glasses?",
     punchline: "Because they couldn't C#!"
+  },
+  {
+    id: 7,
+    setup: "Why do Java developers wear glasses?",
+    punchline: "Because they don't C#!"
   }
 ];
 
