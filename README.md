@@ -44,3 +44,9 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 Why do React developers wear glasses?
 
 Because they can't see the state without them!
+
+## Another Joke
+
+Why do programmers prefer dark mode?
+
+Because light attracts bugs!
