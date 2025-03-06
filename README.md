@@ -44,3 +44,7 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 Why do programmers prefer dark mode?
 
 Because light attracts bugs!
+
+Why do programmers prefer using hex?
+
+Because decimals have a point!
