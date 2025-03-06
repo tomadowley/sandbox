@@ -23,8 +23,8 @@ export const jokes: Joke[] = [
   },
   {
     id: 4,
-    setup: "Why do programmers always mix up Halloween and Christmas?",
-    punchline: "Because Oct 31 == Dec 25!"
+    setup: "Why do programmers confuse Halloween and Christmas?",
+    punchline: "Because Oct(31) === Dec(25)!"
   },
   {
     id: 5,
