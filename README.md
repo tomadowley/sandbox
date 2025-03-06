@@ -44,3 +44,7 @@ You don't have to ever use `eject`. The curated feature set is suitable for smal
 Why did the JavaScript developer wear glasses?
 
 Because they couldn't C#!
+
+Why do JavaScript developers prefer to use map() instead of a therapist?
+
+Because they don't want to reduce their problems, they just want to transform them!
