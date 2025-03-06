@@ -17,3 +17,6 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+// Developer humor to brighten your day
+console.log("Why do programmers prefer dark mode? Because light attracts bugs!");
