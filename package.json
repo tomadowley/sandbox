@@ -1,7 +1,10 @@
 {
+  // Project metadata and configuration for a React application bootstrapped with Create React App
   "name": "sandbox",
   "version": "0.1.0",
   "private": true,
+
+  // External libraries and frameworks required by the application
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -16,18 +19,24 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+
+  // Custom commands for common development tasks
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "react-scripts start",     // Starts the development server
+    "build": "react-scripts build",     // Creates a production-ready build
+    "test": "react-scripts test",       // Runs the test suite
+    "eject": "react-scripts eject"      // Ejects CRA configuration (one-way operation)
   },
+
+  // Linting configuration for maintaining code quality
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
     ]
   },
+
+  // Target browser environments for compatibility
   "browserslist": {
     "production": [
       ">0.2%",
