@@ -1,10 +1,19 @@
-import React from "react";
+import React, { act } from "react";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders learn react link", () => {
+test("renders game canvas", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-  expect(false).toBe(true);
+  const canvasElement = screen.getByRole('canvas');
+  expect(canvasElement).toBeInTheDocument();
+  expect(canvasElement).toHaveClass('game-canvas');
+});
+
+test("initializes game properly", () => {
+  act(() => {
+    render(<App />);
+  });
+  
+  const appContainer = screen.getByClassName('App');
+  expect(appContainer).toBeInTheDocument();
 });
