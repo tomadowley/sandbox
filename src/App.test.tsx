@@ -1,40 +1,38 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
+import React, { act } from "react";
+import { render, screen, waitFor } from "@testing-library/react";
 import App from "./App";
 
-// Mock the game module to fix the import error
-jest.mock('./game', () => ({
-  Game: class MockGame {
-    start = jest.fn();
-    stop = jest.fn();
-    keys = {};
-  },
-  handleKeyDown: jest.fn(),
-  handleKeyUp: jest.fn()
-}));
+describe("App component", () => {
+  test("renders the game container", () => {
+    const { container } = render(<App />);
+    const appDiv = container.querySelector('.App');
+    expect(appDiv).toBeInTheDocument();
+  });
 
-// Mock canvas methods that aren't implemented in JSDOM
-HTMLCanvasElement.prototype.getContext = jest.fn(() => ({
-  clearRect: jest.fn(),
-  beginPath: jest.fn(),
-  arc: jest.fn(),
-  fill: jest.fn(),
-  closePath: jest.fn(),
-  fillRect: jest.fn(),
-  fillText: jest.fn(),
-  font: '',
-  textAlign: '',
-  fillStyle: ''
-}));
-
-test("renders game canvas", () => {
-  render(<App />);
-  const canvasElement = document.querySelector('.game-canvas');
-  expect(canvasElement).toBeInTheDocument();
-});
-
-test("canvas has correct styling", () => {
-  render(<App />);
-  const canvasElement = document.querySelector('.game-canvas');
-  expect(canvasElement).toHaveClass('game-canvas');
+  test("renders canvas element for the game", async () => {
+    act(() => {
+      render(<App />);
+    });
+    
+    // Wait for the canvas to be rendered after effects run
+    await waitFor(() => {
+      const canvasElement = document.querySelector('canvas.game-canvas');
+      expect(canvasElement).not.toBeNull();
+    });
+  });
+  
+  test("canvas is properly configured", async () => {
+    let canvasElement;
+    
+    act(() => {
+      render(<App />);
+    });
+    
+    await waitFor(() => {
+      canvasElement = document.querySelector('canvas.game-canvas');
+      expect(canvasElement).not.toBeNull();
+    });
+    
+    expect(canvasElement).toHaveClass('game-canvas');
+  });
 });
