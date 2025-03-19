@@ -1,19 +1,21 @@
-import React, { act } from "react";
+import React from "react";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders game canvas", () => {
-  render(<App />);
-  const canvasElement = screen.getByRole('canvas');
-  expect(canvasElement).toBeInTheDocument();
-  expect(canvasElement).toHaveClass('game-canvas');
+test("renders the game container", () => {
+  const { container } = render(<App />);
+  const appDiv = container.querySelector('.App');
+  expect(appDiv).toBeInTheDocument();
 });
 
-test("initializes game properly", () => {
-  act(() => {
-    render(<App />);
-  });
-  
-  const appContainer = screen.getByClassName('App');
-  expect(appContainer).toBeInTheDocument();
+test("renders canvas element for the game", () => {
+  const { container } = render(<App />);
+  const canvasElement = container.querySelector('canvas.game-canvas');
+  expect(canvasElement).toBeInTheDocument();
+});
+
+test("canvas has proper styling class", () => {
+  const { container } = render(<App />);
+  const canvasElement = container.querySelector('canvas');
+  expect(canvasElement).toHaveClass('game-canvas');
 });
