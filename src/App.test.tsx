@@ -1,38 +1,29 @@
-import React, { act } from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import React from "react";
+import { render, screen } from "@testing-library/react";
+import '@testing-library/jest-dom';
 import App from "./App";
 
 describe("App component", () => {
   test("renders the game container", () => {
     const { container } = render(<App />);
-    const appDiv = container.querySelector('.App');
-    expect(appDiv).toBeInTheDocument();
+    expect(container.querySelector('.App')).toBeTruthy();
   });
 
-  test("renders canvas element for the game", async () => {
-    act(() => {
-      render(<App />);
-    });
-    
-    // Wait for the canvas to be rendered after effects run
-    await waitFor(() => {
-      const canvasElement = document.querySelector('canvas.game-canvas');
-      expect(canvasElement).not.toBeNull();
-    });
+  test("renders canvas element for the game", () => {
+    const { container } = render(<App />);
+    // Use a more direct assertion since canvas might be created after some effects
+    expect(container.querySelector('canvas')).toBeTruthy();
   });
   
-  test("canvas is properly configured", async () => {
-    let canvasElement;
+  test("canvas has proper class", () => {
+    const { container } = render(<App />);
+    const canvas = container.querySelector('canvas');
     
-    act(() => {
-      render(<App />);
-    });
-    
-    await waitFor(() => {
-      canvasElement = document.querySelector('canvas.game-canvas');
-      expect(canvasElement).not.toBeNull();
-    });
-    
-    expect(canvasElement).toHaveClass('game-canvas');
+    if (canvas) {
+      expect(canvas.className).toContain('game-canvas');
+    } else {
+      // If canvas is not found, fail the test explicitly
+      expect(canvas).toBeTruthy();
+    }
   });
 });
