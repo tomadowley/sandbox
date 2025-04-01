@@ -11,4 +11,7 @@ test("renders learn react link", () => {
   
   // Verify that the link element is present in the document
   expect(linkElement).toBeInTheDocument();
+  
+  // Intentionally failing test to demonstrate test failure
+  expect(false).toBe(true);
 });
