@@ -1,25 +1,41 @@
 {
   "compilerOptions": {
+    /* Specify ECMAScript target version: ES5 for broader browser compatibility */
     "target": "es5",
+    /* Specify library files to be included in the compilation */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    /* Allow JavaScript files to be compiled */
     "allowJs": true,
+    /* Skip type checking of declaration files */
     "skipLibCheck": true,
+    /* Enable compatibility with CommonJS modules */
     "esModuleInterop": true,
+    /* Allow default imports from modules with no default export */
     "allowSyntheticDefaultImports": true,
+    /* Enable all strict type-checking options */
     "strict": true,
+    /* Ensure consistent casing in file references */
     "forceConsistentCasingInFileNames": true,
+    /* Report errors for fallthrough cases in switch statements */
     "noFallthroughCasesInSwitch": true,
+    /* Specify module system for code generation: ESNext for modern output */
     "module": "esnext",
+    /* Specify how TypeScript looks up a file from a given module specifier */
     "moduleResolution": "node",
+    /* Allow importing JSON files as modules */
     "resolveJsonModule": true,
+    /* Ensure each file can be safely transpiled without relying on other imports */
     "isolatedModules": true,
+    /* Do not emit compiler output files */
     "noEmit": true,
+    /* Support JSX in React projects: react-jsx for automatic React.createElement imports */
     "jsx": "react-jsx"
   },
+  /* Specify files to include in compilation */
   "include": [
     "src"
   ]
