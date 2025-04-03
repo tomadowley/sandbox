@@ -16,3 +16,10 @@ test("renders without crashing", () => {
   expect(div).not.toBeEmpty();
   document.body.removeChild(div);
 });
+
+test("verifies app logo is present", () => {
+  render(<App />);
+  const logoElement = screen.getByAltText(/logo/i);
+  expect(logoElement).toBeInTheDocument();
+  expect(logoElement.tagName).toBe("IMG");
+});
