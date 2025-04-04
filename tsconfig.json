@@ -1,25 +1,42 @@
 {
+  // TypeScript Compiler Configuration
   "compilerOptions": {
+    // Target ECMAScript version for compiled JavaScript
     "target": "es5",
+    // Specify library files to be included in the compilation
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    // Allow JavaScript files to be compiled
     "allowJs": true,
+    // Skip type checking of declaration files
     "skipLibCheck": true,
+    // Enables compatibility with Babel ecosystem
     "esModuleInterop": true,
+    // Allow default imports from modules with no default export
     "allowSyntheticDefaultImports": true,
+    // Enable all strict type-checking options
     "strict": true,
+    // Disallow inconsistently-cased references to the same file
     "forceConsistentCasingInFileNames": true,
+    // Report errors for fallthrough cases in switch statements
     "noFallthroughCasesInSwitch": true,
+    // Specify module system for compiled JavaScript
     "module": "esnext",
+    // Determine how modules get resolved
     "moduleResolution": "node",
+    // Allow importing JSON files as modules
     "resolveJsonModule": true,
+    // Ensure each file can be safely transpiled without relying on other imports
     "isolatedModules": true,
+    // Do not emit compiled output files
     "noEmit": true,
+    // Support JSX in .tsx files: "react-jsx" mode generates React.createElement calls directly
     "jsx": "react-jsx"
   },
+  // Files to include in compilation
   "include": [
     "src"
   ]
