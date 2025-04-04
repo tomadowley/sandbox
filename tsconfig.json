@@ -1,25 +1,41 @@
 {
   "compilerOptions": {
+    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'. */
     "target": "es5",
+    /* Specify library files to be included in the compilation. */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    /* Allow JavaScript files to be compiled. */
     "allowJs": true,
+    /* Skip type checking of declaration files. */
     "skipLibCheck": true,
+    /* Enables emit interoperability between CommonJS and ES Modules. */
     "esModuleInterop": true,
+    /* Allows import from modules with a '.js' extension. */
     "allowSyntheticDefaultImports": true,
+    /* Enable all strict type-checking options. */
     "strict": true,
+    /* Ensure that casing is correct in imports. */
     "forceConsistentCasingInFileNames": true,
+    /* Report errors for fallthrough cases in switch statements. */
     "noFallthroughCasesInSwitch": true,
+    /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'. */
     "module": "esnext",
+    /* Specify module resolution strategy. */
     "moduleResolution": "node",
+    /* Include modules imported with '.json' extension. */
     "resolveJsonModule": true,
+    /* Ensure each file can be safely transpiled without relying on other imports. */
     "isolatedModules": true,
+    /* Do not emit compiler output files. */
     "noEmit": true,
+    /* Support JSX in .tsx files: 'preserve', 'react-native', 'react', 'react-jsx'. */
     "jsx": "react-jsx"
   },
+  /* Specify files to include in compilation. */
   "include": [
     "src"
   ]
