@@ -1,3 +1,9 @@
+/**
+ * This file contains tests for the App component.
+ * It verifies that the App renders correctly and displays the expected content.
+ * The primary focus is to ensure that a "learn react" link appears in the rendered output.
+ */
+
 // Import React, testing utilities, and the component to be tested
 import React from "react";
 import { render, screen } from "@testing-library/react";
