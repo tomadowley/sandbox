@@ -101,10 +101,32 @@ The project follows the standard Create React App structure:
 This React application provides:
 
 - A modern, component-based UI built with React 18's latest features
+  - **Automatic Batching**: Multiple state updates are automatically batched into a single render for better performance
+  - **Concurrent Rendering**: React 18's concurrent mode allows for non-blocking rendering of components
+  - **Improved Suspense**: Enhanced data fetching capabilities with the Suspense component
+  - **Transitions API**: Distinguish between urgent and non-urgent updates in your UI interactions
+  - **Server Components**: Support for rendering components on the server (requires additional setup)
+
 - Type safety throughout the codebase with TypeScript integration
+  - **Static Type Checking**: Catch type-related errors during development instead of runtime
+  - **Enhanced IDE Support**: Get intellisense, code completion, and better refactoring tools
+  - **Interfaces and Types**: Define clear contracts between components with TypeScript interfaces
+  - **Type Inference**: TypeScript often infers types automatically, reducing the need for explicit annotations
+  - **Configuration**: Customized `tsconfig.json` with strict type checking enabled for maximum safety
+
 - Fast development experience with hot module replacement
+  - **Instant Feedback**: Changes to components are reflected immediately without full page reloads
+  - **State Preservation**: Component state is preserved during hot updates when possible
+  - **Error Overlay**: Clear error messages display in the browser when something goes wrong
+  - **Fast Refresh**: React-specific HMR implementation that maintains component state between reloads
+  - **Development Server**: Webpack dev server with built-in proxy support for API requests
+
 - Comprehensive testing tools for unit and integration tests
-- Optimized production builds with code splitting and asset optimization
+  - **Jest Framework**: Configured for running tests with a simple, intuitive API
+  - **React Testing Library**: Focus on testing components as users would interact with them
+  - **Mock Functions**: Easily mock dependencies and external services for isolated testing
+  - **Snapshot Testing**: Capture and verify component rendering output
+  - **Coverage Reports**: Generate test coverage reports to identify untested code
 
 ### Limitations
 
