@@ -1,26 +1,48 @@
+// TypeScript configuration file that defines how the TypeScript compiler should process and validate code in this project
 {
+  // Compiler options that customize the TypeScript compiler's behavior
   "compilerOptions": {
+    // Specifies which ECMAScript version to compile to (ES5 is widely supported in browsers)
     "target": "es5",
+    // List of library files to be included in the compilation
     "lib": [
+      // DOM definitions for browser environment
       "dom",
+      // DOM iteration protocols
       "dom.iterable",
+      // Latest ECMAScript features
       "esnext"
     ],
+    // Allow JavaScript files to be compiled
     "allowJs": true,
+    // Skip type checking of all declaration files (*.d.ts)
     "skipLibCheck": true,
+    // Enable interoperability between CommonJS and ES Modules
     "esModuleInterop": true,
+    // Allow default imports from modules with no default export
     "allowSyntheticDefaultImports": true,
+    // Enable all strict type checking options
     "strict": true,
+    // Disallow inconsistently-cased references to the same file
     "forceConsistentCasingInFileNames": true,
+    // Report errors for fallthrough cases in switch statements
     "noFallthroughCasesInSwitch": true,
+    // Specify module code generation method
     "module": "esnext",
+    // Specify module resolution strategy
     "moduleResolution": "node",
+    // Allow importing JSON modules
     "resolveJsonModule": true,
+    // Ensure each file can be safely transpiled without relying on other imports
     "isolatedModules": true,
+    // Do not emit outputs (rely on other tools like Babel for that)
     "noEmit": true,
+    // Support JSX in .tsx files (React specific version that doesn't require React import)
     "jsx": "react-jsx"
   },
+  // Files and folders to include in compilation
   "include": [
+    // Include all files in the src directory
     "src"
   ]
 }
