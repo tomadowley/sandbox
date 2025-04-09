@@ -1,78 +1,45 @@
 {
-  // Project metadata: identifies the package in the npm registry
   "name": "sandbox",
-  // Version following semantic versioning (major.minor.patch)
   "version": "0.1.0",
-  // Prevents accidental publishing to npm registry
   "private": true,
-  
-  // Production dependencies required at runtime
   "dependencies": {
-    // Testing libraries for React components
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
-    // TypeScript type definitions for libraries
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.120",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
-    // Core React libraries
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    // Create React App scripts and configurations
     "react-scripts": "5.0.1",
-    // TypeScript for static type checking
     "typescript": "^4.9.5",
-    // Performance measurement library
     "web-vitals": "^2.1.4"
   },
-  
-  // Development dependencies only needed during development/build
   "devDependencies": {
-    // Required by babel-preset-react-app for private class fields and methods
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
-  
-  // NPM scripts for various development tasks
   "scripts": {
-    // Starts the development server with hot reload
     "start": "react-scripts start",
-    // Creates a production build in the build/ folder
     "build": "react-scripts build",
-    // Runs tests in watch mode (interactive)
     "test": "react-scripts test",
-    // Ejects CRA configuration for advanced customization (one-way operation)
     "eject": "react-scripts eject"
   },
-  
-  // ESLint configuration for code quality
   "eslintConfig": {
-    // Extends the default Create React App linting rules
     "extends": [
       "react-app",
       "react-app/jest"
     ]
   },
-  
-  // Browser compatibility configuration
   "browserslist": {
-    // Browsers supported in production build
     "production": [
-      // Browser market share > 0.2%
       ">0.2%",
-      // Exclude dead browsers (IE 10, etc)
       "not dead",
-      // Exclude Opera Mini
       "not op_mini all"
     ],
-    // Browsers targeted during development
     "development": [
-      // Latest version of Chrome
       "last 1 chrome version",
-      // Latest version of Firefox
       "last 1 firefox version",
-      // Latest version of Safari
       "last 1 safari version"
     ]
   }
