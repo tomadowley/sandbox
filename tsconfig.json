@@ -1,25 +1,44 @@
+// TypeScript Configuration File
+// This file configures the TypeScript compiler options for the project
+// https://www.typescriptlang.org/docs/handbook/tsconfig-json.html
 {
   "compilerOptions": {
+    // Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'
     "target": "es5",
+    // Specify library files to be included in the compilation
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "dom",           // DOM definitions
+      "dom.iterable",  // DOM iterable APIs
+      "esnext"         // Latest ECMAScript features
     ],
+    // Allow JavaScript files to be compiled
     "allowJs": true,
+    // Skip type checking of declaration files
     "skipLibCheck": true,
+    // Enable interoperability between CommonJS and ES Modules
     "esModuleInterop": true,
+    // Allow default imports from modules with no default export
     "allowSyntheticDefaultImports": true,
+    // Enable all strict type checking options
     "strict": true,
+    // Disallow inconsistently-cased references to the same file
     "forceConsistentCasingInFileNames": true,
+    // Report errors for fallthrough cases in switch statements
     "noFallthroughCasesInSwitch": true,
+    // Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'
     "module": "esnext",
+    // Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6)
     "moduleResolution": "node",
+    // Include modules imported with .json extension
     "resolveJsonModule": true,
+    // Ensure each file can be safely transpiled without relying on other imports
     "isolatedModules": true,
+    // Do not emit outputs (useful when using Babel for transpilation)
     "noEmit": true,
+    // Support JSX in .tsx files: 'preserve', 'react-native', 'react', 'react-jsx'
     "jsx": "react-jsx"
   },
+  // Specify files to include in compilation
   "include": [
     "src"
   ]
