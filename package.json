@@ -19,24 +19,34 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
+  "//scripts": "Commands that can be run using npm or yarn to perform various tasks in the project",
   "scripts": {
+    "//start": "Runs the app in development mode with live reloading at http://localhost:3000",
     "start": "react-scripts start",
+    "//build": "Creates an optimized production build in the build/ folder ready for deployment",
     "build": "react-scripts build",
+    "//test": "Runs tests in watch mode, rerunning when files change",
     "test": "react-scripts test",
+    "//eject": "Removes the build dependency to gain full control over configurations (one-way operation)",
     "eject": "react-scripts eject"
   },
+  "//eslintConfig": "Configuration for ESLint, a tool for identifying and reporting on patterns in JavaScript/TypeScript",
   "eslintConfig": {
+    "//extends": "Inherits configurations from create-react-app's default rules for React and Jest",
     "extends": [
       "react-app",
       "react-app/jest"
     ]
   },
+  "//browserslist": "Specifies which browsers the project should support in different environments",
   "browserslist": {
+    "//production": "Targets a wide range of browsers for production builds to maximize compatibility",
     "production": [
       ">0.2%",
       "not dead",
       "not op_mini all"
     ],
+    "//development": "Targets modern browsers during development for faster builds and better debugging",
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
@@ -44,3 +54,4 @@
     ]
   }
 }
+```# DONE
