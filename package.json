@@ -19,34 +19,34 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
   },
-  "//scripts": "Commands that can be run using npm or yarn to perform various tasks in the project",
+  "//scripts": "NPM scripts for running development, testing, and build commands",
   "scripts": {
-    "//start": "Runs the app in development mode with live reloading at http://localhost:3000",
+    "//start": "Starts the development server with hot-reloading at http://localhost:3000",
     "start": "react-scripts start",
-    "//build": "Creates an optimized production build in the build/ folder ready for deployment",
+    "//build": "Creates an optimized production build in the build/ directory",
     "build": "react-scripts build",
-    "//test": "Runs tests in watch mode, rerunning when files change",
+    "//test": "Runs tests in interactive watch mode, re-running tests on file changes",
     "test": "react-scripts test",
-    "//eject": "Removes the build dependency to gain full control over configurations (one-way operation)",
+    "//eject": "Ejects the create-react-app configuration for full customization (irreversible)",
     "eject": "react-scripts eject"
   },
-  "//eslintConfig": "Configuration for ESLint, a tool for identifying and reporting on patterns in JavaScript/TypeScript",
+  "//eslintConfig": "Configuration for ESLint to enforce code quality and consistency",
   "eslintConfig": {
-    "//extends": "Inherits configurations from create-react-app's default rules for React and Jest",
+    "//extends": "Uses the predefined rule sets for React and Jest testing",
     "extends": [
       "react-app",
       "react-app/jest"
     ]
   },
-  "//browserslist": "Specifies which browsers the project should support in different environments",
+  "//browserslist": "Defines which browsers should be supported in production and development",
   "browserslist": {
-    "//production": "Targets a wide range of browsers for production builds to maximize compatibility",
+    "//production": "Browser targets for the production build, balancing compatibility and performance",
     "production": [
       ">0.2%",
       "not dead",
       "not op_mini all"
     ],
-    "//development": "Targets modern browsers during development for faster builds and better debugging",
+    "//development": "Browser targets for development, focusing on modern browsers for faster builds",
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
@@ -54,4 +54,3 @@
     ]
   }
 }
-```# DONE
