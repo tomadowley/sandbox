@@ -1,13 +1,19 @@
+
+/* Reset margin and set default font family for the entire application */
 body {
   margin: 0;
+  /* System font stack prioritizing platform-specific fonts for better native appearance */
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
     sans-serif;
+  /* Improve font rendering on WebKit and Mozilla browsers */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Styling for code elements to use monospace fonts */
 code {
+  /* Monospace font stack for code elements to improve readability */
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
