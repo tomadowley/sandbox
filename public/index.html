@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Bowl Chair Co. | Psychedelic 60s Seating Revolution</title>
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/chair-styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -41,6 +42,58 @@
                 <p>The Bowl Chair: A circular revolution from another dimension. It's not just furniture, it's a trip.</p>
                 <a href="#contact" class="btn">BLOW YOUR MIND</a>
             </div>
+            <!-- Hero Chair Animation -->
+            <div class="chair-floating">
+                <div class="chair-floating-inner chair-color-shift">
+                    <!-- Chair SVG Representation -->
+                    <svg class="bowl-chair-svg" viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+                        <defs>
+                            <linearGradient id="chair-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#ff5400" />
+                                <stop offset="50%" stop-color="#ff00aa" />
+                                <stop offset="100%" stop-color="#04d9ff" />
+                            </linearGradient>
+                            <linearGradient id="rim-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#ffcb00" />
+                                <stop offset="100%" stop-color="#ff5400" />
+                            </linearGradient>
+                            <linearGradient id="pillow-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" stop-color="#04d9ff" />
+                                <stop offset="100%" stop-color="#7e00ff" />
+                            </linearGradient>
+                            <linearGradient id="leg-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#e0e0e0" />
+                                <stop offset="100%" stop-color="#b0b0b0" />
+                            </linearGradient>
+                            <linearGradient id="base-gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#c0c0c0" />
+                                <stop offset="100%" stop-color="#808080" />
+                            </linearGradient>
+                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="10" result="blur" />
+                                <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                            </filter>
+                        </defs>
+                        <!-- Chair Base (Bowl Shape) -->
+                        <ellipse class="chair-svg-base" cx="400" cy="300" rx="200" ry="120" />
+                        <!-- Chair Inner Rim -->
+                        <ellipse class="chair-svg-rim" cx="400" cy="300" rx="180" ry="100" />
+                        <!-- Chair Cushion/Pillow -->
+                        <ellipse class="chair-svg-pillow" cx="400" cy="300" rx="150" ry="80" />
+                        <!-- Chair Highlight -->
+                        <ellipse class="chair-svg-highlight" cx="350" cy="270" rx="50" ry="20" transform="rotate(-20 350 270)" />
+                        <!-- Chair Stem/Leg -->
+                        <rect class="chair-svg-leg" x="380" y="380" width="40" height="80" rx="5" />
+                        <!-- Chair Base Bottom -->
+                        <ellipse class="chair-svg-base-bottom" cx="400" cy="460" rx="80" ry="20" />
+                        <!-- Pattern Overlay -->
+                        <circle cx="350" cy="290" r="10" fill="rgba(255,255,255,0.1)" />
+                        <circle cx="380" cy="310" r="12" fill="rgba(255,255,255,0.1)" />
+                        <circle cx="420" cy="280" r="15" fill="rgba(255,255,255,0.1)" />
+                        <circle cx="440" cy="320" r="8" fill="rgba(255,255,255,0.1)" />
+                    </svg>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -58,7 +111,13 @@
                     <p>Our journey began with a psychedelic vision: what if a chair could transport you not just physically, but spiritually? Each Bowl Chair pulses with the vibrant energy of the 60s—channeling the era's boundless optimism, radical design philosophies, and technicolor dreams into a circular statement piece that's far out, man.</p>
                 </div>
                 <div class="about-image">
-                    <div class="image-placeholder"></div>
+                    <!-- Chair Cutaway View -->
+                    <div class="chair-cutaway chair-color-shift">
+                        <div class="chair-cutaway-outer"></div>
+                        <div class="chair-cutaway-inner"></div>
+                        <div class="chair-cutaway-seat"></div>
+                        <div class="fabric-pattern"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -69,7 +128,32 @@
             <h2>THE BOWL CHAIR</h2>
             <div class="product-showcase">
                 <div class="product-image">
-                    <div class="circular"></div>
+                    <!-- 3D Chair Visualization -->
+                    <div class="chair-3d-container">
+                        <div class="chair-3d">
+                            <div class="chair-base"></div>
+                            <div class="chair-back"></div>
+                            <div class="chair-seat"></div>
+                            <div class="chair-pattern"></div>
+                            <div class="chair-highlight"></div>
+                            <div class="chair-stem"></div>
+                            <div class="chair-base-bottom"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- 360 View Controls -->
+                    <div class="view-360-controls">
+                        <button class="view-360-btn" id="view-pause">Pause Rotation</button>
+                        <button class="view-360-btn" id="view-play">Resume</button>
+                    </div>
+                    
+                    <!-- Material Swatches -->
+                    <div class="chair-materials">
+                        <div class="material-swatch material-velvet active" data-material="velvet"></div>
+                        <div class="material-swatch material-leather" data-material="leather"></div>
+                        <div class="material-swatch material-wool" data-material="wool"></div>
+                        <div class="material-swatch material-psychedelic" data-material="psychedelic"></div>
+                    </div>
                 </div>
                 <div class="product-details">
                     <h3>COSMIC COMFORT</h3>
@@ -291,5 +375,6 @@
     </footer>
 
     <script src="js/main.js"></script>
+    <script src="js/chair-animation.js"></script>
 </body>
 </html>
