@@ -1,4 +1,4 @@
-import { Position, Size, Entity } from '../types';
+import { Position, Size, Entity } from '../../types';
 interface CleoStats {
   food: number;
   scratches: number;
