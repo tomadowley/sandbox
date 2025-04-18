@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import GameMap from './components/GameMap';
 import Player from './components/Player';
 import Territory from './components/Territory';
+import Instructions from './components/Instructions';
 import { PlayerData, GameState, TerritoryData } from './types';
 import { initialTerritories, initialPlayers } from './data/gameData';
 import { handleCollisions, updatePlayerPosition } from './utils/physics';
@@ -18,6 +19,7 @@ const Game: React.FC = () => {
     winner: null,
   });
 
+  const [showInstructions, setShowInstructions] = useState(true);
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>(0);
   const keysPressed = useRef<Set<string>>(new Set());
@@ -102,6 +104,13 @@ const Game: React.FC = () => {
     }
   }, [gameState.territories]);
 
+  const endMovementPhase = () => {
+    setGameState(prevState => ({
+      ...prevState,
+      phase: 'ATTACK',
+    }));
+  };
+
   const endTurn = () => {
     setGameState(prevState => ({
       ...prevState,
@@ -115,20 +124,21 @@ const Game: React.FC = () => {
   const handleTerritorySelect = (territoryId: number) => {
     const territory = gameState.territories.find(t => t.id === territoryId);
     
-    if (territory && territory.ownerId === gameState.currentPlayerIndex) {
-      // Select own territory
-      setGameState(prev => ({
-        ...prev,
-        selectedTerritory: territoryId,
-        targetTerritory: null
-      }));
-    } else if (gameState.selectedTerritory !== null && territory) {
-      // Attack adjacent territory
-      setGameState(prev => ({
-        ...prev,
-        targetTerritory: territoryId,
-        phase: 'ATTACK'
-      }));
+    if (gameState.phase === 'ATTACK') {
+      if (territory && territory.ownerId === gameState.currentPlayerIndex) {
+        // Select own territory
+        setGameState(prev => ({
+          ...prev,
+          selectedTerritory: territoryId,
+          targetTerritory: null
+        }));
+      } else if (gameState.selectedTerritory !== null && territory) {
+        // Attack adjacent territory
+        setGameState(prev => ({
+          ...prev,
+          targetTerritory: territoryId
+        }));
+      }
     }
   };
 
@@ -175,8 +185,21 @@ const Game: React.FC = () => {
     });
   };
 
+  const toggleInstructions = () => {
+    setShowInstructions(!showInstructions);
+  };
+
+  // Get territory count for current player
+  const currentPlayerTerritoryCount = gameState.territories.filter(
+    t => t.ownerId === gameState.currentPlayerIndex
+  ).length;
+
   return (
     <div className="game-container" ref={gameContainerRef}>
+      {showInstructions && (
+        <Instructions onClose={toggleInstructions} />
+      )}
+      
       <GameMap>
         {gameState.territories.map(territory => (
           <Territory
@@ -202,34 +225,45 @@ const Game: React.FC = () => {
         <div className="player-info">
           <h3>Current Player: {gameState.players[gameState.currentPlayerIndex].name}</h3>
           <p>Phase: {gameState.phase}</p>
-          <p>Territories: {
-            gameState.territories.filter(t => t.ownerId === gameState.currentPlayerIndex).length
-          }</p>
+          <p>Territories: {currentPlayerTerritoryCount}</p>
+          <button className="button help-button" onClick={toggleInstructions}>
+            {showInstructions ? 'Hide Instructions' : 'Show Instructions'}
+          </button>
         </div>
         
         <div className="controls">
-          {gameState.phase === 'ATTACK' && (
-            <button className="button" onClick={executeAttack}>
+          {gameState.phase === 'MOVEMENT' && (
+            <button className="button" onClick={endMovementPhase}>
+              End Movement
+            </button>
+          )}
+          
+          {gameState.phase === 'ATTACK' && gameState.selectedTerritory !== null && gameState.targetTerritory !== null && (
+            <button className="button attack-button" onClick={executeAttack}>
               Attack
             </button>
           )}
           
+          {gameState.phase === 'ATTACK' && (
+            <button className="button" onClick={() => setGameState(prev => ({ ...prev, phase: 'FORTIFY' }))}>
+              Skip Attack
+            </button>
+          )}
+          
           {gameState.phase === 'FORTIFY' && (
-            <button className="button" onClick={endTurn}>
+            <button className="button end-turn-button" onClick={endTurn}>
               End Turn
             </button>
           )}
           
           {gameState.gameOver && (
-            <>
-              <div className="game-over-message">
-                <h2>Game Over!</h2>
-                <p>{gameState.winner !== null && gameState.players[gameState.winner].name} wins!</p>
-                <button className="button" onClick={resetGame}>
-                  Play Again
-                </button>
-              </div>
-            </>
+            <div className="game-over-message">
+              <h2>Game Over!</h2>
+              <p>{gameState.winner !== null && gameState.players[gameState.winner].name} wins!</p>
+              <button className="button" onClick={resetGame}>
+                Play Again
+              </button>
+            </div>
           )}
         </div>
       </div>
