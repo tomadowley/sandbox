@@ -1,38 +1,390 @@
+:root {
+  --primary-color: #ff69b4;
+  --secondary-color: #8a2be2;
+  --accent-color: #ffd700;
+  --text-color: #333;
+  --background-color: #fff8e7;
+  --section-bg-1: #ffebf5;
+  --section-bg-2: #f0e6ff;
+  --section-bg-3: #fffae0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Lora', serif;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  overflow-x: hidden;
+}
+
 .App {
   text-align: center;
+  position: relative;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.parallax-wrapper {
+  position: relative;
+  z-index: 1;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+/* Header Styles */
+.shrine-header {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.5s ease;
 }
 
-.App-link {
-  color: #61dafb;
+.header-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%);
+  z-index: -1;
 }
 
-@keyframes App-logo-spin {
+.shrine-title {
+  font-family: 'UnifrakturMaguntia', cursive;
+  font-size: 5rem;
+  margin-bottom: 1rem;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.2), 0 0 20px var(--accent-color);
+  animation: glow 2s infinite alternate;
+  transition: all 0.3s ease;
+}
+
+.shrine-subtitle {
+  font-family: 'Courgette', cursive;
+  font-size: 1.8rem;
+  color: #fff;
+  max-width: 80%;
+  text-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+.floating-cleo {
+  position: absolute;
+  animation-name: float;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+  z-index: 2;
+  transform-origin: center;
+  width: 100px;
+  height: auto;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-20px) rotate(5deg);
+  }
+}
+
+@keyframes glow {
   from {
-    transform: rotate(0deg);
+    text-shadow: 0 0 10px rgba(255, 105, 180, 0.7), 0 0 20px rgba(138, 43, 226, 0.5);
   }
   to {
-    transform: rotate(360deg);
+    text-shadow: 0 0 15px rgba(255, 105, 180, 0.9), 0 0 30px rgba(138, 43, 226, 0.7), 0 0 40px rgba(255, 215, 0, 0.5);
+  }
+}
+
+.scroll-indicator {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 2s infinite;
+  color: white;
+  font-size: 2rem;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0) translateX(-50%);
+  }
+  40% {
+    transform: translateY(-20px) translateX(-50%);
+  }
+  60% {
+    transform: translateY(-10px) translateX(-50%);
+  }
+}
+
+/* Section Styles */
+.shrine-section {
+  padding: 5rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.introduction {
+  background-color: var(--section-bg-1);
+  position: relative;
+}
+
+.intro-text {
+  font-size: 1.3rem;
+  line-height: 1.6;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.paw-divider {
+  margin: 2rem 0;
+  font-size: 2rem;
+  color: var(--primary-color);
+}
+
+/* Poems Section */
+.poems-section {
+  background-color: var(--section-bg-2);
+  position: relative;
+}
+
+.poems-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.poem-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  max-width: 350px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.poem-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+}
+
+.poem-title {
+  font-family: 'Courgette', cursive;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.poem-content {
+  font-style: italic;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+/* Gallery Section */
+.gallery-section {
+  background-color: var(--section-bg-3);
+  position: relative;
+}
+
+.gallery-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.gallery-item {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  aspect-ratio: 1;
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover {
+  transform: scale(1.05);
+}
+
+.gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: filter 0.3s ease;
+}
+
+.gallery-item:hover img {
+  filter: brightness(1.1);
+}
+
+.gallery-item .overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+  color: white;
+  padding: 1rem;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.gallery-item:hover .overlay {
+  opacity: 1;
+}
+
+/* Prayers Section */
+.prayers-section {
+  background-color: var(--section-bg-1);
+  position: relative;
+}
+
+.prayers-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.prayer-card {
+  background-color: white;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: left;
+  transition: transform 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.prayer-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 5px;
+  height: 100%;
+  background-color: var(--secondary-color);
+}
+
+.prayer-card.special::before {
+  background-color: var(--accent-color);
+}
+
+.prayer-card:hover {
+  transform: translateX(10px);
+}
+
+.prayer-title {
+  font-family: 'Courgette', cursive;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.prayer-card.special .prayer-title {
+  color: var(--accent-color);
+}
+
+.prayer-content {
+  line-height: 1.6;
+}
+
+/* Footer Styles */
+.shrine-footer {
+  background-color: #333;
+  color: white;
+  padding: 3rem 2rem;
+  position: relative;
+}
+
+.paw-print {
+  font-size: 3rem;
+  margin-top: 1rem;
+  animation: pulse 2s infinite alternate;
+}
+
+@keyframes pulse {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.2);
+  }
+}
+
+/* Floating Cleos */
+.floating-cleos-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.floating-dachshund {
+  position: absolute;
+  width: 60px;
+  height: auto;
+  opacity: 0.6;
+  filter: drop-shadow(0 3px 5px rgba(0, 0, 0, 0.2));
+  animation-name: float-around;
+  animation-duration: 20s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  z-index: 0;
+}
+
+@keyframes float-around {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  25% {
+    transform: translate(100px, 100px) rotate(90deg);
+  }
+  50% {
+    transform: translate(200px, 0) rotate(180deg);
+  }
+  75% {
+    transform: translate(100px, -100px) rotate(270deg);
+  }
+  100% {
+    transform: translate(0, 0) rotate(360deg);
+  }
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .shrine-title {
+    font-size: 3rem;
+  }
+  
+  .shrine-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .poems-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .poem-card {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .gallery-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
