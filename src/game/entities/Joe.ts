@@ -1,4 +1,4 @@
-import { Entity, Position, Size } from '../types';
+import { Entity, Position, Size } from '../../types';
 
 class Joe implements Entity {
   private position: Position;
