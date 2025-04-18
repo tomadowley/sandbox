@@ -1,12 +1,14 @@
 /* Base Styles & Variables */
 :root {
-    --color-primary: #282828;
-    --color-secondary: #d1a67e;
-    --color-accent: #c27a3e;
-    --color-light: #f9f5f0;
-    --color-dark: #121212;
-    --color-gray: #888888;
+    --color-primary: #222;
+    --color-secondary: #f15a24; /* Vibrant orange - classic 60s */
+    --color-accent: #01a3a4; /* Turquoise - popular in 60s design */
+    --color-light: #fff9f2;
+    --color-dark: #111111;
+    --color-gray: #777777;
     --color-light-gray: #e0e0e0;
+    --color-accent2: #fd7272; /* Coral/pink accent - mod style */
+    --color-accent3: #864997; /* Purple accent - psychedelic influence */
     
     --font-primary: 'Poppins', sans-serif;
     --spacing-xs: 0.5rem;
@@ -15,8 +17,9 @@
     --spacing-lg: 4rem;
     --spacing-xl: 8rem;
     
-    --border-radius: 12px;
-    --transition: all 0.3s ease;
+    --border-radius: 40px; /* More exaggerated curves */
+    --circle-radius: 50%;
+    --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* More playful animation */
 }
 
 * {
@@ -35,23 +38,31 @@ body {
     color: var(--color-primary);
     background-color: var(--color-light);
     overflow-x: hidden;
+    background-image: 
+        radial-gradient(circle at 10% 20%, rgba(241, 90, 36, 0.05) 0%, transparent 20%),
+        radial-gradient(circle at 90% 80%, rgba(1, 163, 164, 0.07) 0%, transparent 25%);
+    background-attachment: fixed;
 }
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    line-height: 1.3;
+    line-height: 1.2;
     margin-bottom: var(--spacing-sm);
+    letter-spacing: -0.5px; /* Tighter kerning typical of 60s typography */
 }
 
 h1 {
-    font-size: 3.5rem;
+    font-size: 4rem;
     font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -2px;
 }
 
 h2 {
-    font-size: 2.5rem;
+    font-size: 2.8rem;
     margin-bottom: var(--spacing-md);
     position: relative;
+    text-transform: uppercase;
 }
 
 h2:after {
@@ -59,13 +70,14 @@ h2:after {
     position: absolute;
     bottom: -10px;
     left: 0;
-    width: 60px;
-    height: 3px;
+    width: 80px;
+    height: 5px;
     background-color: var(--color-secondary);
+    border-radius: 5px;
 }
 
 h3 {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
 }
 
 p {
@@ -97,27 +109,73 @@ img {
 
 section {
     padding: var(--spacing-xl) 0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add a groovy 60s bubble pattern to sections */
+section::before {
+    content: '';
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: var(--circle-radius);
+    background-color: rgba(241, 90, 36, 0.05);
+    top: -150px;
+    right: -150px;
+    z-index: -1;
+}
+
+section::after {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: var(--circle-radius);
+    background-color: rgba(1, 163, 164, 0.05);
+    bottom: -100px;
+    left: -100px;
+    z-index: -1;
 }
 
 .btn {
     display: inline-block;
     background-color: var(--color-secondary);
     color: var(--color-light);
-    padding: 1rem 2rem;
-    border-radius: 50px;
+    padding: 1rem 2.5rem;
+    border-radius: 100px; /* Very rounded - bubble style */
     font-weight: 500;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     transition: var(--transition);
     border: none;
     cursor: pointer;
     font-size: 0.9rem;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+    z-index: -1;
 }
 
 .btn:hover {
     background-color: var(--color-accent);
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(1, 163, 164, 0.2);
+}
+
+.btn:hover::before {
+    left: 100%;
 }
 
 /* Header & Navigation */
@@ -127,7 +185,7 @@ header {
     left: 0;
     width: 100%;
     z-index: 1000;
-    background-color: rgba(249, 245, 240, 0.95);
+    background-color: rgba(255, 249, 242, 0.95);
     backdrop-filter: blur(10px);
     transition: var(--transition);
 }
@@ -144,9 +202,25 @@ nav {
 }
 
 .logo {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
     color: var(--color-primary);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    position: relative;
+    padding-left: 15px;
+}
+
+.logo::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 80%;
+    background-color: var(--color-secondary);
+    border-radius: 4px;
 }
 
 .nav-links {
@@ -157,13 +231,16 @@ nav {
 .nav-links a {
     position: relative;
     font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 0.9rem;
 }
 
 .nav-links a:after {
     content: "";
     position: absolute;
     width: 0;
-    height: 2px;
+    height: 3px;
     bottom: -5px;
     left: 0;
     background-color: var(--color-secondary);
@@ -199,27 +276,84 @@ nav {
     color: var(--color-light);
 }
 
+/* Add a groovy overlay pattern */
+.hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 20% 30%, rgba(241, 90, 36, 0.3) 0%, transparent 25%),
+        radial-gradient(circle at 70% 60%, rgba(1, 163, 164, 0.3) 0%, transparent 30%);
+    mix-blend-mode: overlay;
+    z-index: 1;
+}
+
 .hero-content {
     max-width: 600px;
+    position: relative;
+    z-index: 2;
 }
 
 .hero h1 {
-    font-size: 4rem;
+    font-size: 5rem;
     margin-bottom: var(--spacing-sm);
-    line-height: 1.2;
+    line-height: 1.1;
+    background: linear-gradient(45deg, var(--color-light), #f8f8f8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
 .hero p {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     margin-bottom: var(--spacing-md);
+    text-shadow: 0 2px 5px rgba(0,0,0,0.3);
 }
 
 /* About Section */
+.about {
+    background-color: var(--color-light);
+    position: relative;
+}
+
+/* Add 60s-style decorative elements */
+.about::before {
+    content: '';
+    position: absolute;
+    right: -100px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 300px;
+    height: 300px;
+    border-radius: 40% 60% 70% 30% / 40% 50% 50% 60%;
+    background-color: rgba(241, 90, 36, 0.05);
+    z-index: 0;
+    animation: morphing 15s linear infinite alternate;
+}
+
+@keyframes morphing {
+    0% {
+        border-radius: 40% 60% 70% 30% / 40% 50% 50% 60%;
+    }
+    50% {
+        border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+    }
+    100% {
+        border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%;
+    }
+}
+
 .about-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
     align-items: center;
+    position: relative;
+    z-index: 1;
 }
 
 .about-text p:last-child {
@@ -233,6 +367,13 @@ nav {
     border-radius: var(--border-radius);
     position: relative;
     overflow: hidden;
+    transform: rotate(-3deg); /* Slightly askew for 60s vibe */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    transition: var(--transition);
+}
+
+.image-placeholder:hover {
+    transform: rotate(0deg) scale(1.03);
 }
 
 .image-placeholder:after {
@@ -249,15 +390,47 @@ nav {
 .product {
     background-color: var(--color-dark);
     color: var(--color-light);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add 60s-style sunburst pattern */
+.product::before {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    top: -25%;
+    left: -25%;
+    background: 
+        repeating-conic-gradient(
+            from 0deg,
+            rgba(241, 90, 36, 0.03) 0deg 10deg,
+            rgba(17, 17, 17, 0) 10deg 20deg
+        );
+    z-index: 0;
+    animation: rotate 60s linear infinite;
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .product h2:after {
     left: 50%;
     transform: translateX(-50%);
+    background: linear-gradient(90deg, var(--color-accent), var(--color-secondary));
 }
 
 .product h2 {
     text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
 .product-showcase {
@@ -265,15 +438,37 @@ nav {
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
     align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.product-image {
+    position: relative;
 }
 
 .circular {
     border-radius: 50%;
     height: 500px;
+    background: radial-gradient(circle, var(--color-light-gray) 0%, #d0d0d0 100%);
+    position: relative;
+    box-shadow: 
+        0 20px 50px rgba(0, 0, 0, 0.3),
+        0 0 0 15px rgba(241, 90, 36, 0.1),
+        0 0 0 30px rgba(1, 163, 164, 0.05);
+    transition: var(--transition);
+}
+
+.circular:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 
+        0 30px 60px rgba(0, 0, 0, 0.4),
+        0 0 0 20px rgba(241, 90, 36, 0.15),
+        0 0 0 40px rgba(1, 163, 164, 0.08);
 }
 
 .circular:after {
     content: "Bowl Chair";
+    font-weight: 600;
 }
 
 .features {
@@ -299,19 +494,48 @@ nav {
 }
 
 .price {
-    font-size: 1.8rem;
-    font-weight: 600;
+    font-size: 2.2rem;
+    font-weight: 700;
     color: var(--color-secondary);
+    display: inline-block;
+    padding: 10px 25px;
+    background-color: rgba(241, 90, 36, 0.1);
+    border-radius: 100px;
 }
 
 /* Design Section */
+.design {
+    background-color: var(--color-light);
+    position: relative;
+}
+
+/* Add retro pattern */
+.design::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 30% 20%, rgba(1, 163, 164, 0.07) 0%, transparent 8%),
+        radial-gradient(circle at 70% 60%, rgba(241, 90, 36, 0.07) 0%, transparent 8%),
+        radial-gradient(circle at 20% 80%, rgba(134, 73, 151, 0.07) 0%, transparent 8%),
+        radial-gradient(circle at 80% 10%, rgba(253, 114, 114, 0.07) 0%, transparent 8%);
+    background-size: 20% 20%;
+    z-index: 0;
+}
+
 .design h2 {
     text-align: center;
+    position: relative;
+    z-index: 1;
 }
 
 .design h2:after {
     left: 50%;
     transform: translateX(-50%);
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
 }
 
 .design-grid {
@@ -319,6 +543,8 @@ nav {
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-md);
     margin-top: var(--spacing-lg);
+    position: relative;
+    z-index: 1;
 }
 
 .design-item {
@@ -326,13 +552,33 @@ nav {
     padding: var(--spacing-md);
     border-radius: var(--border-radius);
     transition: var(--transition);
-    background-color: white;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(10px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.design-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s ease;
 }
 
 .design-item:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    transform: translateY(-15px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.design-item:hover::before {
+    transform: scaleX(1);
 }
 
 .design-icon {
@@ -342,17 +588,43 @@ nav {
     height: 80px;
     margin-bottom: var(--spacing-sm);
     color: var(--color-secondary);
+    transition: var(--transition);
+}
+
+.design-item:hover .design-icon {
+    color: var(--color-accent);
+    transform: scale(1.1);
 }
 
 /* Testimonials Section */
 .testimonials {
     background-color: var(--color-light);
     text-align: center;
+    position: relative;
+}
+
+/* Add 60s wavy pattern */
+.testimonials::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 20px;
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(241, 90, 36, 0.1) 10px,
+            rgba(241, 90, 36, 0.1) 20px
+        );
 }
 
 .testimonials h2:after {
     left: 50%;
     transform: translateX(-50%);
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-accent));
 }
 
 .testimonial-slider {
@@ -360,6 +632,11 @@ nav {
     max-width: 800px;
     margin: 0 auto;
     overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: var(--spacing-md);
 }
 
 .testimonial {
@@ -367,15 +644,61 @@ nav {
 }
 
 .testimonial p {
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-style: italic;
     margin-bottom: var(--spacing-sm);
+    position: relative;
+    padding: 0 var(--spacing-md);
+}
+
+.testimonial p::before, .testimonial p::after {
+    content: '"';
+    font-size: 4rem;
+    color: var(--color-secondary);
+    opacity: 0.2;
+    position: absolute;
+    line-height: 0;
+}
+
+.testimonial p::before {
+    left: 0;
+    top: 20px;
+}
+
+.testimonial p::after {
+    right: 0;
+    bottom: 0;
 }
 
 .testimonial cite {
     font-style: normal;
     font-weight: 600;
     color: var(--color-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    position: relative;
+    display: inline-block;
+}
+
+.testimonial cite::before {
+    content: '';
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    width: 20px;
+    height: 2px;
+    background-color: var(--color-secondary);
+}
+
+.testimonial cite::after {
+    content: '';
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    width: 20px;
+    height: 2px;
+    background-color: var(--color-secondary);
 }
 
 .slider-controls {
@@ -387,7 +710,7 @@ nav {
 
 .slider-controls button {
     background: none;
-    border: 2px solid var(--color-primary);
+    border: 2px solid var(--color-secondary);
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -396,23 +719,58 @@ nav {
     justify-content: center;
     cursor: pointer;
     transition: var(--transition);
+    color: var(--color-secondary);
 }
 
 .slider-controls button:hover {
-    background-color: var(--color-primary);
+    background-color: var(--color-secondary);
     color: var(--color-light);
+    transform: scale(1.1);
 }
 
 /* Contact Section */
 .contact {
     background-color: var(--color-primary);
     color: var(--color-light);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add 60s-style atomic starburst */
+.contact::before {
+    content: '';
+    position: absolute;
+    right: -100px;
+    bottom: -100px;
+    width: 300px;
+    height: 300px;
+    background: 
+        radial-gradient(circle, transparent 30%, rgba(241, 90, 36, 0.05) 30%, rgba(241, 90, 36, 0.05) 40%, transparent 40%),
+        radial-gradient(circle, transparent 20%, rgba(1, 163, 164, 0.05) 20%, rgba(1, 163, 164, 0.05) 30%, transparent 30%);
+    background-size: 100px 100px;
+    animation: rotate 40s linear infinite;
+    z-index: 0;
+}
+
+.contact::after {
+    content: '';
+    position: absolute;
+    left: -50px;
+    top: -50px;
+    width: 200px;
+    height: 200px;
+    background: 
+        radial-gradient(circle, rgba(134, 73, 151, 0.05) 0%, transparent 50%),
+        radial-gradient(circle, rgba(253, 114, 114, 0.05) 10%, transparent 60%);
+    z-index: 0;
 }
 
 .contact-content {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var(--spacing-lg);
+    position: relative;
+    z-index: 1;
 }
 
 .contact-details {
@@ -426,6 +784,10 @@ nav {
     gap: var(--spacing-sm);
 }
 
+.contact-item svg {
+    color: var(--color-secondary);
+}
+
 .form-group {
     position: relative;
     margin-bottom: var(--spacing-md);
@@ -434,19 +796,20 @@ nav {
 .form-group input,
 .form-group textarea {
     width: 100%;
-    padding: 12px 0;
+    padding: 15px 0;
     font-size: 16px;
     color: var(--color-light);
     background: transparent;
     border: none;
-    border-bottom: 1px solid var(--color-light-gray);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
     outline: none;
     transition: var(--transition);
+    border-radius: 0;
 }
 
 .form-group label {
     position: absolute;
-    top: 12px;
+    top: 15px;
     left: 0;
     font-size: 16px;
     color: var(--color-light-gray);
@@ -461,11 +824,13 @@ nav {
     top: -20px;
     font-size: 12px;
     color: var(--color-secondary);
+    letter-spacing: 1px;
 }
 
 .form-group input:focus,
 .form-group textarea:focus {
-    border-bottom: 1px solid var(--color-secondary);
+    border-bottom: 2px solid var(--color-secondary);
+    box-shadow: 0 5px 10px rgba(241, 90, 36, 0.1);
 }
 
 /* Footer */
@@ -473,6 +838,19 @@ footer {
     background-color: var(--color-dark);
     color: var(--color-light);
     padding: var(--spacing-lg) 0 var(--spacing-md);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Add retro pattern to footer */
+footer::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 10px;
+    background: linear-gradient(90deg, var(--color-secondary), var(--color-accent), var(--color-accent2), var(--color-accent3));
 }
 
 .footer-content {
@@ -480,16 +858,20 @@ footer {
     grid-template-columns: 1.5fr 2fr 1fr;
     gap: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
+    position: relative;
 }
 
 .footer-logo {
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -1px;
 }
 
 .tagline {
     font-size: 0.9rem;
     color: var(--color-gray);
+    font-style: italic;
 }
 
 .footer-links {
@@ -501,6 +883,9 @@ footer {
 .footer-column h4 {
     margin-bottom: var(--spacing-sm);
     font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--color-secondary);
 }
 
 .footer-column ul li {
@@ -510,10 +895,12 @@ footer {
 .footer-column a {
     color: var(--color-light-gray);
     font-size: 0.9rem;
+    transition: var(--transition);
 }
 
 .footer-column a:hover {
     color: var(--color-secondary);
+    padding-left: 5px;
 }
 
 .social-icons {
@@ -526,16 +913,18 @@ footer {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.1);
     transition: var(--transition);
+    color: var(--color-light);
 }
 
 .social-icons a:hover {
     background-color: var(--color-secondary);
-    transform: translateY(-3px);
+    transform: translateY(-5px) rotate(10deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .copyright {
@@ -549,15 +938,15 @@ footer {
 /* Media Queries */
 @media screen and (max-width: 1024px) {
     h1 {
-        font-size: 3rem;
+        font-size: 3.5rem;
     }
     
     h2 {
-        font-size: 2rem;
+        font-size: 2.2rem;
     }
     
     .hero h1 {
-        font-size: 3.5rem;
+        font-size: 4rem;
     }
     
     .footer-content {
@@ -571,7 +960,7 @@ footer {
 
 @media screen and (max-width: 768px) {
     h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .nav-links {
@@ -588,6 +977,7 @@ footer {
         transform: translateX(100%);
         transition: transform 0.5s ease-in;
         box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
     }
     
     .nav-links.active {
@@ -617,15 +1007,15 @@ footer {
 
 @media screen and (max-width: 480px) {
     h1 {
-        font-size: 2rem;
+        font-size: 2.5rem;
     }
     
     h2 {
-        font-size: 1.8rem;
+        font-size: 2rem;
     }
     
     .hero h1 {
-        font-size: 2.5rem;
+        font-size: 3rem;
     }
     
     .hero p {
@@ -641,7 +1031,7 @@ footer {
     }
 }
 
-/* Animations */
+/* 60s-inspired Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -653,6 +1043,33 @@ footer {
     }
 }
 
+@keyframes groovyBg {
+    0% {
+        background-position: 0% 0%;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
 .fadeIn {
     animation: fadeIn 1s ease forwards;
+}
+
+/* Additional 60s-inspired decorative elements */
+.psychedelic-circle {
+    position: absolute;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: conic-gradient(
+        var(--color-secondary),
+        var(--color-accent),
+        var(--color-accent2),
+        var(--color-accent3),
+        var(--color-secondary)
+    );
+    opacity: 0.1;
+    filter: blur(50px);
+    animation: rotate 30s linear infinite;
 }
