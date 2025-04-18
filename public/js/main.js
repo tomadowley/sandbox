@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (link.style.animation) {
                 link.style.animation = '';
             } else {
-                link.style.animation = `fadeIn 0.5s ease forwards ${index / 7 + 0.3}s`;
+                link.style.animation = `fadeIn 0.5s cubic-bezier(0.23, 1, 0.32, 1) forwards ${index / 7 + 0.3}s`;
             }
         });
         
@@ -115,8 +115,37 @@ document.addEventListener('DOMContentLoaded', function() {
             // Reset form
             contactForm.reset();
             
-            // Show success message
-            alert('Far out, man! Thanks for your groovy inquiry. Our team will reach out to arrange a consultation soon!');
+            // Show success message with psychedelic styling
+            const successMsg = document.createElement('div');
+            successMsg.style.position = 'fixed';
+            successMsg.style.top = '50%';
+            successMsg.style.left = '50%';
+            successMsg.style.transform = 'translate(-50%, -50%)';
+            successMsg.style.background = 'linear-gradient(45deg, #ff5400, #ff00aa, #04d9ff, #7e00ff)';
+            successMsg.style.backgroundSize = '400% 400%';
+            successMsg.style.animation = 'psychedelic 5s infinite';
+            successMsg.style.color = 'white';
+            successMsg.style.padding = '2rem';
+            successMsg.style.borderRadius = '20px';
+            successMsg.style.boxShadow = '0 0 30px rgba(255, 84, 0, 0.5)';
+            successMsg.style.fontSize = '1.5rem';
+            successMsg.style.textAlign = 'center';
+            successMsg.style.zIndex = '10000';
+            successMsg.style.maxWidth = '90%';
+            successMsg.style.fontWeight = 'bold';
+            successMsg.style.textTransform = 'uppercase';
+            successMsg.innerHTML = 'Far out! Your cosmic message has been sent to our dimension. We\'ll beam back to you soon!';
+            
+            document.body.appendChild(successMsg);
+            
+            // Remove the message after 5 seconds
+            setTimeout(() => {
+                successMsg.style.opacity = '0';
+                successMsg.style.transition = 'opacity 1s ease';
+                setTimeout(() => {
+                    document.body.removeChild(successMsg);
+                }, 1000);
+            }, 5000);
         });
     }
 
@@ -133,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Elements to animate
-    const animElements = document.querySelectorAll('.about-content, .product-showcase, .design-grid, .design-item, .contact-content');
+    const animElements = document.querySelectorAll('.about-content, .product-showcase, .design-grid, .design-item, .contact-content, h1, h2, h3, .btn');
     
     // Add animation class when element is in viewport
     function checkAnimations() {
@@ -150,37 +179,157 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial check
     checkAnimations();
 
-    // Create 60s-style psychedelic background animation in the hero section
-    const hero = document.querySelector('.hero');
-    
-    // Create and add 60s-style decorative elements
-    function createPsychedelicElements() {
-        // Only add these effects if not on mobile
-        if (window.innerWidth > 768) {
-            // Add floating bubbles in various sections
-            const sections = [document.querySelector('.about'), document.querySelector('.design')];
-            
-            sections.forEach(section => {
-                if (!section) return;
-                
-                for (let i = 0; i < 5; i++) {
-                    const bubble = document.createElement('div');
-                    bubble.classList.add('psychedelic-circle');
-                    bubble.style.width = `${Math.random() * 150 + 50}px`;
-                    bubble.style.height = bubble.style.width;
-                    bubble.style.left = `${Math.random() * 100}%`;
-                    bubble.style.top = `${Math.random() * 100}%`;
-                    bubble.style.opacity = `${Math.random() * 0.07 + 0.03}`;
-                    bubble.style.animationDuration = `${Math.random() * 40 + 20}s`;
-                    bubble.style.animationDelay = `${Math.random() * 5}s`;
-                    
-                    section.appendChild(bubble);
-                }
-            });
+    // Create cursor trail effect
+    function createCursorTrail() {
+        const numTrails = 10;
+        const trails = [];
+        
+        // Create trail elements
+        for (let i = 0; i < numTrails; i++) {
+            const trail = document.createElement('div');
+            trail.classList.add('cursor-trail');
+            document.body.appendChild(trail);
+            trails.push(trail);
         }
+        
+        // Position variables
+        let mouseX = 0, mouseY = 0;
+        let trailX = Array(numTrails).fill(0);
+        let trailY = Array(numTrails).fill(0);
+        
+        // Update mouse position
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Show trails when mouse is moving
+            trails.forEach(trail => {
+                trail.style.opacity = '1';
+            });
+        });
+        
+        // Animation loop for smooth trail following
+        function animateTrails() {
+            // Update each trail position with delay
+            for (let i = 0; i < numTrails; i++) {
+                // Follow with delay (each trail follows the previous one)
+                trailX[i] = i === 0 ? mouseX : trailX[i-1];
+                trailY[i] = i === 0 ? mouseY : trailY[i-1];
+                
+                // Set position
+                trails[i].style.left = trailX[i] + 'px';
+                trails[i].style.top = trailY[i] + 'px';
+                
+                // Set size and color based on position in trail
+                const size = 20 - i * 1.5;
+                trails[i].style.width = size + 'px';
+                trails[i].style.height = size + 'px';
+                
+                // Color based on position
+                const hue = (Date.now() / 20 + i * 15) % 360;
+                trails[i].style.background = `hsla(${hue}, 100%, 60%, ${1 - i/numTrails})`;
+            }
+            
+            requestAnimationFrame(animateTrails);
+        }
+        
+        // Start animation
+        animateTrails();
+        
+        // Hide trails when mouse is not moving
+        let timeout;
+        document.addEventListener('mousemove', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                trails.forEach(trail => {
+                    trail.style.opacity = '0';
+                });
+            }, 500);
+        });
     }
     
-    createPsychedelicElements();
+    // Initialize cursor trail on devices with hover capability
+    if (window.matchMedia("(hover: hover)").matches) {
+        createCursorTrail();
+    }
+    
+    // Create psychedelic hover effects for elements
+    const hoverElements = document.querySelectorAll('.design-item, .circular, .btn');
+    
+    hoverElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            this.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+            
+            if (this.classList.contains('design-item')) {
+                // Random rotation between -5 and 5 degrees for a groovy effect
+                const randomRotationX = Math.random() * 10 - 5;
+                const randomRotationY = Math.random() * 10 - 5;
+                const randomScale = 1 + Math.random() * 0.1;
+                this.style.transform = `translateY(-20px) rotateX(${randomRotationX}deg) rotateY(${randomRotationY}deg) scale(${randomScale})`;
+            }
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            if (this.classList.contains('design-item')) {
+                this.style.transform = 'translateY(0) rotateX(0) rotateY(0) scale(1)';
+            }
+        });
+    });
+    
+    // Psychedelic background color shift
+    const psychedelicBg = document.querySelector('.psychedelic-background');
+    
+    if (psychedelicBg) {
+        let hue = 0;
+        
+        function animateBg() {
+            hue = (hue + 0.1) % 360;
+            psychedelicBg.style.filter = `hue-rotate(${hue}deg)`;
+            requestAnimationFrame(animateBg);
+        }
+        
+        animateBg();
+    }
+    
+    // Interactive title animation
+    const mainTitle = document.querySelector('.hero h1');
+    
+    if (mainTitle) {
+        mainTitle.addEventListener('mouseover', function() {
+            this.style.transform = 'skew(-10deg) rotate(-2deg) scale(1.1)';
+            this.style.textShadow = `
+                0 0 20px rgba(255, 84, 0, 0.8),
+                0 0 30px rgba(255, 0, 170, 0.6),
+                0 0 40px rgba(4, 217, 255, 0.4),
+                0 0 50px rgba(126, 0, 255, 0.3)
+            `;
+            this.style.transition = 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+        });
+        
+        mainTitle.addEventListener('mouseout', function() {
+            this.style.transform = 'skew(-5deg) rotate(-1deg)';
+            this.style.textShadow = `
+                0 0 10px rgba(255, 84, 0, 0.8),
+                0 0 20px rgba(255, 0, 170, 0.5),
+                0 0 30px rgba(4, 217, 255, 0.3)
+            `;
+        });
+    }
+    
+    // Audio visualization animation for chair
+    const chairElement = document.querySelector('.circular');
+    
+    if (chairElement) {
+        function pulseChair() {
+            const scale = 1 + Math.sin(Date.now() / 1000) * 0.03;
+            const hueRotate = Math.sin(Date.now() / 1500) * 15;
+            chairElement.style.transform = `scale(${scale})`;
+            chairElement.style.filter = `hue-rotate(${hueRotate}deg)`;
+            requestAnimationFrame(pulseChair);
+        }
+        
+        pulseChair();
+    }
 });
 
 // Add burger menu toggle animation
@@ -195,82 +344,148 @@ burgerMenu.classList.add('burger-transition');
 // Add additional styles for burger menu toggle animation
 document.head.insertAdjacentHTML('beforeend', `
     <style>
+        @keyframes psychedelic {
+            0% {
+                background-position: 0% 50%;
+                filter: hue-rotate(0deg);
+            }
+            50% {
+                background-position: 100% 50%;
+                filter: hue-rotate(180deg);
+            }
+            100% {
+                background-position: 0% 50%;
+                filter: hue-rotate(360deg);
+            }
+        }
+        
         .burger-transition div {
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .burger.toggle .line1 {
             transform: rotate(-45deg) translate(-5px, 6px);
+            background: linear-gradient(90deg, #04d9ff, #ff00aa);
         }
         .burger.toggle .line2 {
             opacity: 0;
         }
         .burger.toggle .line3 {
             transform: rotate(45deg) translate(-5px, -6px);
+            background: linear-gradient(90deg, #ff00aa, #ffcb00);
         }
         
-        /* Additional 60s-inspired effects */
-        @keyframes wave {
-            0%, 100% {
-                transform: translateY(0);
+        /* 3D hover effect for buttons */
+        .btn {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-7px) rotateX(10deg) scale(1.05);
+        }
+        
+        /* Make headers wiggle slightly */
+        h1, h2, h3 {
+            display: inline-block;
+            animation: wiggle 8s ease-in-out infinite;
+        }
+        
+        /* Make circular elements pulse */
+        .circular::after {
+            animation: pulse 3s infinite alternate;
+        }
+        
+        @keyframes pulse {
+            0% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(0.9);
             }
-            50% {
-                transform: translateY(-15px);
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.1);
             }
         }
         
-        /* Add psychedelic text effect to headings */
-        h1, h2 {
-            position: relative;
+        /* Floating animation for bubbles */
+        .bubble {
+            animation: float 20s infinite alternate ease-in-out;
         }
         
-        h1::before, h2::before {
-            content: attr(data-text);
+        /* Create liquid bubble effect */
+        .bubble::after {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            color: transparent;
-            opacity: 0.1;
-            mix-blend-mode: difference;
+            top: 10%;
+            left: 10%;
+            width: 80%;
+            height: 80%;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            filter: blur(5px);
         }
     </style>
 `);
 
-// Add cool 60s hover effects to design items
-const designItems = document.querySelectorAll('.design-item');
-designItems.forEach(item => {
-    item.addEventListener('mouseover', function() {
-        this.style.transition = 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-        
-        // Random rotation between -5 and 5 degrees for a groovy effect
-        const randomRotation = Math.random() * 10 - 5;
-        this.style.transform = `translateY(-15px) rotate(${randomRotation}deg)`;
-    });
+// Create psychedelic page transitions
+window.addEventListener('beforeunload', function() {
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = '#ff5400';
+    overlay.style.zIndex = '10000';
+    overlay.style.transition = 'transform 0.5s cubic-bezier(0.23, 1, 0.32, 1)';
+    overlay.style.transform = 'scale(0)';
+    overlay.style.borderRadius = '50%';
     
-    item.addEventListener('mouseout', function() {
-        this.style.transform = 'translateY(0) rotate(0)';
-    });
+    document.body.appendChild(overlay);
+    
+    setTimeout(() => {
+        overlay.style.transform = 'scale(1)';
+    }, 10);
 });
 
-// Add trippy color-changing effect to the circular chair image
-const chairImage = document.querySelector('.circular');
-if (chairImage) {
-    chairImage.style.transition = 'all 0.5s ease';
-    chairImage.addEventListener('mouseover', function() {
-        this.style.boxShadow = `
-            0 20px 50px rgba(0, 0, 0, 0.3),
-            0 0 0 15px rgba(241, 90, 36, 0.2),
-            0 0 0 30px rgba(1, 163, 164, 0.1),
-            0 0 0 45px rgba(134, 73, 151, 0.05)
-        `;
-    });
+// Simulated audio visualization for the hero section
+function createAudioVisualization() {
+    const heroBg = document.querySelector('.hero-background');
+    if (!heroBg) return;
     
-    chairImage.addEventListener('mouseout', function() {
-        this.style.boxShadow = `
-            0 20px 50px rgba(0, 0, 0, 0.3),
-            0 0 0 15px rgba(241, 90, 36, 0.1),
-            0 0 0 30px rgba(1, 163, 164, 0.05)
-        `;
-    });
+    const numBars = 5;
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.bottom = '0';
+    container.style.left = '0';
+    container.style.width = '100%';
+    container.style.height = '50px';
+    container.style.display = 'flex';
+    container.style.justifyContent = 'space-around';
+    container.style.alignItems = 'flex-end';
+    container.style.padding = '0 20%';
+    container.style.zIndex = '0';
+    container.style.opacity = '0.5';
+    
+    // Create individual bars
+    for (let i = 0; i < numBars; i++) {
+        const bar = document.createElement('div');
+        bar.style.width = '20px';
+        bar.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+        bar.style.borderRadius = '10px 10px 0 0';
+        container.appendChild(bar);
+        
+        // Animate each bar height
+        function animateBar() {
+            const height = 10 + Math.random() * 40;
+            bar.style.height = `${height}px`;
+            const delay = 100 + Math.random() * 200;
+            setTimeout(animateBar, delay);
+        }
+        
+        animateBar();
+    }
+    
+    heroBg.appendChild(container);
 }
+
+createAudioVisualization();
