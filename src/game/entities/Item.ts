@@ -1,1 +1,1 @@
-import { Entity, Position, Size } from '../types';
+import { Entity, Position, Size } from '../../types';
