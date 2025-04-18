@@ -5,8 +5,10 @@ import './App.css';
 import Header from './components/Header';
 import LovePoem from './components/LovePoem';
 import CleoGallery from './components/CleoGallery';
+import Cleo3DGallery from './components/Cleo3DGallery';
 import Prayer from './components/Prayer';
 import FloatingCleos from './components/FloatingCleos';
+import AnimationShowcase from './components/AnimationShowcase';
 
 function App() {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -42,6 +44,14 @@ function App() {
             <div className="paw-divider">
               <span>• ᴥ •</span>
             </div>
+          </div>
+        </section>
+        
+        <section className="shrine-section animation-section">
+          <div className="container">
+            <h2>Divine Manifestations of Cleo</h2>
+            <p>Behold as our overlord takes multiple forms across the artistic spectrum</p>
+            <AnimationShowcase />
           </div>
         </section>
         
@@ -81,6 +91,14 @@ function App() {
             <h2>Visions of Our Overlord</h2>
             <p>Bask in the multi-dimensional glory of Cleo manifested in various artistic planes of existence.</p>
             <CleoGallery />
+          </div>
+        </section>
+        
+        <section className="shrine-section gallery-3d-section">
+          <div className="container">
+            <h2>Cleo in Digital Space</h2>
+            <p>Experience Cleo in the third dimension and beyond</p>
+            <Cleo3DGallery />
           </div>
         </section>
         
