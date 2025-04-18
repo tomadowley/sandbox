@@ -16,6 +16,7 @@ export default class Cleo implements Entity {
   private y: number;
   private width: number;
   private height: number;
+  private speed: number = 9; // Faster Cleo
   private facingLeft: boolean = false;
   private stats: CleoStats = {
     food: 100,
@@ -36,10 +37,10 @@ export default class Cleo implements Entity {
     this.height = args.height;
   }
   public moveX(dx: number) {
-    this.x += dx;
+    this.x += dx * (this.speed / 4);
   }
   public moveY(dy: number) {
-    this.y += dy;
+    this.y += dy * (this.speed / 4);
   }
   public setX(x: number) {
     this.x = x;
@@ -79,56 +80,139 @@ export default class Cleo implements Entity {
     // Could animate or trigger effects here if needed
   }
   public render(ctx: CanvasRenderingContext2D) {
-    // Draw simplified cartoon Cleo as a sausage dog!
-    // Save context state
+    // Detailed cartoon Cleo!
     ctx.save();
-    // Move to Cleo's position
     ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-    if (this.facingLeft) {
-      ctx.scale(-1, 1);
-    }
-    // Draw body
-    ctx.fillStyle = '#8B4513';
-    ctx.strokeStyle = '#4A2511';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.ellipse(0, 0, this.width/2, this.height/2, 0, 0, Math.PI*2);
-    ctx.fill();
-    ctx.stroke();
-    // Draw head
-    ctx.beginPath();
-    ctx.ellipse(this.width/2 - this.height/3, 0, this.height/2, this.height/2, 0, 0, Math.PI*2);
-    ctx.fillStyle = '#a0522d';
-    ctx.fill();
-    ctx.stroke();
-    // Ear
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(this.width/2 - this.height/3, this.height/3, this.height/5, this.height/3, 0, 0, Math.PI*2);
-    ctx.fillStyle = '#5b2e06';
-    ctx.fill();
-    ctx.restore();
-    // Eye
-    ctx.beginPath();
-    ctx.arc(this.width/2, -this.height/8, this.height/8, 0, Math.PI*2);
-    ctx.fillStyle = '#111';
-    ctx.fill();
-    // Legs (just 2 for cute effect)
-    ctx.strokeStyle = '#4A2511';
+    if (this.facingLeft) ctx.scale(-1, 1);
+    // BODY
+    ctx.fillStyle = "#8B4513";
+    ctx.strokeStyle = "#55330a";
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(-this.width/4, this.height/2 - 4);
-    ctx.lineTo(-this.width/4, this.height/2 + 8);
-    ctx.moveTo(this.width/6, this.height/2 - 4);
-    ctx.lineTo(this.width/6, this.height/2 + 8);
+    ctx.ellipse(0, 0, this.width * 0.52, this.height * 0.36, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.stroke();
-    // Tail (wags upward)
+    // CHEST highlight
     ctx.beginPath();
-    ctx.moveTo(-this.width/2, 0);
-    ctx.quadraticCurveTo(-this.width/2 - 10, -10, -this.width/2, -15);
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = '#4A2511';
+    ctx.ellipse(-this.width * 0.21, this.height * 0.04, this.width * 0.17, this.height * 0.13, Math.PI/6, 0, Math.PI * 2);
+    ctx.fillStyle = "#b07a46";
+    ctx.globalAlpha = 0.7;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    // HEAD (slightly separate from body)
+    ctx.save();
+    ctx.translate(this.width * 0.43, 0);
+    ctx.rotate(-0.06);
+    ctx.fillStyle = "#a0522d";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, this.height * 0.44, this.height * 0.34, 0, 0, Math.PI * 2);
+    ctx.fill();
     ctx.stroke();
+    // EARS
+    ctx.save();
+    ctx.rotate(-0.3);
+    ctx.beginPath();
+    ctx.ellipse(-this.height * 0.33, -this.height * 0.14, this.height * 0.21, this.height * 0.26, 0, 0, Math.PI*2);
+    ctx.fillStyle = "#4c2306";
+    ctx.globalAlpha = 0.95;
+    ctx.fill();
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+    ctx.save();
+    ctx.rotate(0.18);
+    ctx.beginPath();
+    ctx.ellipse(-this.height * 0.26, this.height * 0.22, this.height * 0.17, this.height * 0.14, 0, 0, Math.PI*2);
+    ctx.fillStyle = "#4c2306";
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+    // EYES - expressive, big and friendly
+    ctx.save();
+    // left
+    ctx.beginPath();
+    ctx.ellipse(this.height * 0.11, -this.height * 0.10, this.height * 0.09, this.height * 0.12, 0.15, 0, Math.PI*2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+    ctx.strokeStyle = "#222";
+    ctx.stroke();
+    // right
+    ctx.beginPath();
+    ctx.ellipse(this.height * 0.22, -this.height * 0.05, this.height * 0.08, this.height * 0.11, -0.08, 0, Math.PI*2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+    ctx.stroke();
+    // Pupils
+    ctx.beginPath();
+    ctx.arc(this.height * 0.12, -this.height * 0.09, this.height*0.04,0,Math.PI*2);
+    ctx.fillStyle = "#1d1b19";
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(this.height * 0.23, -this.height * 0.06, this.height*0.035,0,Math.PI*2);
+    ctx.fill();
+    // Highlight
+    ctx.beginPath();
+    ctx.arc(this.height * 0.14, -this.height * 0.11, this.height*0.012, 0, Math.PI*2);
+    ctx.fillStyle = "#fff";
+    ctx.globalAlpha = 0.6;
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    ctx.restore();
+    // MOUTH (smiling or puppy pant)
+    ctx.save();
+    ctx.lineWidth = 2.3;
+    ctx.strokeStyle = "#822e14";
+    ctx.beginPath();
+    ctx.arc(this.height * 0.19, this.height * 0.08, this.height*0.069, Math.PI*0.22, Math.PI*0.78, false);
+    ctx.stroke();
+    // tongue
+    ctx.beginPath();
+    ctx.arc(this.height * 0.19, this.height * 0.13, this.height*0.025, 0, Math.PI, false);
+    ctx.fillStyle = "#e47676";
+    ctx.fill();
+    ctx.restore();
+    // Brows for a "sweet" look
+    ctx.save();
+    ctx.strokeStyle = "#443117";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(this.height*0.11, -this.height*0.18, this.height*0.06, 0.8, 2.6, false);
+    ctx.stroke();
+    ctx.restore();
+    ctx.restore(); // head
+    // LEGS (defined paws and two rear, two front)
+    for (let i = 0; i < 4; i++) {
+      ctx.save();
+      let lx = (i < 2 ? -0.22 : 0.11) * this.width; // rear/front
+      let ly = (i % 2 ? 0.26 : 0.16) * this.height;
+      ctx.translate(lx, ly);
+      ctx.rotate(-0.11 + i*0.09); // slight angle
+      ctx.fillStyle = "#623411";
+      ctx.beginPath();
+      ctx.ellipse(0, 0, this.height*0.075, this.height*0.17, 0, 0, Math.PI*2);
+      ctx.fill();
+      ctx.restore();
+      // paw definition
+      ctx.save();
+      ctx.translate(lx, ly + this.height*0.07);
+      ctx.strokeStyle = "#2a1706";
+      ctx.lineWidth = 1.1;
+      ctx.beginPath();
+      ctx.moveTo(-this.height*0.03, 0);
+      ctx.lineTo(this.height*0.03, 0);
+      ctx.stroke();
+      ctx.restore();
+    }
+    // TAIL (with wag)
+    ctx.save();
+    let wag = Math.sin(Date.now() / 90) * 10;
+    ctx.lineWidth = 3.4;
+    ctx.strokeStyle = "#4A2511";
+    ctx.beginPath();
+    ctx.moveTo(-this.width*0.5, -this.height*0.02);
+    ctx.quadraticCurveTo(-this.width*0.65, 0 - wag, -this.width*0.6, -this.height*0.22 - wag);
+    ctx.stroke();
+    ctx.restore();
     ctx.restore();
   }
 }
