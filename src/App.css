@@ -244,31 +244,91 @@ body {
   background-color: #000;
 }
 
-/* Game Section */
+/* Game Section - 3D Version */
 .game-section {
   background-color: var(--section-bg-1);
   position: relative;
 }
 
-.cleo-game-container {
-  margin: 2rem auto;
-  max-width: 800px;
-}
-
-.game-area {
+.cleo-game-3d-container {
   position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin: 2rem auto;
+  max-width: 1000px;
+  height: 600px;
   border-radius: 15px;
   overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.game-canvas {
-  display: block;
+.game-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
-  background-color: #87CEEB;
+  height: 100%;
+  background-color: #000;
 }
 
-.game-overlay, .game-over-overlay, .countdown-overlay {
+.game-ui {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 1rem;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  pointer-events: none;
+}
+
+.game-score, .game-level, .game-lives {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.game-score {
+  flex: 2;
+  display: flex;
+  justify-content: space-between;
+}
+
+.game-level {
+  flex: 1;
+  text-align: center;
+}
+
+.game-lives {
+  margin-left: 0.5rem;
+}
+
+.life-icon {
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 1.2rem;
+  animation: pulse 1.5s infinite alternate;
+}
+
+.game-message {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 0.8rem;
+  font-weight: bold;
+  font-size: 1.2rem;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.game-overlay, .game-over-overlay, .countdown-overlay, .pause-overlay {
   position: absolute;
   top: 0;
   left: 0;
@@ -283,19 +343,22 @@ body {
   text-align: center;
   padding: 2rem;
   box-sizing: border-box;
+  z-index: 20;
 }
 
-.game-overlay h2, .game-over-overlay h2 {
+.game-overlay h2, .game-over-overlay h2, .pause-overlay h2 {
   font-family: 'Courgette', cursive;
   font-size: 2.5rem;
   margin-bottom: 1rem;
   color: var(--accent-color);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.7);
 }
 
 .countdown-overlay .countdown {
-  font-size: 6rem;
+  font-size: 8rem;
   font-weight: bold;
   color: var(--accent-color);
+  text-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
   animation: countdown-pulse 1s infinite alternate;
 }
 
@@ -310,86 +373,32 @@ body {
   }
 }
 
-.game-overlay button, .game-over-overlay button {
+.game-over-overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.game-overlay button, .game-over-overlay button, .pause-overlay button {
   background-color: var(--secondary-color);
   color: white;
   border: none;
   border-radius: 50px;
-  padding: 0.8rem 2rem;
-  font-size: 1.2rem;
+  padding: 1rem 2.5rem;
+  font-size: 1.3rem;
   margin-top: 2rem;
   cursor: pointer;
   transition: all 0.3s ease;
-}
-
-.game-overlay button:hover, .game-over-overlay button:hover {
-  background-color: var(--primary-color);
-  transform: translateY(-5px);
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Animated dachshund in floating poppadoms */
-.animated-floating-dog {
-  position: relative;
-  width: 80px;
-  height: 40px;
+.game-overlay button:hover, .game-over-overlay button:hover, .pause-overlay button:hover {
+  background-color: var(--primary-color);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
 }
 
-.dog-body {
-  position: absolute;
-  width: 60px;
-  height: 20px;
-  background-color: #8B4513;
-  border-radius: 20px;
-  top: 10px;
-  left: 15px;
-}
-
-.dog-head {
-  position: absolute;
-  width: 25px;
-  height: 15px;
-  background-color: #8B4513;
-  border-radius: 50%;
-  top: 12px;
-  left: 0;
-}
-
-.dog-tail {
-  position: absolute;
-  width: 15px;
-  height: 5px;
-  background-color: #8B4513;
-  border-radius: 5px;
-  top: 15px;
-  right: 0;
-  transform-origin: left center;
-  animation: tail-wag 0.5s infinite alternate;
-}
-
-.dog-legs {
-  position: absolute;
-  width: 60px;
-  top: 25px;
-  left: 15px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.leg {
-  width: 5px;
-  height: 10px;
-  background-color: #8B4513;
-  border-radius: 2px;
-}
-
-@keyframes tail-wag {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(20deg);
-  }
+.pause-overlay {
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
 }
 
 /* Poems Section */
@@ -928,5 +937,19 @@ body {
   
   .animation-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .cleo-game-3d-container {
+    height: 400px;
+  }
+  
+  .game-score, .game-level, .game-lives {
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .game-message {
+    font-size: 1rem;
+    padding: 0.5rem;
   }
 }
