@@ -9,6 +9,7 @@ import Cleo3DGallery from './components/Cleo3DGallery';
 import Prayer from './components/Prayer';
 import FloatingCleos from './components/FloatingCleos';
 import AnimationShowcase from './components/AnimationShowcase';
+import CleoGame from './components/CleoGame';
 
 function App() {
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -55,6 +56,14 @@ function App() {
           </div>
         </section>
         
+        <section className="shrine-section game-section">
+          <div className="container">
+            <h2>Cleo's Poppadom Chase</h2>
+            <p>Help Cleo collect her absolute favorite treat - poppadoms! She will do anything for these crispy delights.</p>
+            <CleoGame />
+          </div>
+        </section>
+        
         <section className="shrine-section poems-section">
           <div className="container">
             <h2>Love Poems to Our Elongated Sovereign</h2>
@@ -81,6 +90,14 @@ function App() {
                 Your paws touch stars with gentle grace.
                 Time bends around your wagging tail,
                 Before your majesty, all worlds pale.`}
+              />
+              
+              <LovePoem 
+                title="Poppadom Passion" 
+                content={`Crispy circles of delight,
+                Set your taste buds all alight.
+                For poppadoms, you'd move the earth,
+                Their crunch reveals your royal worth.`}
               />
             </div>
           </div>
@@ -124,6 +141,12 @@ function App() {
               />
               
               <Prayer 
+                title="The Poppadom Blessing"
+                content="Blessed be the crunch that brings such joy, the sacred poppadom that makes thy tail wag with divine ecstasy. May thy poppadom bowl never be empty, and may the crispy delights always be perfectly cooked. We honor thy favorite food as we honor thee, O Cleo the Poppadom Lover."
+                special={true}
+              />
+              
+              <Prayer 
                 title="The Emergency Invocation"
                 content="In times of great distress, when thunder rolls or vacuum cleaners roar, we call upon the courage of Cleo. Grant us but a fraction of thy bravery, O Wiener Wonder, that we might face our fears with the same ferocity with which you attack thy squeaky toys."
                 special={true}
@@ -135,7 +158,7 @@ function App() {
         <footer className="shrine-footer">
           <div className="container">
             <p>This shrine was erected in eternal devotion to Cleo, the dachshund overlord.</p>
-            <p>May her reign be long and her naps peaceful.</p>
+            <p>May her reign be long, her naps peaceful, and her poppadom supply endless.</p>
             <div className="paw-print">🐾</div>
           </div>
         </footer>
