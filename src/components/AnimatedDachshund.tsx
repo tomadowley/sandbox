@@ -5,6 +5,17 @@ interface AnimatedDachshundProps {
   size?: number;
 }
 
+// Define a proper interface for style configs
+interface StyleConfig {
+  bodyColor: string;
+  outlineColor: string;
+  background: string;
+  speed: number;
+  pixelate?: boolean;
+  blur?: boolean;
+  thickOutline?: boolean;
+}
+
 const AnimatedDachshund: React.FC<AnimatedDachshundProps> = ({ 
   style = 'default', 
   size = 300 
@@ -12,7 +23,7 @@ const AnimatedDachshund: React.FC<AnimatedDachshundProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   
   // Animation styles
-  const styles = {
+  const styles: Record<string, StyleConfig> = {
     default: {
       bodyColor: '#8B4513',
       outlineColor: '#4A2511',
@@ -87,7 +98,7 @@ const AnimatedDachshund: React.FC<AnimatedDachshundProps> = ({
       const tailWag = Math.sin(time * 0.2 * styleConfig.speed);
       const bodyBounce = Math.abs(Math.sin(time * 0.1 * styleConfig.speed)) * 5;
       
-      // Set line style
+      // Set line style - Using optional chaining to safely access thickOutline
       ctx.lineWidth = styleConfig.thickOutline ? 5 * scale : 3 * scale;
       ctx.strokeStyle = styleConfig.outlineColor;
       
