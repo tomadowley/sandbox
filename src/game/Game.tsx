@@ -9,6 +9,7 @@ const Game: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [gameState, setGameState] = useState<GameState>(initialGameState);
   const [isGameOver, setIsGameOver] = useState<boolean>(false);
+  const [isPassedOut, setIsPassedOut] = useState<boolean>(false);
   const animationFrameRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
 
@@ -22,13 +23,20 @@ const Game: React.FC = () => {
 
     // Set up controls (keyboard events)
     const cleanupControls = setupControls((direction) => {
-      setGameState(prevState => ({
-        ...prevState,
-        nana: {
-          ...prevState.nana,
-          direction
+      setGameState(prevState => {
+        // Only allow changing direction if not passed out
+        if (prevState.drunkenness >= 100) {
+          return prevState;
         }
-      }));
+        
+        return {
+          ...prevState,
+          nana: {
+            ...prevState.nana,
+            direction
+          }
+        };
+      });
     });
 
     // Start the game loop
@@ -45,6 +53,14 @@ const Game: React.FC = () => {
         if (newState.drunkenness <= 0) {
           setIsGameOver(true);
           return prevState;
+        }
+        
+        // Check if passed out (drunkenness reached 100%)
+        if (newState.drunkenness >= 100) {
+          setIsPassedOut(true);
+        } else if (prevState.drunkenness >= 100 && newState.drunkenness < 100) {
+          // Recover from passing out
+          setIsPassedOut(false);
         }
         
         return newState;
@@ -69,11 +85,12 @@ const Game: React.FC = () => {
       cancelAnimationFrame(animationFrameRef.current);
       cleanupControls();
     };
-  }, [isGameOver]);
+  }, [isGameOver, gameState]);
 
   const restartGame = () => {
     setGameState(initialGameState);
     setIsGameOver(false);
+    setIsPassedOut(false);
   };
 
   return (
@@ -84,7 +101,7 @@ const Game: React.FC = () => {
           <div className="drunk-meter-label">Drunkenness:</div>
           <div className="drunk-meter-bar">
             <div 
-              className="drunk-meter-fill" 
+              className={`drunk-meter-fill ${isPassedOut ? 'passed-out' : ''}`}
               style={{ width: `${gameState.drunkenness}%` }}
             />
           </div>
@@ -109,11 +126,19 @@ const Game: React.FC = () => {
         </div>
       )}
       
+      {isPassedOut && !isGameOver && (
+        <div className="passed-out-message">
+          <p>Nana passed out! Too much to drink!</p>
+          <p>Wait for her to recover...</p>
+        </div>
+      )}
+      
       <div className="game-instructions">
         <h3>How to Play:</h3>
         <p>Help Nana stay drunk by collecting drinks!</p>
         <p>Use arrow keys or WASD to move Nana around.</p>
         <p>Avoid water and coffee - they'll sober you up!</p>
+        <p>But don't get too drunk (100%) or Nana will pass out!</p>
         <p>Your drunkenness constantly decreases, so keep drinking!</p>
       </div>
     </div>

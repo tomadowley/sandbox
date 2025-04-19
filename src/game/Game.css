@@ -40,12 +40,23 @@
   background-color: #ddd;
   border-radius: 10px;
   overflow: hidden;
+  border: 2px solid #000;
 }
 
 .drunk-meter-fill {
   height: 100%;
   background-color: #8a2be2;
   transition: width 0.3s ease;
+}
+
+.drunk-meter-fill.passed-out {
+  background-color: #ff0000;
+  animation: pulse 1s infinite alternate;
+}
+
+@keyframes pulse {
+  from { background-color: #ff0000; }
+  to { background-color: #ff6666; }
 }
 
 .drunk-meter-value {
@@ -98,6 +109,24 @@
 
 .game-over button:hover {
   background-color: #6a1b9a;
+}
+
+.passed-out-message {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(255, 0, 0, 0.8);
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  animation: bounce 0.5s infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to { transform: translate(-50%, -50%) scale(1.05); }
 }
 
 .game-instructions {

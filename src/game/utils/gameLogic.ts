@@ -12,11 +12,27 @@ export function updateGameState(gameState: GameState, deltaTime: number): GameSt
   // Create a new state to avoid direct mutations
   const newState = { ...gameState };
   
-  // Update Nana's position based on input direction
-  updateNanaPosition(newState, deltaTime);
+  // Check if Nana is completely drunk (100%)
+  const isCompletelyDrunk = newState.drunkenness >= 100;
   
-  // Update drunkenness (constantly decreasing)
-  newState.drunkenness -= (DRUNKENNESS_DECREASE_RATE * deltaTime) / 1000;
+  // Update Nana's position only if not completely drunk
+  if (!isCompletelyDrunk) {
+    updateNanaPosition(newState, deltaTime);
+  } else {
+    // If Nana is completely drunk, she can't move
+    newState.nana.direction = null;
+    newState.nana.velocity = { x: 0, y: 0 };
+    
+    // Slowly recover from being completely drunk
+    newState.drunkenness -= (DRUNKENNESS_DECREASE_RATE * 1.5 * deltaTime) / 1000;
+  }
+  
+  // If not completely drunk, decrease drunkenness normally
+  if (!isCompletelyDrunk) {
+    newState.drunkenness -= (DRUNKENNESS_DECREASE_RATE * deltaTime) / 1000;
+  }
+  
+  // Keep drunkenness within bounds
   newState.drunkenness = Math.max(0, Math.min(100, newState.drunkenness));
   
   // Update game objects
@@ -98,6 +114,11 @@ function updateGameObjects(gameState: GameState, deltaTime: number): void {
 
 function checkCollisions(gameState: GameState): void {
   const { nana, gameObjects } = gameState;
+  
+  // Don't check collisions if Nana is already completely drunk and passed out
+  if (gameState.drunkenness >= 100) {
+    return;
+  }
   
   // Check collision with each game object
   for (let i = gameObjects.length - 1; i >= 0; i--) {
