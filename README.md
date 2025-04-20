@@ -2,6 +2,14 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+---
+
+**Why do React developers never get lost?**
+
+Because they always follow the "components"!
+
+---
+
 ## Available Scripts
 
 In the project directory, you can run:
