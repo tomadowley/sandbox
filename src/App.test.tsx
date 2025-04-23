@@ -12,3 +12,9 @@ test("renders learn react link", () => {
 test("renders without crashing", () => {
   render(<App />);
 });
+
+test("renders logo image", () => {
+  render(<App />);
+  const logoImages = screen.getAllByRole('img');
+  expect(logoImages.length).toBeGreaterThan(0);
+});
