@@ -377,7 +377,7 @@ export default function App() {
             height: 0,
             borderLeft: `${Math.max(size * 0.043, 13)}px solid transparent`,
             borderRight: `${Math.max(size * 0.043, 13)}px solid transparent`,
-            borderBottom: `${Math.max(size * 0.092, 30)}px solid #191e28",
+            borderBottom: `${Math.max(size * 0.092, 30)}px solid #191e28`,
             borderRadius: "8px 8px 25px 25px",
             position: "relative"
           }}>
