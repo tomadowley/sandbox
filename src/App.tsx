@@ -28,7 +28,9 @@ function App() {
   // Racket parameters
   const racketWidth = canvasWidth * 0.28; // 28% court width
   const racketHeight = canvasHeight * 0.038;
-  const racketY = canvasHeight - racketHeight * 2.1;
+  // Racket sits a certain number of pixels above the very bottom to allow "miss" detection
+  const racketBottomOffset = Math.max(canvasHeight * 0.02, 8);  // space between racket and bottom
+  const racketY = canvasHeight - racketHeight - racketBottomOffset;
 
   // Ball parameters
   const ballRadius = Math.max(0.031 * canvasWidth, 15);
@@ -163,10 +165,11 @@ function App() {
         let hit = false;
         if (
           incoming && canHit &&
-          nextY + ballRadius >= racketY &&
-          nextY - ballRadius <= racketY + racketHeight &&
-          nextX + ballRadius >= racketX - racketWidth / 2 &&
-          nextX - ballRadius <= racketX + racketWidth / 2
+          // Use floor, ceil, and a small tolerant fudge factor for fairer gameplay
+          nextY + ballRadius >= racketY - 2 &&
+          nextY - ballRadius <= racketY + racketHeight + 2 &&
+          nextX + ballRadius >= racketX - racketWidth / 2 - 2 &&
+          nextX - ballRadius <= racketX + racketWidth / 2 + 2
         ) {
           // Calculate hit angle: base vy up, vx based on strike position
           let rel = ((nextX - racketX) / (racketWidth/2));
@@ -262,7 +265,7 @@ function App() {
               left: racketX - racketWidth / 2,
               width: racketWidth,
               height: racketHeight,
-              bottom: 3 * canvasHeight / 140,
+              bottom: canvasHeight - racketY - racketHeight,  // aligns with logic
               boxShadow: touching ? "0 0 18px #9cf" : undefined,
               transition: touching ? "none" : "left 0.05s",
             }}
