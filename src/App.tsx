@@ -275,7 +275,7 @@ function App() {
               left: racketX - racketWidth / 2,
               width: racketWidth,
               height: racketHeight,
-              bottom: canvasHeight - racketY - racketHeight,  // aligns with logic
+              top: racketY, // Use top for exact y-position match
               boxShadow: touching ? "0 0 18px #9cf" : undefined,
               transition: touching ? "none" : "left 0.05s",
             }}
