@@ -34,6 +34,7 @@
   width: 90vw;
   height: 60vh;
   transition: box-shadow 0.4s;
+  image-rendering: pixelated; /* Better rendering of blocky pixels */
 }
 
 .fractal-caption {
@@ -44,4 +45,27 @@
   margin-top: 2.9vmin;
   text-shadow: 0 2px 25px #21c0fb66;
   user-select: none;
+}
+
+.fractal-controls {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.performance-toggle {
+  background: rgba(97, 218, 251, 0.1);
+  color: #61dafb;
+  border: 1px solid rgba(97, 218, 251, 0.3);
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.performance-toggle:hover {
+  background: rgba(97, 218, 251, 0.2);
+  border-color: rgba(97, 218, 251, 0.5);
 }
