@@ -10,7 +10,8 @@ const johnReplies = [
   "That reminds me of a story, but it's too long to tell.",
   "Let's keep things simple, shall we?",
   "Have you tried turning it off and on again?",
-  "That's above my paygrade!"
+  "That's above my paygrade!",
+  "I love Nando's for lunch!"
 ];
 
 export default function JohnSimulator() {
