@@ -4,6 +4,6 @@ import App from "./App";
 
 test("renders John Simulator", () => {
   render(<App />);
-  const heading = screen.getByText(/John Simulator/i);
+  const heading = screen.getByRole("heading", { name: /john simulator/i });
   expect(heading).toBeInTheDocument();
 });
