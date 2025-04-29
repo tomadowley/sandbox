@@ -1,24 +1,38 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+
+const MAX_DEPTH = 10;
+
+function MirrorFrame({ level }: { level: number }) {
+  if (level > MAX_DEPTH) return null;
+
+  return (
+    <div
+      className="mirror-frame"
+      style={{
+        boxShadow: `0 0 32px 8px rgba(97,218,251, 0.25)`,
+        border: `3px solid rgba(97,218,251, 0.5)`,
+        background: `rgba(40,44,52,0.6)`,
+        // Gradually scale and offset each deeper layer
+        transform: `scale(${1 - level * 0.06}) rotateY(${-3 * level}deg)`,
+        zIndex: MAX_DEPTH - level,
+        animationDelay: `${level * 100}ms`
+      }}
+    >
+      <MirrorFrame level={level + 1} />
+    </div>
+  );
+}
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="mirror-container">
+        <MirrorFrame level={1} />
+      </div>
+      <p className="mirror-caption">
+        Infinity Mirror Simulator
+      </p>
     </div>
   );
 }

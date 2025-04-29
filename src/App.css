@@ -1,38 +1,67 @@
 .App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+  background: #23272f radial-gradient(ellipse at 60% 20%, #212631 60%, #23272f 100%);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+}
+
+.mirror-container {
+  margin-top: 7vh;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  height: 60vmin;
+  width: 60vmin;
+  position: relative;
+  perspective: 800px;
 }
 
-.App-link {
+.mirror-frame {
+  position: absolute;
+  top: 7%;
+  left: 7%;
+  right: 7%;
+  bottom: 7%;
+  border-radius: 15px;
+  box-sizing: border-box;
+  background: rgba(13, 17, 23, 0.15);
+  border: 3px solid rgba(97, 218, 251, 0.38);
+  box-shadow:
+    0 0 12px 2px #61dafb88,
+    0 0 45px 10px #1e1e9133,
+    inset 0 0 60px 5px #212631;
+  transition: box-shadow 0.3s, border-color 0.3s;
+  animation: mirror-glow 2.6s cubic-bezier(.81,.02,.29,1) infinite alternate;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes mirror-glow {
+  0% {
+    border-color: #61dafbdd;
+    box-shadow:
+      0 0 16px 6px #61dafbaa,
+      0 0 80px 35px #00aaff22,
+      inset 0 0 108px 12px #282c3492;
+  }
+  100% {
+    border-color: #00aaff88;
+    box-shadow:
+      0 0 48px 10px #61dafbaa,
+      0 0 120px 55px #00aaff44,
+      inset 0 0 210px 56px #282c3433;
+  }
+}
+
+.mirror-caption {
   color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  font-size: 1.5rem;
+  margin-top: 4vh;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 25px #21c0fb55;
 }
