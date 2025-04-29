@@ -1,200 +1,283 @@
 import React, { useRef, useEffect, useState } from "react";
 import "./App.css";
 
-// Optimized fractal drawing function with reduced computations
-function drawFractal(
-  ctx: CanvasRenderingContext2D,
-  width: number,
-  height: number,
-  t: number,
-  pixelSize: number
-) {
-  // Mandelbrot zoom animation with color cycling
-  // Animate zoom-in and center
-  const zoom = 1.3 + Math.sin(t / 2000) * 1.1 + (Math.cos(t / 9000) * 2.0);
-  const offsetX = -0.7 + Math.sin(t / 6100) * 0.3;
-  const offsetY = 0.0 + Math.cos(t / 8300) * 0.25;
-
-  // Color cycling coefficients
-  const colorOffset = t / 1200;
-  
-  // Clear only when needed (not every frame)
-  if (pixelSize === 1) {
-    ctx.clearRect(0, 0, width, height);
+// Optimization technique: pre-compute color palette to avoid expensive calculations in the render loop
+function generateColorPalette(size: number): string[] {
+  const palette: string[] = [];
+  for (let i = 0; i < size; i++) {
+    const hue = (i * 6) % 360;
+    palette.push(`hsl(${hue}, 95%, 53%)`);
   }
-
-  // Pre-calculate constants for the loop
-  const maxIter = 50 + Math.floor(25 * Math.sin(t / 3500));
-  const invZoom = 1 / zoom;
-  const widthMul = 3.5 / width;
-  const heightMul = 2.6 / height;
-  
-  // Use pixel blocks for faster rendering
-  for (let px = 0; px < width; px += pixelSize) {
-    for (let py = 0; py < height; py += pixelSize) {
-      // Map pixel to fractal coordinate
-      const x0 = (px * widthMul - 2.5) * invZoom + offsetX;
-      const y0 = (py * heightMul - 1.3) * invZoom + offsetY;
-
-      let x = 0, y = 0, x2 = 0, y2 = 0, iter = 0;
-      
-      // Fast path bailout optimization
-      while (x2 + y2 < 4 && iter < maxIter) {
-        y = 2 * x * y + y0;
-        x = x2 - y2 + x0;
-        x2 = x * x;
-        y2 = y * y;
-        iter++;
-      }
-
-      // Color optimization with lookup tables
-      let color;
-      if (iter === maxIter) {
-        color = "rgb(20,20,38)";
-      } else {
-        // Faster coloring algorithm
-        let smooth = iter + 1 - Math.log2(Math.log2(x2 + y2) + 1e-9);
-        let hue = (smooth * 6 + colorOffset * 360) % 360;
-        let sat = 95;
-        let light = 53;
-        color = `hsl(${hue},${sat}%,${light}%)`;
-      }
-      
-      ctx.fillStyle = color;
-      ctx.fillRect(px, py, pixelSize, pixelSize);
-    }
-  }
+  return palette;
 }
 
-function FractalVideo() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [performanceMode, setPerformanceMode] = useState<string>("balanced");
-  const [fps, setFps] = useState<number>(0);
-
-  useEffect(() => {
-    let anim: number;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // For measuring FPS
-    let frameCount = 0;
-    let lastFrameTime = performance.now();
-    let lastFpsUpdate = performance.now();
+// The worker will handle the heavy computation
+const workerCode = `
+  let width = 0;
+  let height = 0;
+  let colorPalette = [];
+  let frameCount = 0;
+  
+  self.onmessage = function(e) {
+    const { type, data } = e.data;
     
-    let running = true;
-    // Progressive rendering
-    let currentPixelSize = 8; // Start with low resolution
-    let targetResolution = 1; // Target full resolution
-    
-    // Create off-screen buffer for double buffering
-    const offscreenCanvas = document.createElement('canvas');
-    const offscreenCtx = offscreenCanvas.getContext('2d', { alpha: false });
-    
-    // Adapt resolution to device
-    const adaptCanvas = () => {
-      const dpr = window.devicePixelRatio || 1;
-      // Lower base resolution for better performance
-      const width = ~~(Math.min(window.innerWidth, 700) * 0.8 * dpr);
-      const height = ~~(Math.min(window.innerHeight, 700) * 0.8 * 0.85 * dpr);
-      
-      canvas.width = width;
-      canvas.height = height;
-      canvas.style.width = (width / dpr) + "px";
-      canvas.style.height = (height / dpr) + "px";
-      
-      if (offscreenCtx) {
-        offscreenCanvas.width = width;
-        offscreenCanvas.height = height;
-      }
-      
-      // Reset progressive rendering
-      currentPixelSize = 8;
-    };
-
-    adaptCanvas();
-    window.addEventListener("resize", adaptCanvas);
-
-    // Determine pixel size based on performance mode
-    const getPixelSize = () => {
-      switch(performanceMode) {
-        case "quality": return 1;
-        case "balanced": 
-          // Progressive rendering, start coarse and refine
-          if (currentPixelSize > targetResolution) {
-            currentPixelSize = Math.max(currentPixelSize / 2, targetResolution);
-          }
-          return currentPixelSize;
-        case "performance": return 4;
-        default: return 2;
-      }
-    };
-
-    function tick() {
-      if (!running) return;
-      
-      // Calculate FPS
-      const now = performance.now();
+    if (type === 'init') {
+      width = data.width;
+      height = data.height;
+      colorPalette = data.colorPalette;
+    } 
+    else if (type === 'render') {
+      const { zoom, offsetX, offsetY, colorOffset } = data;
       frameCount++;
       
-      if (now - lastFpsUpdate >= 1000) {
-        setFps(Math.round((frameCount * 1000) / (now - lastFpsUpdate)));
-        frameCount = 0;
-        lastFpsUpdate = now;
-      }
+      // Use lower resolution when moving and progressively improve
+      const pixelSkip = data.highQuality ? 1 : 2;
       
-      // Get appropriate pixel size for current performance mode
-      const pixelSize = getPixelSize();
+      // Use a typed array for better performance
+      const pixelData = new Uint8ClampedArray(width * height * 4);
       
-      // Draw to offscreen buffer first if available
-      const renderCtx = offscreenCtx || ctx;
-      const renderCanvas = offscreenCanvas || canvas;
+      let yStart = frameCount % pixelSkip;
       
-      if (renderCtx) {
-        drawFractal(
-          renderCtx,
-          renderCanvas.width,
-          renderCanvas.height,
-          now,
-          pixelSize
-        );
-        
-        // Copy to visible canvas if using double buffering
-        if (offscreenCtx) {
-          ctx.drawImage(offscreenCanvas, 0, 0);
+      // Stagger the pixel calculation to improve responsiveness
+      for (let py = yStart; py < height; py += pixelSkip) {
+        for (let px = 0; px < width; px += pixelSkip) {
+          const x0 = ((px / width) * 3.5 - 2.5) / zoom + offsetX;
+          const y0 = ((py / height) * 2.6 - 1.3) / zoom + offsetY;
+          
+          let x = 0, y = 0, iter = 0;
+          const maxIter = 100;
+          
+          // Fast path bailout - check if point is in main bulb or cardioid
+          const q = (x0-0.25)*(x0-0.25) + y0*y0;
+          if (x0 * (x0 + 1) + y0 * y0 < 0.25 || q*(q+(x0-0.25)) < 0.25*y0*y0) {
+            iter = maxIter;
+          } else {
+            // Classic Mandelbrot iteration
+            while (x*x + y*y < 4 && iter < maxIter) {
+              const xtemp = x*x - y*y + x0;
+              y = 2*x*y + y0;
+              x = xtemp;
+              iter++;
+            }
+          }
+          
+          // Get color from palette
+          let idx, r, g, b;
+          if (iter === maxIter) {
+            r = 20; g = 20; b = 38;
+          } else {
+            // Simple smooth coloring
+            const smoothed = iter + 1 - Math.log(Math.log(x*x + y*y)) / Math.LN2;
+            idx = Math.floor((smoothed * 10 + colorOffset) % colorPalette.length);
+            
+            // Parse HSL color (simplified)
+            const h = (idx * 6) % 360;
+            // HSL to RGB conversion (simplified for performance)
+            const c = 0.95 * 0.53 * 2;
+            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+            const m = 0.53 - c/2;
+            
+            let rc, gc, bc;
+            if (h < 60) { rc = c; gc = x; bc = 0; }
+            else if (h < 120) { rc = x; gc = c; bc = 0; }
+            else if (h < 180) { rc = 0; gc = c; bc = x; }
+            else if (h < 240) { rc = 0; gc = x; bc = c; }
+            else if (h < 300) { rc = x; gc = 0; bc = c; }
+            else { rc = c; gc = 0; bc = x; }
+            
+            r = Math.round((rc + m) * 255);
+            g = Math.round((gc + m) * 255);
+            b = Math.round((bc + m) * 255);
+          }
+          
+          // Fill the area if using pixel skipping
+          for (let fillY = 0; fillY < pixelSkip && py + fillY < height; fillY++) {
+            for (let fillX = 0; fillX < pixelSkip && px + fillX < width; fillX++) {
+              const pixelIndex = ((py + fillY) * width + (px + fillX)) * 4;
+              pixelData[pixelIndex] = r;
+              pixelData[pixelIndex + 1] = g;
+              pixelData[pixelIndex + 2] = b;
+              pixelData[pixelIndex + 3] = 255;
+            }
+          }
         }
       }
       
-      anim = requestAnimationFrame(tick);
+      self.postMessage({ 
+        type: 'renderComplete', 
+        pixelData, 
+        width, 
+        height,
+        yStart,
+        pixelSkip
+      });
     }
-    
-    tick();
+  };
+`;
 
+function FractalVideo() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const workerRef = useRef<Worker | null>(null);
+  const [isHighQuality, setIsHighQuality] = useState(false);
+  const [fps, setFps] = useState(0);
+
+  useEffect(() => {
+    // Create a blob URL for the worker
+    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const workerURL = URL.createObjectURL(blob);
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    // Get the 2d context
+    const ctx = canvas.getContext('2d', { alpha: false });
+    if (!ctx) return;
+    
+    // Initialize dimensions
+    let width = canvas.width;
+    let height = canvas.height;
+    let isFirstRender = true;
+    let running = true;
+    let frameCount = 0;
+    let lastTimestamp = performance.now();
+    let lastFpsUpdate = performance.now();
+    
+    // Performance optimization: Create worker for heavy computation
+    const worker = new Worker(workerURL);
+    workerRef.current = worker;
+    
+    // Generate color palette
+    const colorPalette = generateColorPalette(360);
+    
+    // Handle messages from worker
+    worker.onmessage = (e) => {
+      if (!running || !ctx || !canvas) return;
+      
+      if (e.data.type === 'renderComplete') {
+        const { pixelData, width, height, yStart, pixelSkip } = e.data;
+        
+        // Create ImageData from the pixel data array
+        const imageData = new ImageData(pixelData, width, height);
+        ctx.putImageData(imageData, 0, 0);
+        
+        // Update FPS counter every second
+        frameCount++;
+        const now = performance.now();
+        if (now - lastFpsUpdate > 1000) {
+          const elapsed = (now - lastFpsUpdate) / 1000;
+          setFps(Math.round(frameCount / elapsed));
+          frameCount = 0;
+          lastFpsUpdate = now;
+        }
+      }
+    };
+    
+    const adaptCanvas = () => {
+      const pixelRatio = window.devicePixelRatio || 1;
+      
+      // Use lower resolution for better performance
+      const scaleFactor = isHighQuality ? 1 : 0.6;
+      
+      const containerWidth = Math.min(window.innerWidth * 0.95, 700);
+      const containerHeight = Math.min(window.innerHeight * 0.6, 700);
+      
+      // Physical size (CSS pixels)
+      canvas.style.width = `${containerWidth}px`;
+      canvas.style.height = `${containerHeight}px`;
+      
+      // Actual render resolution (scaled down for performance)
+      width = Math.floor(containerWidth * pixelRatio * scaleFactor);
+      height = Math.floor(containerHeight * pixelRatio * scaleFactor);
+      
+      canvas.width = width;
+      canvas.height = height;
+      
+      // Initialize the worker when size changes
+      worker.postMessage({
+        type: 'init',
+        data: {
+          width,
+          height,
+          colorPalette
+        }
+      });
+      
+      isFirstRender = true;
+    };
+    
+    // Initialize canvas size
+    adaptCanvas();
+    
+    // Handle resize events
+    window.addEventListener('resize', adaptCanvas);
+    
+    // Animation state
+    let animTime = 0;
+    let lastFrame = performance.now();
+    
+    // Main animation loop
+    const animate = () => {
+      if (!running) return;
+      
+      const now = performance.now();
+      const deltaTime = now - lastFrame;
+      lastFrame = now;
+      
+      // Control animation speed
+      animTime += deltaTime * 0.15;
+      
+      // Calculate parameters for rendering
+      const t = animTime;
+      
+      // Smooth zoom and pan animations
+      const zoom = 1.3 + Math.sin(t / 3000) * 1.0 + (Math.cos(t / 9000) * 1.5);
+      const offsetX = -0.7 + Math.sin(t / 7100) * 0.3;
+      const offsetY = 0.0 + Math.cos(t / 6300) * 0.25;
+      const colorOffset = t / 200;
+      
+      // Tell worker to render a frame
+      worker.postMessage({
+        type: 'render',
+        data: {
+          zoom,
+          offsetX,
+          offsetY,
+          colorOffset,
+          highQuality: isHighQuality
+        }
+      });
+      
+      requestAnimationFrame(animate);
+    };
+    
+    animate();
+    
+    // Toggle quality when clicking on canvas
+    const handleClick = () => {
+      setIsHighQuality(!isHighQuality);
+    };
+    
+    canvas.addEventListener('click', handleClick);
+    
     return () => {
       running = false;
-      window.removeEventListener("resize", adaptCanvas);
-      cancelAnimationFrame(anim);
+      URL.revokeObjectURL(workerURL);
+      worker.terminate();
+      workerRef.current = null;
+      window.removeEventListener('resize', adaptCanvas);
+      canvas.removeEventListener('click', handleClick);
     };
-  }, [performanceMode]);
-
-  // Toggle performance mode
-  const togglePerformanceMode = () => {
-    setPerformanceMode(prev => {
-      if (prev === "balanced") return "quality";
-      if (prev === "quality") return "performance";
-      return "balanced";
-    });
-  };
+  }, [isHighQuality]);
 
   return (
     <div className="fractal-video-container">
       <canvas ref={canvasRef} className="fractal-canvas" />
       <div className="fractal-caption">Fractal Video</div>
-      <div className="fractal-controls">
-        <button onClick={togglePerformanceMode} className="performance-toggle">
-          Mode: {performanceMode} ({fps} FPS)
-        </button>
+      <div className="fractal-info">
+        <div className="fps-counter">{fps} FPS</div>
+        <div className="quality-toggle">
+          {isHighQuality ? "High Quality" : "Performance Mode"} (click to toggle)
+        </div>
       </div>
     </div>
   );

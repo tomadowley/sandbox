@@ -34,7 +34,7 @@
   width: 90vw;
   height: 60vh;
   transition: box-shadow 0.4s;
-  image-rendering: pixelated; /* Better rendering of blocky pixels */
+  cursor: pointer;
 }
 
 .fractal-caption {
@@ -47,25 +47,38 @@
   user-select: none;
 }
 
-.fractal-controls {
-  margin-top: 1rem;
+.fractal-info {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  margin-top: 1.5vmin;
+  color: #61dafb88;
+  font-size: 0.9rem;
+  user-select: none;
 }
 
-.performance-toggle {
-  background: rgba(97, 218, 251, 0.1);
-  color: #61dafb;
-  border: 1px solid rgba(97, 218, 251, 0.3);
-  border-radius: 4px;
-  padding: 0.5rem 1rem;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+.fps-counter {
+  font-weight: bold;
+  font-family: monospace;
+  font-size: 1.1rem;
 }
 
-.performance-toggle:hover {
-  background: rgba(97, 218, 251, 0.2);
-  border-color: rgba(97, 218, 251, 0.5);
+.quality-toggle {
+  margin-top: 0.5rem;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+
+.quality-toggle:hover {
+  opacity: 1;
+}
+
+@media (max-width: 600px) {
+  .fractal-caption {
+    font-size: 1.6rem;
+  }
+  
+  .fps-counter {
+    font-size: 0.9rem;
+  }
 }
