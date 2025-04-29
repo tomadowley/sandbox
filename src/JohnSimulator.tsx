@@ -46,7 +46,7 @@ export default function JohnSimulator() {
       borderRadius: 8,
       background: '#f8f8f8'
     }}>
-      <h2>John Simulator</h2>
+      <h2>John Simulator is ready for Nando&apos;s!</h2>
       <div style={{
         height: 200,
         overflowY: 'auto',
