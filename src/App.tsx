@@ -33,7 +33,7 @@ function describeArc(cx: number, cy: number, r: number, a0: number, a1: number) 
   const x1 = cx + r * Math.cos(rad(a0 - 90)), y1 = cy + r * Math.sin(rad(a0 - 90));
   const x2 = cx + r * Math.cos(rad(a1 - 90)), y2 = cy + r * Math.sin(rad(a1 - 90));
   const largeArc = a1 - a0 > 180 ? 1 : 0;
-  return `M ${cx} ${cx} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+  return `M ${cx} ${cy} L ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2} Z`;
 }
 function getWheelSize() {
   // Clamp minimum
