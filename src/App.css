@@ -1,67 +1,47 @@
 .App {
   background: #23272f radial-gradient(ellipse at 60% 20%, #212631 60%, #23272f 100%);
   min-height: 100vh;
+  min-width: 100vw;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
-}
-
-.mirror-container {
-  margin-top: 7vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 60vmin;
-  width: 60vmin;
-  position: relative;
-  perspective: 800px;
-}
-
-.mirror-frame {
-  position: absolute;
-  top: 7%;
-  left: 7%;
-  right: 7%;
-  bottom: 7%;
-  border-radius: 15px;
-  box-sizing: border-box;
-  background: rgba(13, 17, 23, 0.15);
-  border: 3px solid rgba(97, 218, 251, 0.38);
-  box-shadow:
-    0 0 12px 2px #61dafb88,
-    0 0 45px 10px #1e1e9133,
-    inset 0 0 60px 5px #212631;
-  transition: box-shadow 0.3s, border-color 0.3s;
-  animation: mirror-glow 2.6s cubic-bezier(.81,.02,.29,1) infinite alternate;
   overflow: hidden;
+}
+
+.fractal-video-container {
+  width: 100vw;
+  height: 80vh;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin: 0;
+  position: relative;
 }
 
-@keyframes mirror-glow {
-  0% {
-    border-color: #61dafbdd;
-    box-shadow:
-      0 0 16px 6px #61dafbaa,
-      0 0 80px 35px #00aaff22,
-      inset 0 0 108px 12px #282c3492;
-  }
-  100% {
-    border-color: #00aaff88;
-    box-shadow:
-      0 0 48px 10px #61dafbaa,
-      0 0 120px 55px #00aaff44,
-      inset 0 0 210px 56px #282c3433;
-  }
+.fractal-canvas {
+  box-shadow:
+    0 0 25px 8px #61dafb55,
+    0 0 80px 10px #9572ff33,
+    0 0 350px 60px #0ff4ff15;
+  border-radius: 12px;
+  background: #181c22;
+  margin-top: 6vh;
+  max-width: 95vw;
+  max-height: 70vh;
+  width: 90vw;
+  height: 60vh;
+  transition: box-shadow 0.4s;
 }
 
-.mirror-caption {
+.fractal-caption {
   color: #61dafb;
-  font-size: 1.5rem;
-  margin-top: 4vh;
-  letter-spacing: 0.08em;
-  text-shadow: 0 2px 25px #21c0fb55;
+  font-size: 2.1rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin-top: 2.9vmin;
+  text-shadow: 0 2px 25px #21c0fb66;
+  user-select: none;
 }
