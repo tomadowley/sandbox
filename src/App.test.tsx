@@ -2,9 +2,8 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders learn react link", () => {
+test("renders lunch predictor UI", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-  expect(false).toBe(true);
+  expect(screen.getByText(/John's Magical Lunch Predictor!/i)).toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /spin/i })).toBeInTheDocument();
 });
