@@ -84,8 +84,8 @@ function FractalVideo() {
     function tick() {
       if (!running) return;
       const now = Date.now();
-      // Add non-null assertion operator (!) to tell TypeScript that ctx is not null here
-      drawFractal(ctx!, canvas.width, canvas.height, now);
+      // Add non-null assertion operators (!) for both ctx and canvas
+      drawFractal(ctx!, canvas!.width, canvas!.height, now);
       anim = requestAnimationFrame(tick);
     }
     tick();
