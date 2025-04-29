@@ -30,6 +30,7 @@ function App() {
   const racketHeight = canvasHeight * 0.038;
   // Racket sits a certain number of pixels above the very bottom to allow "miss" detection
   const racketBottomOffset = Math.max(canvasHeight * 0.02, 8);  // space between racket and bottom
+  // Racket Y = top edge of racket (from top of court), math matches how CSS "bottom" is used below
   const racketY = canvasHeight - racketHeight - racketBottomOffset;
 
   // Ball parameters
@@ -152,24 +153,33 @@ function App() {
           incoming = true;
           canHit = true; // enable collision with racket again
         }
-        // Bounce off floor (loss): missed
-        if (nextY + ballRadius > canvasHeight) {
+        // Bounce off floor (loss): missed (only if NOT inside racket!)
+        if (
+          nextY + ballRadius > canvasHeight &&
+          // Not overlapping the racket
+          !(
+            (nextY - ballRadius <= racketY + racketHeight + 2) &&
+            (nextY + ballRadius >= racketY - 2) &&
+            (nextX + ballRadius >= racketX - racketWidth / 2 - 2) &&
+            (nextX - ballRadius <= racketX + racketWidth / 2 + 2)
+          )
+        ) {
           setGameOver(true);
           if (score > bestScore) {
             setBestScore(score);
             localStorage.setItem("bestScore", String(score));
           }
-          return { x, y, vx:0, vy:0, incoming: true, canHit: false };
+          return { x, y, vx: 0, vy: 0, incoming: true, canHit: false };
         }
-        // Racket collision when ball is returning (incoming toward player) and close to racket y
+        // Only detect collision if the ball is moving downward (vy > 0), incoming to player
         let hit = false;
         if (
-          incoming && canHit &&
-          // Use floor, ceil, and a small tolerant fudge factor for fairer gameplay
-          nextY + ballRadius >= racketY - 2 &&
-          nextY - ballRadius <= racketY + racketHeight + 2 &&
-          nextX + ballRadius >= racketX - racketWidth / 2 - 2 &&
-          nextX - ballRadius <= racketX + racketWidth / 2 + 2
+          incoming && canHit && vy > 0 &&
+          // Ball's next bottom edge hits racket's upper surface
+          (nextY + ballRadius) >= racketY - 2 &&
+          (nextY - ballRadius) <= (racketY + racketHeight + 2) &&
+          (nextX + ballRadius) >= (racketX - racketWidth / 2 - 2) &&
+          (nextX - ballRadius) <= (racketX + racketWidth / 2 + 2)
         ) {
           // Calculate hit angle: base vy up, vx based on strike position
           let rel = ((nextX - racketX) / (racketWidth/2));
