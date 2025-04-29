@@ -11,89 +11,82 @@ function generateColorPalette(size: number): string[] {
   return palette;
 }
 
-// The worker will handle the heavy computation
+// The worker will handle the heavy computation (function syntax for maximum compat, make sure worker processes render after each init)
 const workerCode = `
-  let width = 0;
-  let height = 0;
-  let colorPalette = [];
-  let frameCount = 0;
-  
+  var width = 0;
+  var height = 0;
+  var colorPalette = [];
+  var frameCount = 0;
+
   self.onmessage = function(e) {
-    const { type, data } = e.data;
-    
+    var type = e.data.type;
+    var data = e.data.data;
+
     if (type === 'init') {
       width = data.width;
       height = data.height;
       colorPalette = data.colorPalette;
-    } 
+      frameCount = 0;
+      // Start drawing the first frame after init!
+      postMessage({ type: 'initialized' });
+    }
     else if (type === 'render') {
-      const { zoom, offsetX, offsetY, colorOffset } = data;
+      var zoom = data.zoom,
+        offsetX = data.offsetX,
+        offsetY = data.offsetY,
+        colorOffset = data.colorOffset;
+
       frameCount++;
-      
+
       // Use lower resolution when moving and progressively improve
-      const pixelSkip = data.highQuality ? 1 : 2;
-      
-      // Use a typed array for better performance
-      const pixelData = new Uint8ClampedArray(width * height * 4);
-      
-      let yStart = frameCount % pixelSkip;
-      
-      // Stagger the pixel calculation to improve responsiveness
-      for (let py = yStart; py < height; py += pixelSkip) {
-        for (let px = 0; px < width; px += pixelSkip) {
-          const x0 = ((px / width) * 3.5 - 2.5) / zoom + offsetX;
-          const y0 = ((py / height) * 2.6 - 1.3) / zoom + offsetY;
-          
-          let x = 0, y = 0, iter = 0;
-          const maxIter = 100;
-          
-          // Fast path bailout - check if point is in main bulb or cardioid
-          const q = (x0-0.25)*(x0-0.25) + y0*y0;
+      var pixelSkip = data.highQuality ? 1 : 2;
+
+      var pixelData = new Uint8ClampedArray(width * height * 4);
+
+      var yStart = frameCount % pixelSkip;
+
+      for (var py = yStart; py < height; py += pixelSkip) {
+        for (var px = 0; px < width; px += pixelSkip) {
+          var x0 = ((px / width) * 3.5 - 2.5) / zoom + offsetX;
+          var y0 = ((py / height) * 2.6 - 1.3) / zoom + offsetY;
+          var x = 0, y = 0, iter = 0;
+          var maxIter = 100;
+          var q = (x0-0.25)*(x0-0.25) + y0*y0;
           if (x0 * (x0 + 1) + y0 * y0 < 0.25 || q*(q+(x0-0.25)) < 0.25*y0*y0) {
             iter = maxIter;
           } else {
-            // Classic Mandelbrot iteration
             while (x*x + y*y < 4 && iter < maxIter) {
-              const xtemp = x*x - y*y + x0;
+              var xtemp = x*x - y*y + x0;
               y = 2*x*y + y0;
               x = xtemp;
               iter++;
             }
           }
-          
-          // Get color from palette
-          let idx, r, g, b;
+          var idx, r, g, b;
           if (iter === maxIter) {
             r = 20; g = 20; b = 38;
           } else {
-            // Simple smooth coloring
-            const smoothed = iter + 1 - Math.log(Math.log(x*x + y*y)) / Math.LN2;
+            var smoothed = iter + 1 - Math.log(Math.log(x*x + y*y)) / Math.LN2;
             idx = Math.floor((smoothed * 10 + colorOffset) % colorPalette.length);
-            
-            // Parse HSL color (simplified)
-            const h = (idx * 6) % 360;
-            // HSL to RGB conversion (simplified for performance)
-            const c = 0.95 * 0.53 * 2;
-            const x = c * (1 - Math.abs((h / 60) % 2 - 1));
-            const m = 0.53 - c/2;
-            
-            let rc, gc, bc;
-            if (h < 60) { rc = c; gc = x; bc = 0; }
-            else if (h < 120) { rc = x; gc = c; bc = 0; }
-            else if (h < 180) { rc = 0; gc = c; bc = x; }
-            else if (h < 240) { rc = 0; gc = x; bc = c; }
-            else if (h < 300) { rc = x; gc = 0; bc = c; }
-            else { rc = c; gc = 0; bc = x; }
-            
+            var h = (idx * 6) % 360;
+            var c = 0.95 * 0.53 * 2;
+            var xx = c * (1 - Math.abs((h / 60) % 2 - 1));
+            var m = 0.53 - c/2;
+            var rc, gc, bc;
+            if (h < 60) { rc = c; gc = xx; bc = 0; }
+            else if (h < 120) { rc = xx; gc = c; bc = 0; }
+            else if (h < 180) { rc = 0; gc = c; bc = xx; }
+            else if (h < 240) { rc = 0; gc = xx; bc = c; }
+            else if (h < 300) { rc = xx; gc = 0; bc = c; }
+            else { rc = c; gc = 0; bc = xx; }
             r = Math.round((rc + m) * 255);
             g = Math.round((gc + m) * 255);
             b = Math.round((bc + m) * 255);
           }
-          
           // Fill the area if using pixel skipping
-          for (let fillY = 0; fillY < pixelSkip && py + fillY < height; fillY++) {
-            for (let fillX = 0; fillX < pixelSkip && px + fillX < width; fillX++) {
-              const pixelIndex = ((py + fillY) * width + (px + fillX)) * 4;
+          for (var fillY = 0; fillY < pixelSkip && py + fillY < height; fillY++) {
+            for (var fillX = 0; fillX < pixelSkip && px + fillX < width; fillX++) {
+              var pixelIndex = ((py + fillY) * width + (px + fillX)) * 4;
               pixelData[pixelIndex] = r;
               pixelData[pixelIndex + 1] = g;
               pixelData[pixelIndex + 2] = b;
@@ -102,15 +95,17 @@ const workerCode = `
           }
         }
       }
-      
-      self.postMessage({ 
-        type: 'renderComplete', 
-        pixelData, 
-        width, 
-        height,
-        yStart,
-        pixelSkip
-      });
+      // IMPORTANT: Only post if width/height are positive
+      if (width > 0 && height > 0) {
+        postMessage({
+          type: 'renderComplete',
+          pixelData: pixelData,
+          width: width,
+          height: height,
+          yStart: yStart,
+          pixelSkip: pixelSkip
+        });
+      }
     }
   };
 `;
@@ -210,32 +205,26 @@ function FractalVideo() {
     
     // Handle resize events
     window.addEventListener('resize', adaptCanvas);
-    
+
     // Animation state
     let animTime = 0;
     let lastFrame = performance.now();
-    
-    // Main animation loop
-    const animate = () => {
+
+    // Animation loop helper
+    let shouldAnimate = true;
+
+    // Define an explicit sendRenderFrame helper to prevent loop breakage
+    const sendRenderFrame = () => {
       if (!running) return;
-      
       const now = performance.now();
       const deltaTime = now - lastFrame;
       lastFrame = now;
-      
-      // Control animation speed
       animTime += deltaTime * 0.15;
-      
-      // Calculate parameters for rendering
       const t = animTime;
-      
-      // Smooth zoom and pan animations
       const zoom = 1.3 + Math.sin(t / 3000) * 1.0 + (Math.cos(t / 9000) * 1.5);
       const offsetX = -0.7 + Math.sin(t / 7100) * 0.3;
       const offsetY = 0.0 + Math.cos(t / 6300) * 0.25;
       const colorOffset = t / 200;
-      
-      // Tell worker to render a frame
       worker.postMessage({
         type: 'render',
         data: {
@@ -246,20 +235,51 @@ function FractalVideo() {
           highQuality: isHighQuality
         }
       });
-      
+    }
+
+    // The animation loop now only posts the render request if "shouldAnimate" is on
+    const animate = () => {
+      if (!running || !shouldAnimate) return;
+      sendRenderFrame();
       requestAnimationFrame(animate);
     };
-    
-    animate();
-    
+
+    // Ensure the animation only starts after worker init
+    let workerIsInitialized = false;
+
+    worker.onmessage = (e) => {
+      if (!running || !ctx || !canvas) return;
+      if (e.data.type === 'initialized') {
+        workerIsInitialized = true;
+        requestAnimationFrame(animate);
+      }
+      else if (e.data.type === 'renderComplete') {
+        const { pixelData, width, height } = e.data;
+        const imageData = new ImageData(pixelData, width, height);
+        ctx.putImageData(imageData, 0, 0);
+
+        frameCount++;
+        const now = performance.now();
+        if (now - lastFpsUpdate > 1000) {
+          const elapsed = (now - lastFpsUpdate) / 1000;
+          setFps(Math.round(frameCount / elapsed));
+          frameCount = 0;
+          lastFpsUpdate = now;
+        }
+      }
+    };
+
+    // Animation only starts after initialization
+    // worker will initialize and send "initialized", then animate
     // Toggle quality when clicking on canvas
     const handleClick = () => {
-      setIsHighQuality(!isHighQuality);
+      setIsHighQuality(v => !v);
     };
-    
+
     canvas.addEventListener('click', handleClick);
-    
+
     return () => {
+      shouldAnimate = false;
       running = false;
       URL.revokeObjectURL(workerURL);
       worker.terminate();
