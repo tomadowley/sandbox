@@ -3,9 +3,123 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 12px;
   background-color: #f5f5f5;
   min-height: 100vh;
+}
+
+.game-canvas {
+  position: relative;
+  background-color: #1a1a1a;
+  border: 2px solid #444;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+  width: 90vw;
+  max-width: 540px;
+  height: 70vw;
+  max-height: 860px;
+  aspect-ratio: 9 / 14;
+  touch-action: none;
+}
+
+.ball {
+  position: absolute;
+  width: 5vw;
+  height: 5vw;
+  min-width: 16px;
+  min-height: 16px;
+  max-width: 32px;
+  max-height: 32px;
+  background-color: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  pointer-events: none;
+}
+
+.racket {
+  position: absolute;
+  bottom: 3vw;
+  height: 3vw;
+  min-height: 18px;
+  max-height: 36px;
+  background-color: #61dafb;
+  border-radius: 12px;
+  box-shadow: 0 0 10px #61dafb;
+  will-change: left;
+}
+
+.front-wall {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 10px;
+  background-color: #555;
+}
+
+/* Responsive menu/instructions */
+.game-menu, .game-instructions {
+  width: 90vw;
+  max-width: 540px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+.game-menu {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(40, 44, 52, 0.9);
+  color: white;
+  padding: 20px 10px;
+  height: 60vw;
+  min-height: 240px;
+  max-height: 700px;
+}
+.game-menu button {
+  background-color: #61dafb;
+  border: none;
+  color: #282c34;
+  padding: 14px 24px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 24px;
+  transition: background-color 0.3s;
+  width: 100%;
+  max-width: 300px;
+}
+.game-menu button:hover, .game-menu button:focus {
+  background-color: #4fa8d1;
+}
+
+.game-instructions {
+  margin-top: 12px;
+  padding: 13px 7px 11px 7px;
+  background-color: #282c34;
+  color: white;
+}
+
+.game-instructions h3 {
+  color: #61dafb;
+  margin-top: 0;
+  font-size: 1.15rem;
+}
+
+.game-instructions p {
+  margin: 5px 0;
+  font-size: 1rem;
+}
+
+@media (max-width: 500px) {
+  .App h1 {
+    font-size: 1.4rem;
+  }
+
+  .game-stats {
+    font-size: 1rem;
+  }
 }
 
 h1 {
