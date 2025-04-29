@@ -66,14 +66,18 @@ function App() {
     setScore(0);
     setGameOver(false);
     setGameStarted(true);
-    // Player serves: ball fires toward front wall at random x velocity
-    let angle = (Math.random()-0.5)*0.6 + Math.PI*1.5;
-    let speed = Math.max(6, canvasHeight/95);
+    // Always serve straight upward (randomly skewed), ensuring vy is negative (toward front wall)
+    const minAngle = -Math.PI / 3; // -60deg from vertical up (left)
+    const maxAngle = Math.PI / 3;  // +60deg from vertical up (right)
+    const angle = Math.PI * 1.5 + (Math.random() * (maxAngle - minAngle) + minAngle); // PI*1.5 = vertical up
+    const speed = Math.max(7, canvasHeight / 85);
+    // Place ball well above racket, so it's clear of loss zone on first serve
+    const launchY = Math.max(ballRadius * 2.5, racketY - ballRadius * 6);
     setBall({
       x: racketX,
-      y: racketY-ballRadius*2.8,
-      vx: Math.cos(angle)*speed,
-      vy: Math.sin(angle)*-speed,
+      y: launchY,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed,
       incoming: false,
       canHit: false
     });
