@@ -361,7 +361,6 @@ const isMobile = typeof window !== "undefined" && window.innerWidth < 700;
             </p>
             <button
               style={{
-                marginRight: isMobile ? 0 : 8,
                 marginTop: isMobile ? 9 : 0,
                 padding: isMobile ? "6px 19px" : "7px 20px",
                 background: "#ede6fa",
@@ -371,7 +370,7 @@ const isMobile = typeof window !== "undefined" && window.innerWidth < 700;
                 fontSize: isMobile ? 12.9 : 15,
                 display: "block",
                 marginLeft: isMobile ? "auto" : undefined,
-                marginRight: isMobile ? "auto" : undefined,
+                marginRight: isMobile ? "auto" : (8 as number | undefined),
               }}
               onClick={nextChallenge}
             >
