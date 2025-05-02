@@ -198,8 +198,8 @@ export default function GorillaVsMenSimulator() {
     mountRef.current.innerHTML = "";
     mountRef.current.appendChild(renderer.domElement);
 
-    // Refs to meshes for updates
-    const meshes: THREE.Mesh[] = [];
+    // Refs to objects for updates (can be Mesh or Group)
+    const meshes: THREE.Object3D[] = [];
 
     function createMeshes() {
       // Remove previous
@@ -316,14 +316,18 @@ export default function GorillaVsMenSimulator() {
 
     let animId: number;
     function animate() {
-      // Update mesh positions and health bars
+      // Update object positions and health bars
       meshes.forEach((group, idx) => {
+        // group: THREE.Object3D (Group or Mesh)
         const f = fighters.filter(f => f.alive)[idx];
         if (f && group) {
           group.position.copy(f.position);
-          // Update health bar
-          // bar is always first child
-          if (group.children[0] instanceof THREE.Mesh) {
+          // Update health bar (bar is always first child)
+          if (
+            "children" in group &&
+            group.children.length > 0 &&
+            group.children[0] instanceof THREE.Mesh
+          ) {
             const bar = group.children[0] as THREE.Mesh;
             const maxHp = f.isGorilla ? GORILLA_STATS.hp : MAN_STATS.hp;
             const hpRatio = Math.max(0, Math.min(1, f.hp / maxHp));
