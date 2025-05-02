@@ -4,6 +4,7 @@ import App from "./App";
 
 test("renders Catch the Seth game title", () => {
   render(<App />);
-  const titleElement = screen.getByText(/Catch the Seth/i);
-  expect(titleElement).toBeInTheDocument();
+  // Prefer the heading role for unique title
+  const heading = screen.getByRole("heading", { name: /Catch the Seth/i });
+  expect(heading).toBeInTheDocument();
 });
