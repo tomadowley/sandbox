@@ -141,16 +141,54 @@ function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [gameState, boardDims.width, playerWidth]);
 
-  // Seth falling animation & collision detection
+  // Seth "AI" avoidance: make him try to dodge/counter Nyree each frame
   useEffect(() => {
     if (gameState !== "playing") return;
 
     const interval = setInterval(() => {
-      setSethY((prev) => {
-        const next = prev + boardDims.height * SETH_SPEED_RATIO;
+      setSethY((prevY) => {
+        let nextY = prevY + boardDims.height * SETH_SPEED_RATIO;
+
+        // Seth's center X and Nyree's center X
+        const sethCenter = sethX + sethWidth / 2;
+        const nyreeCenter = playerX + playerWidth / 2;
+        const safeGap = playerWidth * 0.55; // how close seth can be to Nyree's center before he tries to move
+
+        // Seth tries to "steer" away from player except for some randomness
+        setSethX((prevX) => {
+          let newX = prevX;
+          // If Seth's bottom is close to the "catch" zone, don't bother moving, just drop
+          if (nextY + sethHeight < playerY - playerHeight / 2) {
+            // Random movement a bit if no danger
+            if (Math.abs(sethCenter - nyreeCenter) < safeGap * 2 && Math.random() < 0.18) {
+              const wiggle = (Math.random() - 0.5) * sethWidth;
+              newX = Math.max(0, Math.min(boardDims.width - sethWidth, prevX + wiggle));
+              return newX;
+            }
+            if (sethCenter > nyreeCenter - safeGap && sethCenter < nyreeCenter + safeGap) {
+              // Seth is on a collision course, so try to escape horizontally
+              const goLeft = sethCenter > boardDims.width / 2 ? true : false;
+              const bias = Math.random() < 0.3; // sometimes Seth switches up
+              if ((goLeft && !bias) || (!goLeft && bias)) {
+                newX -= sethWidth * (0.7 + 0.6 * Math.random());
+              } else {
+                newX += sethWidth * (0.7 + 0.6 * Math.random());
+              }
+            } else if (nyreeCenter < sethCenter && prevX > 0) {
+              // Player is to the left, drift (slowly) right
+              newX += sethWidth * (0.14 + 0.18 * Math.random());
+            } else if (nyreeCenter > sethCenter && prevX < boardDims.width - sethWidth) {
+              // Player right, drift left
+              newX -= sethWidth * (0.14 + 0.18 * Math.random());
+            }
+            // Clamp Seth in bounds
+            newX = Math.max(0, Math.min(boardDims.width - sethWidth, newX));
+          }
+          return newX;
+        });
 
         // Check collision if next step is past or at the player's row
-        if (next + sethHeight >= playerY) {
+        if (nextY + sethHeight >= playerY) {
           const sethLeft = sethX;
           const sethRight = sethX + sethWidth;
           const playerLeft = playerX;
@@ -166,13 +204,13 @@ function App() {
           }
         }
 
-        return next;
+        return nextY;
       });
     }, 18);
 
     return () => clearInterval(interval);
     // eslint-disable-next-line
-  }, [sethX, playerX, gameState, sethHeight, playerY, boardDims.height]);
+  }, [sethX, playerX, gameState, sethHeight, playerY, boardDims.height, playerWidth, sethWidth, boardDims.width]);
 
   // Prevent scroll on arrow press
   useEffect(() => {
