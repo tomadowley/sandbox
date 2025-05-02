@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test-the-thing-that-is-the-thing-i-built:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16 # Specify the Node.js version (update if needed)
+          cache: "npm"
+
+      # Step 3: Install dependencies
+      - name: Install dependencies which are needed by the thing
+        run: npm install
+
+      # Step 4: Run unit tests
+      - name: Run tests
+        run: npm test -- --watchAll=false
