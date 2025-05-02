@@ -20,7 +20,7 @@ const MAN_STATS = {
   color: 0xddddcc,
 };
 
-const NUM_MEN = 100;
+const NUM_MEN = 10;
 
 type Fighter = {
   id: number;
