@@ -351,7 +351,11 @@ export default function GorillaVsMenSimulator() {
     return () => {
       cancelAnimationFrame(animId);
       renderer.dispose();
-      meshes.forEach(m => m.geometry.dispose());
+      meshes.forEach(m => {
+        if (m instanceof THREE.Mesh) {
+          m.geometry.dispose();
+        }
+      });
       mountRef.current && (mountRef.current.innerHTML = "");
     };
     // Re-create scene when fighters change
