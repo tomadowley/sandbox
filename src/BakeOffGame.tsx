@@ -8,14 +8,6 @@ type Challenge = {
   description: string;
   steps: Step[];
 };
-// ...rest of code...
-
-// Types
-type Challenge = {
-  name: string;
-  description: string;
-  steps: Step[];
-};
 
 type Step = {
   station: StationType;
@@ -25,7 +17,6 @@ type Step = {
 };
 
 type StationType = "Mixing" | "Proofing" | "Baking" | "Decorating";
-
 type GameStatus = "playing" | "success" | "fail" | "handshake";
 
 // Challenge Data
