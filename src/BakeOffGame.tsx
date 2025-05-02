@@ -1,4 +1,14 @@
 import React, { useState } from "react";
+import PaulCharacter from "./PaulCharacter";
+import BakerCharacter from "./BakerCharacter";
+
+// Types
+type Challenge = {
+  name: string;
+  description: string;
+  steps: Step[];
+};
+// ...rest of code...
 
 // Types
 type Challenge = {
@@ -166,50 +176,134 @@ export default function BakeOffGame() {
     setHintShown(true);
   }
 
-  // UI
+  // Mobile-friendly style helpers
+const isMobile = typeof window !== "undefined" && window.innerWidth < 700;
+// UI
   return (
-    <div id="bakeoff-main" style={{ fontFamily: "Quicksand,Verdana,sans-serif", background: "#fff7ed", padding: 32, borderRadius: 12, boxShadow: "0 8px 32px #0002" }}>
-      <h1 style={{ color: "#a2572c" }}>🥖 The Great Bake Off Simulator 🍰</h1>
-      <section style={{ margin: "16px 0 32px" }}>
+    <div
+      id="bakeoff-main"
+      style={{
+        fontFamily: "Quicksand,Verdana,sans-serif",
+        background: "#fff7ed",
+        padding: isMobile ? 6 : 32,
+        borderRadius: 12,
+        boxShadow: "0 8px 32px #0002",
+        minHeight: "100vh",
+        width: "100vw",
+        overflowX: "hidden",
+      }}
+    >
+      <h1
+        style={{
+          color: "#a2572c",
+          fontSize: isMobile ? 21 : 32,
+          marginBottom: isMobile ? 3 : 16,
+          textAlign: "center",
+          letterSpacing: "1.5px",
+        }}
+      >
+        🥖 The Great Bake Off Simulator 🍰
+      </h1>
+      <section
+        style={{
+          margin: isMobile ? "7px 0 12px" : "16px 0 32px",
+          fontSize: isMobile ? 13.5 : 17,
+          textAlign: "center",
+          lineHeight: isMobile ? 1.2 : 1.4,
+        }}
+      >
         <strong>Goal:</strong> Impress Paul with your bakes and earn a Handshake!
       </section>
+      {/* Characters Row */}
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "flex-end",
+          marginBottom: isMobile ? 7 : 22,
+          gap: isMobile ? 12 : 40,
+          minHeight: isMobile ? 90 : 110,
+        }}
+      >
+        <PaulCharacter
+          mood={
+            gameStatus === "handshake"
+              ? "handshake"
+              : gameStatus === "success"
+              ? "excited"
+              : "grumpy"
+          }
+          animate={gameStatus === "fail" || gameStatus === "handshake" || gameStatus === "playing"}
+        />
+        <BakerCharacter
+          status={
+            gameStatus === "fail"
+              ? "fail"
+              : gameStatus === "success"
+              ? "celebrate"
+              : gameStatus === "playing"
+              ? currentStepIdx > 0 || selections.length > 0
+                ? "working"
+                : "idle"
+              : "idle"
+          }
+          animate={gameStatus === "success" || gameStatus === "fail" || gameStatus === "playing"}
+        />
+      </div>
       <article
         style={{
           background: "#ffe4c4",
           border: "2px solid #a2572c",
-          padding: 24,
+          padding: isMobile ? 10 : 24,
           borderRadius: 8,
-          maxWidth: 550,
+          maxWidth: isMobile ? 410 : 550,
           margin: "0 auto",
+          minHeight: isMobile ? 230 : 240,
+          boxSizing: "border-box",
         }}
       >
-        <h2>Challenge: {challenge.name}</h2>
-        <p>{challenge.description}</p>
+        <h2
+          style={{
+            fontSize: isMobile ? 18 : 23,
+            textAlign: isMobile ? "center" : "left",
+            marginBottom: isMobile ? 4 : 14,
+          }}
+        >
+          Challenge: {challenge.name}
+        </h2>
+        <p style={{ fontSize: isMobile ? 13.7 : 17 }}>{challenge.description}</p>
 
         {gameStatus === "playing" ? (
           <>
-            <h3>
-              <span style={{ background: "#de8621", color: "white", padding: "1px 8px", borderRadius: 4 }}>
+            <h3 style={{
+              fontSize: isMobile ? 15.5 : 19,
+              marginBottom: isMobile ? 4 : 8,
+              textAlign: isMobile ? "center" : "left",
+            }}>
+              <span style={{ background: "#de8621", color: "white", padding: isMobile ? "1px 5px" : "1px 8px", borderRadius: 4 }}>
                 {currentStepIdx + 1}/{challenge.steps.length}
               </span>{" "}
               {step.station} Station
             </h3>
-            <p>
+            <p style={{ fontSize: isMobile ? 12.5 : 16, textAlign: isMobile ? "center" : "left" }}>
               <em>{step.action}</em>
             </p>
-            <div style={{ margin: "12px 0" }}>
+            <div style={{ margin: isMobile ? "8px 0" : "12px 0", display: "flex", flexWrap: "wrap", gap: isMobile ? 5 : 8, justifyContent: "center" }}>
               {stationChoices[step.station].map((opt) => (
                 <button
                   key={opt}
                   style={{
-                    margin: 6,
-                    padding: "10px 18px",
+                    margin: isMobile ? 3 : 6,
+                    padding: isMobile ? "8px 10px" : "10px 18px",
                     background: "#fffaf2",
                     color: "#a2572c",
                     border: "2px solid #dfa161",
                     borderRadius: 6,
                     fontWeight: "bold",
                     cursor: "pointer",
+                    fontSize: isMobile ? 13.2 : 16,
+                    minWidth: isMobile ? 95 : 128,
                   }}
                   onClick={() => handleChoice(opt)}
                 >
@@ -218,13 +312,22 @@ export default function BakeOffGame() {
               ))}
             </div>
             {hintShown ? (
-              <div style={{ color: "#be5d07", marginTop: 10 }}>
+              <div style={{ color: "#be5d07", marginTop: 10, fontSize: isMobile ? 12.8 : 15 }}>
                 ℹ️ <strong>Hint:</strong> {step.hint}
               </div>
             ) : (
               step.hint && (
                 <button
-                  style={{ marginTop: 16, color: "#fff", background: "#be5d07", border: "none", borderRadius: 3, padding: "4px 18px", cursor: "pointer" }}
+                  style={{
+                    marginTop: isMobile ? 9 : 16,
+                    color: "#fff",
+                    background: "#be5d07",
+                    border: "none",
+                    borderRadius: 3,
+                    padding: isMobile ? "3px 12px" : "4px 18px",
+                    cursor: "pointer",
+                    fontSize: isMobile ? 12.7 : 15,
+                  }}
                   onClick={showHint}
                 >
                   Need a hint?
@@ -234,10 +337,24 @@ export default function BakeOffGame() {
           </>
         ) : gameStatus === "fail" ? (
           <>
-            <h3 style={{ color: "#91280e" }}>Oh no! That's not right.</h3>
-            <p>Paul gives you his signature disappointed stare. Try again?</p>
+            <h3 style={{ color: "#91280e", textAlign: isMobile ? "center" : "left", fontSize: isMobile ? 16 : 19 }}>
+              Oh no! That's not right.
+            </h3>
+            <p style={{ textAlign: isMobile ? "center" : "left", fontSize: isMobile ? 12.4 : 16 }}>
+              Paul gives you his signature disappointed stare. Try again?
+            </p>
             <button
-              style={{ marginRight: 10, padding: "7px 20px", background: "#fff7ea", border: "2px solid #dfa161", borderRadius: 5, fontWeight: "bold" }}
+              style={{
+                display: "block",
+                margin: isMobile ? "8px auto" : "4px 0",
+                marginRight: isMobile ? 0 : 10,
+                padding: isMobile ? "6px 17px" : "7px 20px",
+                background: "#fff7ea",
+                border: "2px solid #dfa161",
+                borderRadius: 5,
+                fontWeight: "bold",
+                fontSize: isMobile ? 12.5 : 16,
+              }}
               onClick={retryChallenge}
             >
               Retry
@@ -245,23 +362,69 @@ export default function BakeOffGame() {
           </>
         ) : gameStatus === "success" ? (
           <>
-            <h2 style={{ color: "#378c6c" }}>Success!</h2>
-            <p>{randomShakeAudio[Math.floor(Math.random() * randomShakeAudio.length)]}</p>
+            <h2 style={{ color: "#378c6c", textAlign: isMobile ? "center" : "left", fontSize: isMobile ? 18 : 21 }}>
+              Success!
+            </h2>
+            <p style={{ textAlign: isMobile ? "center" : "left", fontSize: isMobile ? 12.8 : 15.5 }}>
+              {randomShakeAudio[Math.floor(Math.random() * randomShakeAudio.length)]}
+            </p>
             <button
-              style={{ marginRight: 8, padding: "7px 20px", background: "#ede6fa", border: "2px solid #a2572c", borderRadius: 5, fontWeight: "bold" }}
+              style={{
+                marginRight: isMobile ? 0 : 8,
+                marginTop: isMobile ? 9 : 0,
+                padding: isMobile ? "6px 19px" : "7px 20px",
+                background: "#ede6fa",
+                border: "2px solid #a2572c",
+                borderRadius: 5,
+                fontWeight: "bold",
+                fontSize: isMobile ? 12.9 : 15,
+                display: "block",
+                marginLeft: isMobile ? "auto" : undefined,
+                marginRight: isMobile ? "auto" : undefined,
+              }}
               onClick={nextChallenge}
             >
               Next Challenge
             </button>
-            <p style={{ marginTop: 12 }}>Can you complete all and win Paul's handshake?</p>
+            <p style={{ marginTop: isMobile ? 5 : 12, fontSize: isMobile ? 12.6 : 15, textAlign: isMobile ? "center" : "left" }}>
+              Can you complete all and win Paul's handshake?
+            </p>
           </>
         ) : (
           // Handshake!
           <>
-            <h2 style={{ color: "#e0b207", fontSize: 28 }}>🤝 Handshake from Paul! 🤝</h2>
-            <pre style={{ color: "#222", background: "#faf5cf", padding: 18, borderRadius: 8, fontSize: 16 }}>{handshakeMessage}</pre>
+            <h2 style={{
+              color: "#e0b207",
+              fontSize: isMobile ? 20 : 28,
+              textAlign: "center",
+              margin: isMobile ? "2px 0" : "7px 0",
+            }}>
+              🤝 Handshake from Paul! 🤝
+            </h2>
+            <pre style={{
+              color: "#222",
+              background: "#faf5cf",
+              padding: isMobile ? 7 : 18,
+              borderRadius: 8,
+              fontSize: isMobile ? 13.5 : 16,
+              lineHeight: isMobile ? 1.13 : 1.3,
+              textAlign: "center",
+            }}>
+              {handshakeMessage}
+            </pre>
             <button
-              style={{ marginTop: 12, padding: "8px 26px", background: "#faf5cf", border: "2px solid #a2572c", borderRadius: 7, fontWeight: "bold" }}
+              style={{
+                marginTop: isMobile ? 8 : 12,
+                padding: isMobile ? "7px 16px" : "8px 26px",
+                background: "#faf5cf",
+                border: "2px solid #a2572c",
+                borderRadius: 7,
+                fontWeight: "bold",
+                fontSize: isMobile ? 13.5 : 16,
+                display: "block",
+                marginLeft: "auto",
+                marginRight: "auto",
+              }}
               onClick={nextChallenge}
             >
               Play Again
@@ -269,7 +432,15 @@ export default function BakeOffGame() {
           </>
         )}
       </article>
-      <footer style={{ marginTop: 36, fontSize: "smaller", color: "#93643a" }}>
+      <footer
+        style={{
+          marginTop: isMobile ? 23 : 36,
+          fontSize: isMobile ? 11.8 : "smaller",
+          color: "#93643a",
+          textAlign: "center",
+          paddingBottom: isMobile ? 38 : 0,
+        }}
+      >
         Tip: Try every station, and pay attention to Paul's clues!
       </footer>
     </div>
