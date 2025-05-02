@@ -5,10 +5,10 @@ import * as THREE from "three";
  * Basic stats for fighters, based on rough real-world averages.
  */
 const GORILLA_STATS = {
-  power: 500, // Arbitrary units, gorilla is ~5x stronger than a strong human
-  stamina: 300,
-  technique: 60, // Gorillas have brute force but less fighting technique
-  hp: 1000,
+  power: 700, // Stronger
+  stamina: 400, // More stamina
+  technique: 70, // Slightly better technique
+  hp: 1600,      // More HP
   color: 0x222222,
 };
 
@@ -20,7 +20,7 @@ const MAN_STATS = {
   color: 0xddddcc,
 };
 
-const NUM_MEN = 10;
+const NUM_MEN = 100;
 
 type Fighter = {
   id: number;
@@ -29,6 +29,8 @@ type Fighter = {
   hp: number;
   stamina: number;
   alive: boolean;
+  recentAttack?: boolean; // true for a few frames after attacking or being attacked
+  armSwingAngle?: number; // for animation frame
 };
 
 enum SimulationState {
@@ -81,7 +83,7 @@ function createInitialFighters(): Fighter[] {
  * - Power, stamina, and technique affect hit/miss and damage.
  */
 function simulateFightStep(fighters: Fighter[]): Fighter[] {
-  const updated = fighters.map(f => ({ ...f }));
+  const updated = fighters.map(f => ({ ...f, recentAttack: false, armSwingAngle: 0 }));
   const gorilla = updated[0];
   if (!gorilla.alive) return updated;
 
@@ -95,7 +97,8 @@ function simulateFightStep(fighters: Fighter[]): Fighter[] {
     if (dist > 2.2) {
       // Move closer
       const direction = gorilla.position.clone().sub(man.position).normalize();
-      man.position.add(direction.multiplyScalar(1.2)); // approach speed
+      man.position.add(direction.multiplyScalar(1.0)); // approach speed (slower for more drama)
+      man.armSwingAngle = 0;
     } else {
       // Attack gorilla
       if (man.stamina > 0 && Math.random() < man.stamina / 150) {
@@ -107,23 +110,26 @@ function simulateFightStep(fighters: Fighter[]): Fighter[] {
           const dmg =
             MAN_STATS.power * (0.7 + Math.random() * 0.6) * (man.stamina / 100);
           gorilla.hp -= dmg;
+          gorilla.recentAttack = true;
         }
         man.stamina -= 8 + Math.random() * 5;
         if (man.stamina < 0) man.stamina = 0;
+        man.recentAttack = true;
+        man.armSwingAngle = Math.PI / 1.5;
       }
     }
   });
 
-  // Gorilla attacks: can hit up to 5 men in melee range per step
+  // Gorilla attacks: can hit up to 6 men in melee range per step
   if (gorilla.stamina > 0 && gorilla.alive) {
     const inRange = livingMen.filter(
       man => man.position.distanceTo(gorilla.position) < 2.6
     );
-    // Attack up to 5
-    for (let i = 0; i < Math.min(5, inRange.length); ++i) {
+    // Attack up to 6 for more spectacle
+    for (let i = 0; i < Math.min(6, inRange.length); ++i) {
       const man = inRange[i];
       // Hit chance is high
-      if (Math.random() < 0.85) {
+      if (Math.random() < 0.92) {
         const dmg =
           GORILLA_STATS.power *
           (0.8 + Math.random() * 0.6) *
@@ -132,9 +138,12 @@ function simulateFightStep(fighters: Fighter[]): Fighter[] {
         if (man.hp <= 0) {
           man.alive = false;
         }
+        man.recentAttack = true;
       }
-      gorilla.stamina -= 5 + Math.random() * 5;
+      gorilla.stamina -= 6 + Math.random() * 5;
       if (gorilla.stamina < 0) gorilla.stamina = 0;
+      gorilla.recentAttack = true;
+      gorilla.armSwingAngle = Math.PI / 1.4;
     }
   }
 
@@ -241,14 +250,15 @@ export default function GorillaVsMenSimulator() {
           );
           head.position.set(0, 2.1, 0.15);
           group.add(head);
-          // Arms
+          // Arms (upper/lower)
           for (let side of [-1, 1]) {
             const upperArm = new THREE.Mesh(
               new THREE.CylinderGeometry(0.24, 0.32, 1.1, 12),
               new THREE.MeshLambertMaterial({ color: 0x444444 })
             );
             upperArm.position.set(0.75 * side, 1.4, 0);
-            upperArm.rotation.z = Math.PI / 5 * side;
+            // Animate arm swing on attack
+            upperArm.rotation.z = (Math.PI / 5) * side + (f.armSwingAngle || 0) * side;
             group.add(upperArm);
 
             const lowerArm = new THREE.Mesh(
@@ -256,7 +266,7 @@ export default function GorillaVsMenSimulator() {
               new THREE.MeshLambertMaterial({ color: 0x444444 })
             );
             lowerArm.position.set(1.18 * side, 0.75, 0);
-            lowerArm.rotation.z = Math.PI / 8 * side;
+            lowerArm.rotation.z = (Math.PI / 8) * side + (f.armSwingAngle || 0) * side * 0.7;
             group.add(lowerArm);
           }
           // Legs
@@ -268,6 +278,11 @@ export default function GorillaVsMenSimulator() {
             upperLeg.position.set(0.45 * side, 0.45, 0);
             upperLeg.rotation.z = Math.PI / 17 * side;
             group.add(upperLeg);
+          }
+          // If recently attacked, flash
+          if (f.recentAttack) {
+            body.material = new THREE.MeshLambertMaterial({ color: 0x991111, emissive: 0x330000 });
+            head.material = new THREE.MeshLambertMaterial({ color: 0x991111, emissive: 0x330000 });
           }
         } else {
           // Man: simple stick figure
@@ -292,7 +307,8 @@ export default function GorillaVsMenSimulator() {
               new THREE.MeshLambertMaterial({ color: 0xcfcfcf })
             );
             arm.position.set(0.23 * side, 1.07, 0);
-            arm.rotation.z = Math.PI / 3 * side;
+            // Animate arm swing on attack
+            arm.rotation.z = (Math.PI / 3) * side + (f.armSwingAngle || 0) * side;
             group.add(arm);
           }
           // Legs
@@ -304,6 +320,11 @@ export default function GorillaVsMenSimulator() {
             leg.position.set(0.12 * side, 0.48, 0);
             leg.rotation.z = Math.PI / 18 * side;
             group.add(leg);
+          }
+          // If recently attacked, flash
+          if (f.recentAttack) {
+            body.material = new THREE.MeshLambertMaterial({ color: 0x991111 });
+            head.material = new THREE.MeshLambertMaterial({ color: 0x991111 });
           }
         }
         group.position.copy(f.position);
@@ -383,14 +404,19 @@ export default function GorillaVsMenSimulator() {
           setSimulationState(SimulationState.Ended);
           stopped = true;
         }
-        return next;
+        return next.map(f => ({
+          ...f,
+          // Diminish arm swing after each step
+          armSwingAngle: f.armSwingAngle ? f.armSwingAngle * 0.6 : 0,
+          recentAttack: f.recentAttack ? true : false,
+        }));
       });
 
       if (!stopped) {
-        animationRef.current = window.setTimeout(runStep, 120); // slow motion for visibility
+        animationRef.current = window.setTimeout(runStep, 320); // much slower for more drama
       }
     }
-    animationRef.current = window.setTimeout(runStep, 120);
+    animationRef.current = window.setTimeout(runStep, 320);
 
     return () => {
       if (animationRef.current) clearTimeout(animationRef.current);
@@ -420,11 +446,11 @@ export default function GorillaVsMenSimulator() {
       <div style={{ marginTop: 16, width: 420, textAlign: "left", fontSize: "0.93rem" }}>
         <b>Legend:</b>
         <br />
-        <span style={{ color: "#222" }}>● Gorilla (large dark sphere)</span>
+        <span style={{ color: "#222" }}>● Gorilla (large dark figure)</span>
         <br />
-        <span style={{ color: "#7c7c7c" }}>● Men (small light spheres)</span>
+        <span style={{ color: "#7c7c7c" }}>● Men (simple stick figures)</span>
         <br />
-        <b>Simulation:</b> Power, stamina, and technique determine hit, damage, and outcome. The gorilla is vastly stronger but outnumbered.
+        <b>Simulation:</b> Now with visual action: Fighters swing arms and flash when attacking or being hit. The gorilla is even more powerful!
       </div>
     </div>
   );
