@@ -21,6 +21,9 @@
       "react-app/jest"
     ]
   },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.1.5"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
