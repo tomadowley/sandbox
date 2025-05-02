@@ -1,0 +1,27 @@
+name: Reusable Workflow
+
+on:
+  workflow_call:
+    inputs:
+      message:
+        description: 'Message to echo'
+        required: false
+        type: string
+        default: 'Hello from reusable workflow'
+    secrets:
+      token:
+        required: false
+    outputs:
+      status:
+        description: 'Status of workflow execution'
+        value: ${{ jobs.reusable-job.outputs.status }}
+
+jobs:
+  reusable-job:
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.set-output.outputs.result }}
+    steps:
+      - run: echo "${{ inputs.message }}"
+      - id: set-output
+        run: echo "result=success" >> $GITHUB_OUTPUT

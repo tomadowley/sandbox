@@ -1,0 +1,10 @@
+name: Nested Workflow
+
+on:
+  workflow_call:
+
+jobs:
+  call-another-workflow:
+    uses: ./.github/workflows/child-workflow.yml
+    with:
+      message: "This is a nested workflow call (workflow calls another workflow)"

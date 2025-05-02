@@ -1,0 +1,25 @@
+name: 'Local Echo Action'
+description: 'Simple echo action'
+
+inputs:
+  message:
+    description: 'Message to echo'
+    required: true
+    default: 'Hello from local action'
+
+outputs:
+  timestamp:
+    description: 'Timestamp of execution'
+    value: ${{ steps.timestamp-step.outputs.time }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Echo Message
+      shell: bash
+      run: echo "${{ inputs.message }}"
+      
+    - name: Generate Timestamp
+      id: timestamp-step
+      shell: bash
+      run: echo "time=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_OUTPUT
