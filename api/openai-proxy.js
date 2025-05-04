@@ -42,6 +42,11 @@ module.exports = async (req, res) => {
     let json;
     try { json = JSON.parse(text); } catch { json = { raw: text }; }
     if (!response.ok) {
+      if (response.status === 429) {
+        console.error("OpenAI rate limit hit (429).", json);
+        res.status(429).json({ error: 'rate_limited', message: (json && json.error && json.error.message) || 'Too many requests – please slow down and try again.' });
+        return;
+      }
       console.error("OpenAI service error:", response.status, json);
     }
     res.status(response.status).json(json);

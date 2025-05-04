@@ -56,7 +56,6 @@ const callOpenAI = async (prompt: string): Promise<string> => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
-    // Note .js -- now using robust proxy
     const response = await fetch("/api/openai-proxy", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -69,6 +68,9 @@ const callOpenAI = async (prompt: string): Promise<string> => {
       signal: controller.signal
     });
     clearTimeout(timeout);
+    if (response.status === 429) {
+      return "__OPENAI_RATELIMIT__";
+    }
     if (!response.ok) {
       const txt = await response.text();
       throw new Error(`OpenAI API Error: ${response.status} - ${txt}`);
@@ -117,7 +119,10 @@ function useLevelState<T>(
         const aiPrompt = aiPromptBuilder(reals[idx]);
         const aiRaw = await callOpenAI(aiPrompt);
         if (!cancelled) {
-          if (aiRaw === "__OPENAI_ERROR__") {
+          if (aiRaw === "__OPENAI_RATELIMIT__") {
+            setError("Rate limited by OpenAI. Please slow down, wait a minute, and try again.");
+            setAiItem(null);
+          } else if (aiRaw === "__OPENAI_ERROR__") {
             setError("AI couldn't generate content. Check your connection or try again.");
           } else {
             setAiItem(formatter(aiRaw));
@@ -172,7 +177,10 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
     const prompt = aiPromptBuilder(REAL_EXAMPLES.pictures[idx]);
     callOpenAI(prompt)
       .then(raw => {
-        if (raw === "__OPENAI_ERROR__") {
+        if (raw === "__OPENAI_RATELIMIT__") {
+          setAIDescription(null);
+          setError("Rate limit reached. Please wait a minute and try again, or reduce how quickly you play.");
+        } else if (raw === "__OPENAI_ERROR__") {
           setAIDescription(null);
           setError("AI couldn't generate a description. Try again.");
         } else {
