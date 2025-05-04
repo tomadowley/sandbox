@@ -56,12 +56,10 @@ const callOpenAI = async (prompt: string): Promise<string> => {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000); // 15s hard timeout
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch("/api/openai-proxy", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Authorization":
-          "Bearer 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"
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
