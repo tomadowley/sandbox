@@ -12,7 +12,7 @@ module.exports = async (req, res) => {
     return;
   }
   
-  const apiKey = "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";
+  const apiKey = "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";
   
   try {
     let body = req.body;
