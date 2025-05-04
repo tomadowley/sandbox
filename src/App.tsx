@@ -54,29 +54,28 @@ const REAL_EXAMPLES = {
 const callOpenAI = async (prompt: string): Promise<string> => {
   try {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000); // 15s hard timeout
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
+    // Note .js -- now using robust proxy
     const response = await fetch("/api/openai-proxy", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
-        messages: [
-          { role: "user", content: prompt }
-        ],
+        messages: [{ role: "user", content: prompt }],
         max_tokens: 512,
         temperature: 0.8
       }),
       signal: controller.signal
     });
     clearTimeout(timeout);
-    if (!response.ok) throw new Error("OpenAI API Error: " + response.status);
+    if (!response.ok) {
+      const txt = await response.text();
+      throw new Error(`OpenAI API Error: ${response.status} - ${txt}`);
+    }
     const data = await response.json();
     return data.choices?.[0]?.message?.content?.trim() || "";
   } catch (e: any) {
-    // Always return an error string for graceful UI fallback
     return "__OPENAI_ERROR__";
   }
 };
