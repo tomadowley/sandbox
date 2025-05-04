@@ -57,12 +57,10 @@ let lastOpenAIRequest = 0;
 const getNow = () => Math.floor(Date.now() / 1000);
 
 const callOpenAI = async (prompt: string): Promise<string> => {
-  // Enforce local throttle:
-  const now = getNow();
-  if (now - lastOpenAIRequest < OPENAI_REQUEST_COOLDOWN) {
-    return "__OPENAI_COOLDOWN__";
+  // Log every request for debug
+  if (typeof window !== "undefined" && window.console) {
+    console.log('[callOpenAI] Called at', new Date().toISOString(), 'Prompt:', prompt.slice(0, 120));
   }
-  lastOpenAIRequest = now;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
