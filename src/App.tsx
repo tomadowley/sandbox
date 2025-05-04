@@ -52,24 +52,35 @@ const REAL_EXAMPLES = {
 
 // ---- OpenAI API Call Utility ----
 const callOpenAI = async (prompt: string): Promise<string> => {
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization":
-        "Bearer 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"
-    },
-    body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        { role: "user", content: prompt }
-      ],
-      max_tokens: 512,
-      temperature: 0.8
-    })
-  });
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content?.trim() || "";
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000); // 15s hard timeout
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization":
+          "Bearer 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"
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "user", content: prompt }
+        ],
+        max_tokens: 512,
+        temperature: 0.8
+      }),
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+    if (!response.ok) throw new Error("OpenAI API Error: " + response.status);
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || "";
+  } catch (e: any) {
+    // Always return an error string for graceful UI fallback
+    return "__OPENAI_ERROR__";
+  }
 };
 
 // ---- Utility for randomizing left/right placement ----
@@ -94,6 +105,7 @@ function useLevelState<T>(
   const [realIdx, setRealIdx] = useState(() => Math.floor(Math.random() * reals.length));
   const [aiItem, setAiItem] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const nextLevel = () => setLevelKey(k => k + 1);
 
@@ -101,23 +113,37 @@ function useLevelState<T>(
     let cancelled = false;
     async function loadLevel() {
       setLoading(true);
+      setError(null);
       const idx = Math.floor(Math.random() * reals.length);
       setRealIdx(idx);
-      const aiPrompt = aiPromptBuilder(reals[idx]);
-      const aiRaw = await callOpenAI(aiPrompt);
-      if (!cancelled) setAiItem(formatter(aiRaw));
-      setLoading(false);
+      try {
+        const aiPrompt = aiPromptBuilder(reals[idx]);
+        const aiRaw = await callOpenAI(aiPrompt);
+        if (!cancelled) {
+          if (aiRaw === "__OPENAI_ERROR__") {
+            setError("AI couldn't generate content. Check your connection or try again.");
+          } else {
+            setAiItem(formatter(aiRaw));
+            setError(null);
+          }
+        }
+      } catch (e: any) {
+        if (!cancelled) setError("AI failed to generate content.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     }
     loadLevel();
     return () => { cancelled = true; };
     // eslint-disable-next-line
   }, [levelKey]);
 
-  // Returns: real, ai, loading, nextLevel
+  // Returns: real, ai, loading, nextLevel, error
   return {
     real: reals[realIdx],
     ai: aiItem,
     loading,
+    error,
     nextLevel
   };
 }
@@ -139,16 +165,31 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
   // For AI, fetch the description each round
   const [aiDescription, setAIDescription] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const nextLevel = React.useCallback(() => {
     setLoading(true);
+    setError(null);
     const idx = Math.floor(Math.random() * REAL_EXAMPLES.pictures.length);
     setRealIdx(idx);
     const prompt = aiPromptBuilder(REAL_EXAMPLES.pictures[idx]);
-    callOpenAI(prompt).then(raw => {
-      setAIDescription(formatter(raw));
-      setLoading(false);
-    });
+    callOpenAI(prompt)
+      .then(raw => {
+        if (raw === "__OPENAI_ERROR__") {
+          setAIDescription(null);
+          setError("AI couldn't generate a description. Try again.");
+        } else {
+          setAIDescription(formatter(raw));
+          setError(null);
+        }
+      })
+      .catch(() => {
+        setAIDescription(null);
+        setError("AI failed to generate a description.");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   // On mount and when nextLevel called, load new round
@@ -162,6 +203,8 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
         ? [{ kind: "real" as const, url: real.url }, { kind: "ai" as const, description: aiDescription }]
         : [{ kind: "ai" as const, description: aiDescription }, { kind: "real" as const, url: real.url }];
       setShuffled(pair);
+    } else {
+      setShuffled(null);
     }
   }, [loading, real, aiDescription]);
 
@@ -176,7 +219,12 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
   return (
     <div>
       <h2>{CATEGORY_TITLES.pictures}</h2>
-      {loading || !shuffled ? (
+      {error ? (
+        <div>
+          <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          <button onClick={nextLevel}>Try Again</button>
+        </div>
+      ) : loading || !shuffled ? (
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
@@ -215,7 +263,7 @@ function PoemsGame({ addPoint, subPoint }: CategoryGameProps) {
     `Write an original, short poem that is in a similar style and length to this human-made poem:\n\n"${real}"\n\nDo NOT copy content or mention AI. Return ONLY your poem.`;
   const formatter = (raw: string) => raw.trim();
 
-  const { real, ai, loading, nextLevel } = useLevelState<string>(
+  const { real, ai, loading, error, nextLevel } = useLevelState<string>(
     realPoems,
     aiPromptBuilder,
     formatter
@@ -238,7 +286,12 @@ function PoemsGame({ addPoint, subPoint }: CategoryGameProps) {
   return (
     <div>
       <h2>{CATEGORY_TITLES.poems}</h2>
-      {loading || !shuffled ? (
+      {error ? (
+        <div>
+          <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          <button onClick={nextLevel}>Try Again</button>
+        </div>
+      ) : loading || !shuffled ? (
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
@@ -264,7 +317,7 @@ function JokesGame({ addPoint, subPoint }: CategoryGameProps) {
     `Create a brand new joke, in a similar style and length to this one, that could have been written by a human:\n\n"${real}"\n\nReturn ONLY your joke.`;
   const formatter = (raw: string) => raw.trim();
 
-  const { real, ai, loading, nextLevel } = useLevelState<string>(
+  const { real, ai, loading, error, nextLevel } = useLevelState<string>(
     realJokes,
     aiPromptBuilder,
     formatter
@@ -287,7 +340,12 @@ function JokesGame({ addPoint, subPoint }: CategoryGameProps) {
   return (
     <div>
       <h2>{CATEGORY_TITLES.jokes}</h2>
-      {loading || !shuffled ? (
+      {error ? (
+        <div>
+          <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          <button onClick={nextLevel}>Try Again</button>
+        </div>
+      ) : loading || !shuffled ? (
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
@@ -313,7 +371,7 @@ function LyricsGame({ addPoint, subPoint }: CategoryGameProps) {
     `Write a short original song lyric in the same style as this real lyric, but on a new topic:\n\n"${real}"\n\nDo NOT copy content or reference AI. Only return the lyric.`;
   const formatter = (raw: string) => raw.trim();
 
-  const { real, ai, loading, nextLevel } = useLevelState<string>(
+  const { real, ai, loading, error, nextLevel } = useLevelState<string>(
     realLyrics,
     aiPromptBuilder,
     formatter
@@ -336,7 +394,12 @@ function LyricsGame({ addPoint, subPoint }: CategoryGameProps) {
   return (
     <div>
       <h2>{CATEGORY_TITLES.lyrics}</h2>
-      {loading || !shuffled ? (
+      {error ? (
+        <div>
+          <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          <button onClick={nextLevel}>Try Again</button>
+        </div>
+      ) : loading || !shuffled ? (
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
@@ -362,7 +425,7 @@ function NewsGame({ addPoint, subPoint }: CategoryGameProps) {
     `Write a fake but plausible news headline, not real, in the same style/length as this real news headline:\n\n"${real}"\n\nDo NOT reference AI. Only the headline.`;
   const formatter = (raw: string) => raw.split('\n')[0].trim();
 
-  const { real, ai, loading, nextLevel } = useLevelState<string>(
+  const { real, ai, loading, error, nextLevel } = useLevelState<string>(
     realHeadlines,
     aiPromptBuilder,
     formatter
@@ -385,7 +448,12 @@ function NewsGame({ addPoint, subPoint }: CategoryGameProps) {
   return (
     <div>
       <h2>{CATEGORY_TITLES.news}</h2>
-      {loading || !shuffled ? (
+      {error ? (
+        <div>
+          <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          <button onClick={nextLevel}>Try Again</button>
+        </div>
+      ) : loading || !shuffled ? (
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
@@ -411,7 +479,7 @@ function StoriesGame({ addPoint, subPoint }: CategoryGameProps) {
     `Write a very short story of the same style and length as this human-written story:\n\n"${real}"\n\nDo NOT reference AI, and do not copy the story. Only return the story.`;
   const formatter = (raw: string) => raw.trim();
 
-  const { real, ai, loading, nextLevel } = useLevelState<string>(
+  const { real, ai, loading, error, nextLevel } = useLevelState<string>(
     realStories,
     aiPromptBuilder,
     formatter
@@ -434,7 +502,12 @@ function StoriesGame({ addPoint, subPoint }: CategoryGameProps) {
   return (
     <div>
       <h2>{CATEGORY_TITLES.stories}</h2>
-      {loading || !shuffled ? (
+      {error ? (
+        <div>
+          <div style={{ color: "red", marginBottom: 16 }}>{error}</div>
+          <button onClick={nextLevel}>Try Again</button>
+        </div>
+      ) : loading || !shuffled ? (
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
