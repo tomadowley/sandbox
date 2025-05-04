@@ -135,7 +135,10 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
   // Randomize which is left/right
   const [shuffled, setShuffled] = useState<[ { url: string }, { url: string } ] | null>(null);
   React.useEffect(() => {
-    if (real && ai) setShuffled(shufflePair([real, ai]));
+    // Only call setShuffled if both real and ai are defined.
+    if (real !== undefined && ai !== null && ai !== undefined) {
+      setShuffled(shufflePair([real, ai as { url: string }]));
+    }
     // eslint-disable-next-line
   }, [real, ai]);
 
