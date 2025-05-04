@@ -12,7 +12,11 @@ module.exports = async (req, res) => {
     return;
   }
   
-  const apiKey = "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";
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    res.status(500).json({ error: "OPENAI_API_KEY is not set. Please set as env in Vercel project settings." });
+    return;
+  }
   
   try {
     let body = req.body;
