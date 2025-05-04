@@ -132,25 +132,38 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
   // For real entries we show the photo; for "AI" we show description
   const formatter = (desc: string) => desc.trim();
 
-  const { real, ai, loading, nextLevel } = useLevelState<{ url: string }, string>(
-    realImages,
-    aiPromptBuilder,
-    formatter
-  );
+  // Get just the real photo
+  const [realIdx, setRealIdx] = useState(() => Math.floor(Math.random() * REAL_EXAMPLES.pictures.length));
+  const real = REAL_EXAMPLES.pictures[realIdx];
 
-  // Randomize left/right: one side is real photo, one is AI description
-  const [shuffled, setShuffled] = useState<
-    [{ kind: "real", url: string }, { kind: "ai", description: string }] | [{ kind: "ai", description: string }, { kind: "real", url: string }] | null>(null);
+  // For AI, fetch the description each round
+  const [aiDescription, setAIDescription] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
+  const nextLevel = React.useCallback(() => {
+    setLoading(true);
+    const idx = Math.floor(Math.random() * REAL_EXAMPLES.pictures.length);
+    setRealIdx(idx);
+    const prompt = aiPromptBuilder(REAL_EXAMPLES.pictures[idx]);
+    callOpenAI(prompt).then(raw => {
+      setAIDescription(formatter(raw));
+      setLoading(false);
+    });
+  }, []);
+
+  // On mount and when nextLevel called, load new round
+  React.useEffect(() => { nextLevel(); }, []); // eslint-disable-line
+
+  // Shuffle "real" and "AI desc" on every round
+  const [shuffled, setShuffled] = useState<Array<{ kind: "real", url: string } | { kind: "ai", description: string }> | null>(null);
   React.useEffect(() => {
-    if (real && ai) {
-      const pair =
-        Math.random() < 0.5
-          ? [{ kind: "real", url: real.url }, { kind: "ai", description: ai }]
-          : [{ kind: "ai", description: ai }, { kind: "real", url: real.url }];
+    if (!loading && real && aiDescription) {
+      const pair = Math.random() < 0.5
+        ? [{ kind: "real" as const, url: real.url }, { kind: "ai" as const, description: aiDescription }]
+        : [{ kind: "ai" as const, description: aiDescription }, { kind: "real" as const, url: real.url }];
       setShuffled(pair);
     }
-  }, [real, ai]);
+  }, [loading, real, aiDescription]);
 
   const handleSelect = (chosen: { kind: string }) => {
     if (loading || !shuffled) return;
