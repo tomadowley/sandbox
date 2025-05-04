@@ -73,9 +73,9 @@ const callOpenAI = async (prompt: string): Promise<string> => {
 };
 
 // ---- Utility for randomizing left/right placement ----
-const shufflePair = <T,>(arr: [T, T]) => {
+function shufflePair<T>(arr: [T, T]): [T, T] {
   return Math.random() < 0.5 ? arr : [arr[1], arr[0]];
-};
+}
 
 // ---- Category Game Components ----
 
@@ -137,7 +137,8 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
   React.useEffect(() => {
     // Only call setShuffled if both real and ai are defined.
     if (real !== undefined && ai !== null && ai !== undefined) {
-      setShuffled(shufflePair([real, ai as { url: string }]));
+      // Be explicit that this is a tuple for TS
+      setShuffled(shufflePair([real, ai] as [{ url: string }, { url: string }]));
     }
     // eslint-disable-next-line
   }, [real, ai]);
