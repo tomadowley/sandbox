@@ -84,33 +84,36 @@ type CategoryGameProps = {
   subPoint: () => void;
 };
 
-function useLevelState<T>(reals: T[], aiPromptBuilder: (real: T) => string, formatter: (aiRaw: string) => T) {
-  // Picks a random real item each time
+// Improved: useLevelState triggers updates and shuffling correctly per round
+function useLevelState<T>(
+  reals: T[],
+  aiPromptBuilder: (real: T) => string,
+  formatter: (aiRaw: string) => T
+) {
+  const [levelKey, setLevelKey] = useState(0);
   const [realIdx, setRealIdx] = useState(() => Math.floor(Math.random() * reals.length));
   const [aiItem, setAiItem] = useState<T | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // Fetch a new AI version based on the real sample
-  const nextLevel = async () => {
-    setLoading(true);
-    const newRealIdx = Math.floor(Math.random() * reals.length);
-    setRealIdx(newRealIdx);
+  const nextLevel = () => setLevelKey(k => k + 1);
 
-    const aiPrompt = aiPromptBuilder(reals[newRealIdx]);
-    const aiRaw = await callOpenAI(aiPrompt);
-    setAiItem(formatter(aiRaw));
-    setLoading(false);
-  };
-
-  // On mount, fetch AI item
   React.useEffect(() => {
-    (async () => {
-      await nextLevel();
-    })();
+    let cancelled = false;
+    async function loadLevel() {
+      setLoading(true);
+      const idx = Math.floor(Math.random() * reals.length);
+      setRealIdx(idx);
+      const aiPrompt = aiPromptBuilder(reals[idx]);
+      const aiRaw = await callOpenAI(aiPrompt);
+      if (!cancelled) setAiItem(formatter(aiRaw));
+      setLoading(false);
+    }
+    loadLevel();
+    return () => { cancelled = true; };
     // eslint-disable-next-line
-  }, []);
+  }, [levelKey]);
 
-  // Returns: [real, ai, loading, nextLevel]
+  // Returns: real, ai, loading, nextLevel
   return {
     real: reals[realIdx],
     ai: aiItem,
@@ -120,35 +123,41 @@ function useLevelState<T>(reals: T[], aiPromptBuilder: (real: T) => string, form
 }
 
 // ---- Pictures Game ----
+// Now the AI side displays a GPT-generated description, not an image
 function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
   const realImages = REAL_EXAMPLES.pictures;
   const aiPromptBuilder = (real: { url: string }) =>
-    `Generate a completely AI-created description of a photo, that could be used to produce an image similar in style/subject to this real photo: "${real.url}" but DO NOT use or copy the photo. Then say nothing else except your alt text description.`;
-  const formatter = (desc: string) => ({ url: `https://source.unsplash.com/random/600x400?sig=${Math.floor(Math.random()*10000)}` }); // Fakes AI image
+    `Write an imaginative, detailed photo description for an image that could be completely artificial (AI generated). Describe the subject, setting, mood, color and style but DO NOT literally copy or refer to the provided URL. Just return the description, nothing else.`;
 
-  const { real, ai, loading, nextLevel } = useLevelState<{ url: string }>(
+  // For real entries we show the photo; for "AI" we show description
+  const formatter = (desc: string) => desc.trim();
+
+  const { real, ai, loading, nextLevel } = useLevelState<{ url: string }, string>(
     realImages,
     aiPromptBuilder,
     formatter
   );
 
-  // Randomize which is left/right
-  const [shuffled, setShuffled] = useState<[ { url: string }, { url: string } ] | null>(null);
+  // Randomize left/right: one side is real photo, one is AI description
+  const [shuffled, setShuffled] = useState<
+    [{ kind: "real", url: string }, { kind: "ai", description: string }] | [{ kind: "ai", description: string }, { kind: "real", url: string }] | null>(null);
+
   React.useEffect(() => {
-    // Only call setShuffled if both real and ai are defined.
-    if (real !== undefined && ai !== null && ai !== undefined) {
-      // Be explicit that this is a tuple for TS
-      setShuffled(shufflePair([real, ai] as [{ url: string }, { url: string }]));
+    if (real && ai) {
+      const pair =
+        Math.random() < 0.5
+          ? [{ kind: "real", url: real.url }, { kind: "ai", description: ai }]
+          : [{ kind: "ai", description: ai }, { kind: "real", url: real.url }];
+      setShuffled(pair);
     }
-    // eslint-disable-next-line
   }, [real, ai]);
 
-  const handleSelect = (chosen: { url: string }) => {
+  const handleSelect = (chosen: { kind: string }) => {
     if (loading || !shuffled) return;
-    if (chosen.url === real.url) addPoint();
+    if (chosen.kind === "real") addPoint();
     else subPoint();
-    nextLevel();
     setShuffled(null);
+    nextLevel();
   };
 
   return (
@@ -158,18 +167,30 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
         <div>Loading...</div>
       ) : (
         <div style={{ display: "flex", gap: 24, justifyContent: "center", margin: 32 }}>
-          {shuffled.map((img, i) =>
-            <div key={i}
-              style={{ cursor: "pointer", border: "2px solid #ccc", borderRadius: 8, overflow: "hidden" }}
-              onClick={() => handleSelect(img)}
-              >
-              <img src={img.url} alt="candidate" style={{ width: 300, height: 200, objectFit: 'cover' }} />
-              <div style={{ textAlign: "center", padding: 8 }}>Photo {i + 1}</div>
+          {shuffled.map((item, i) =>
+            <div
+              key={i}
+              style={{ cursor: "pointer", border: "2px solid #ccc", borderRadius: 8, overflow: "hidden", minWidth: 320, minHeight: 220, background: "#fff" }}
+              onClick={() => handleSelect(item)}
+            >
+              {item.kind === "real" ? (
+                <>
+                  <img src={item.url} alt="Real" style={{ width: 300, height: 200, objectFit: 'cover', display: "block" }} />
+                  <div style={{ textAlign: "center", padding: 8 }}>Photo {i + 1}</div>
+                </>
+              ) : (
+                <>
+                  <div style={{ padding: 16, minHeight: 140, display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
+                    <span><b>AI Generated Description:</b><br />"{item.description}"</span>
+                  </div>
+                  <div style={{ textAlign: "center", padding: 8 }}>Photo {i + 1}</div>
+                </>
+              )}
             </div>
           )}
         </div>
       )}
-      <div>Choose which photo is real (not AI-generated).</div>
+      <div>Identify which is the real photograph and which is just an AI-generated description!</div>
     </div>
   );
 }
