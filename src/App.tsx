@@ -51,7 +51,18 @@ const REAL_EXAMPLES = {
 };
 
 // ---- OpenAI API Call Utility ----
+const OPENAI_REQUEST_COOLDOWN = 20; // seconds
+
+let lastOpenAIRequest = 0;
+const getNow = () => Math.floor(Date.now() / 1000);
+
 const callOpenAI = async (prompt: string): Promise<string> => {
+  // Enforce local throttle:
+  const now = getNow();
+  if (now - lastOpenAIRequest < OPENAI_REQUEST_COOLDOWN) {
+    return "__OPENAI_COOLDOWN__";
+  }
+  lastOpenAIRequest = now;
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -119,7 +130,10 @@ function useLevelState<T>(
         const aiPrompt = aiPromptBuilder(reals[idx]);
         const aiRaw = await callOpenAI(aiPrompt);
         if (!cancelled) {
-          if (aiRaw === "__OPENAI_RATELIMIT__") {
+          if (aiRaw === "__OPENAI_COOLDOWN__") {
+            setError("You must wait at least 20 seconds between rounds to stay within OpenAI rate limits. Please wait and try again.");
+            setAiItem(null);
+          } else if (aiRaw === "__OPENAI_RATELIMIT__") {
             setError("Rate limited by OpenAI. Please slow down, wait a minute, and try again.");
             setAiItem(null);
           } else if (aiRaw === "__OPENAI_ERROR__") {
@@ -177,7 +191,12 @@ function PicturesGame({ addPoint, subPoint }: CategoryGameProps) {
     const prompt = aiPromptBuilder(REAL_EXAMPLES.pictures[idx]);
     callOpenAI(prompt)
       .then(raw => {
-        if (raw === "__OPENAI_RATELIMIT__") {
+        if (raw === "__OPENAI_COOLDOWN__") {
+          setAIDescription(null);
+          setError(
+            `You must wait at least 20 seconds between rounds to stay within OpenAI rate limits. Please wait and try again.`
+          );
+        } else if (raw === "__OPENAI_RATELIMIT__") {
           setAIDescription(null);
           setError("Rate limit reached. Please wait a minute and try again, or reduce how quickly you play.");
         } else if (raw === "__OPENAI_ERROR__") {
