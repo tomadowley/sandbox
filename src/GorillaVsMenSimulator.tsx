@@ -194,9 +194,9 @@ export default function GorillaVsMenSimulator() {
     skyTex.needsUpdate = true;
     scene.background = skyTex;
 
-    // Camera: orbit mode!
+    // Camera: constant orbit mode!
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    // Initial position will be set in animate
+    // All multi-camera logic removed; position set in animate().
   // <-- This closing bracket was likely missing to properly end the Three.js setup effect
 
     // Lights (brighter, more dramatic)
@@ -428,9 +428,10 @@ export default function GorillaVsMenSimulator() {
     let animId: number;
     function animate() {
       // Camera orbits smoothly around the arena at all times
-      const t = Date.now() * 0.00020; // adjust speed as needed
+      const t = Date.now() * 0.00022; // slightly faster orbit for more action
       const radius = 25;
-      const height = 12 + Math.sin(Date.now() * 0.00016) * 2.3; // some vertical motion
+      const yBase = 11.5, yVar = 3.2;
+      const height = yBase + Math.cos(Date.now() * 0.00010) * yVar;
       camera.position.set(
         Math.cos(t) * radius,
         height,
@@ -444,7 +445,7 @@ export default function GorillaVsMenSimulator() {
         }));
       });
 
-      // No more camera switching logic -- just orbit!
+      // Camera is always orbiting -- all pose/switch logic is gone!
 
       if (!stopped) {
         animationRef.current = window.setTimeout(runStep, 350); // slower for more drama
