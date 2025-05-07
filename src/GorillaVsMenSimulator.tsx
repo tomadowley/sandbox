@@ -438,61 +438,61 @@ export default function GorillaVsMenSimulator() {
     );
     camera.lookAt(0, 1.3, 0);
 
-      // Update object positions and health bars
-      meshes.forEach((group, idx) => {
-        const f = fighters.filter(f => f.alive)[idx];
-        if (f && group) {
-          if (f.recentAttack && !f.isGorilla && f.armSwingAngle && f.armSwingAngle > Math.PI / 2) {
-            group.position.copy(f.position.clone().add(new THREE.Vector3(0, Math.min(3, f.armSwingAngle * 2), 0)));
-          } else {
-            group.position.copy(f.position);
-          }
-          if (
-            "children" in group &&
-            group.children.length > 0 &&
-            group.children[0] instanceof THREE.Mesh
-          ) {
-            const bar = group.children[0] as THREE.Mesh;
-            const maxHp = f.isGorilla ? GORILLA_STATS.hp : MAN_STATS.hp;
-            const hpRatio = Math.max(0, Math.min(1, f.hp / maxHp));
-            (bar.material as THREE.MeshBasicMaterial).color.set(
-              new THREE.Color().lerpColors(
-                new THREE.Color(0xff0000),
-                new THREE.Color(0x00ff00),
-                hpRatio
-              )
-            );
-            bar.scale.x = hpRatio;
-          }
+    // Update object positions and health bars
+    meshes.forEach((group, idx) => {
+      const f = fighters.filter(f => f.alive)[idx];
+      if (f && group) {
+        if (f.recentAttack && !f.isGorilla && f.armSwingAngle && f.armSwingAngle > Math.PI / 2) {
+          group.position.copy(f.position.clone().add(new THREE.Vector3(0, Math.min(3, f.armSwingAngle * 2), 0)));
+        } else {
+          group.position.copy(f.position);
         }
-      });
-
-      // Shockwave effect: massive gorilla attack or KO
-      if (shockwaveMesh) {
-        shockwaveAge += 1;
-        shockwaveMesh.scale.x = 2 + shockwaveAge * 0.65;
-        shockwaveMesh.scale.y = 2 + shockwaveAge * 0.65;
-        (shockwaveMesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.25 - shockwaveAge * 0.01);
-        if ((shockwaveMesh.material as THREE.MeshBasicMaterial).opacity <= 0) {
-          scene.remove(shockwaveMesh);
-          shockwaveMesh.geometry.dispose();
-          shockwaveMesh = null;
+        if (
+          "children" in group &&
+          group.children.length > 0 &&
+          group.children[0] instanceof THREE.Mesh
+        ) {
+          const bar = group.children[0] as THREE.Mesh;
+          const maxHp = f.isGorilla ? GORILLA_STATS.hp : MAN_STATS.hp;
+          const hpRatio = Math.max(0, Math.min(1, f.hp / maxHp));
+          (bar.material as THREE.MeshBasicMaterial).color.set(
+            new THREE.Color().lerpColors(
+              new THREE.Color(0xff0000),
+              new THREE.Color(0x00ff00),
+              hpRatio
+            )
+          );
+          bar.scale.x = hpRatio;
         }
       }
+    });
 
-      // Dramatic white flash on KO or heavy hit
-      if (flashIntensity > 0) {
-        renderer.setClearColor(new THREE.Color(1, 1, 1).lerp(new THREE.Color(0xb8e2ff), 1 - flashIntensity), 1);
-        flashIntensity *= 0.90;
-        renderer.render(scene, camera);
-        renderer.setClearColor(0x000000, 0);
-        scene.background = skyTex;
-      } else {
-        scene.background = skyTex;
-        renderer.render(scene, camera);
+    // Shockwave effect: massive gorilla attack or KO
+    if (shockwaveMesh) {
+      shockwaveAge += 1;
+      shockwaveMesh.scale.x = 2 + shockwaveAge * 0.65;
+      shockwaveMesh.scale.y = 2 + shockwaveAge * 0.65;
+      (shockwaveMesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.25 - shockwaveAge * 0.01);
+      if ((shockwaveMesh.material as THREE.MeshBasicMaterial).opacity <= 0) {
+        scene.remove(shockwaveMesh);
+        shockwaveMesh.geometry.dispose();
+        shockwaveMesh = null;
       }
-      animId = requestAnimationFrame(animate);
     }
+
+    // Dramatic white flash on KO or heavy hit
+    if (flashIntensity > 0) {
+      renderer.setClearColor(new THREE.Color(1, 1, 1).lerp(new THREE.Color(0xb8e2ff), 1 - flashIntensity), 1);
+      flashIntensity *= 0.90;
+      renderer.render(scene, camera);
+      renderer.setClearColor(0x000000, 0);
+      scene.background = skyTex;
+    } else {
+      scene.background = skyTex;
+      renderer.render(scene, camera);
+    }
+    animId = requestAnimationFrame(animate);
+  }
       ...f,
           // Diminish arm swing after each step
           armSwingAngle: f.armSwingAngle ? f.armSwingAngle * 0.6 : 0,
