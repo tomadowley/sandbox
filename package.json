@@ -9,7 +9,8 @@
     "web-vitals": "^2.1.0",
     "@react-three/fiber": "^8.15.9",
     "@react-three/drei": "^9.92.0",
-    "three": "^0.156.1"
+    "three": "^0.156.1",
+    "@testing-library/jest-dom": "^5.17.0"
   },
   "scripts": {
     "start": "react-scripts start",
