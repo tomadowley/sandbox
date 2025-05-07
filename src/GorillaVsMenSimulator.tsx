@@ -194,10 +194,40 @@ export default function GorillaVsMenSimulator() {
     skyTex.needsUpdate = true;
     scene.background = skyTex;
 
-    // Camera
+    // Camera system: multiple dramatic positions
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-    camera.position.set(0, 17, 28);
-    camera.lookAt(0, 0.6, 0);
+
+    // Camera states to cycle through (wide, overhead, close gorilla, orbit, etc.)
+    type CamPose = { pos: THREE.Vector3; look: THREE.Vector3; duration: number; name: string };
+    const camPoses: CamPose[] = [
+      { pos: new THREE.Vector3(0, 17, 28), look: new THREE.Vector3(0, 0.6, 0), duration: 3200, name: "wide" },
+      { pos: new THREE.Vector3(0, 40, 0), look: new THREE.Vector3(0, 0, 0), duration: 1600, name: "overhead" },
+      { pos: new THREE.Vector3(0, 5, 9), look: new THREE.Vector3(0, 1.5, 0), duration: 1200, name: "gorilla_close" },
+      { pos: new THREE.Vector3(9, 4, 2), look: new THREE.Vector3(0, 1.6, 0), duration: 900, name: "side_pan" },
+      { pos: new THREE.Vector3(-11, 5, -5), look: new THREE.Vector3(0, 1.4, 0), duration: 1200, name: "crowd" },
+      { pos: new THREE.Vector3(0, 11, -23), look: new THREE.Vector3(0, 0.9, 0), duration: 2000, name: "reverse" },
+    ];
+    let camPoseIdx = 0;
+    let camTransition = 0;
+    let camTarget = camPoses[0];
+    let camPrev = camPoses[0];
+    let camLastSwitch = Date.now();
+
+    function switchCamera(overTheTop = false) {
+      camPrev = camTarget;
+      if (overTheTop) {
+        // Use a random close-up or orbit when an over-the-top event occurs.
+        camPoseIdx = Math.floor(2 + Math.random() * (camPoses.length - 2));
+      } else {
+        camPoseIdx = (camPoseIdx + 1) % camPoses.length;
+      }
+      camTarget = camPoses[camPoseIdx];
+      camTransition = 0;
+      camLastSwitch = Date.now();
+    }
+
+    camera.position.copy(camTarget.pos);
+    camera.lookAt(camTarget.look);
 
     // Lights (brighter, more dramatic)
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -242,8 +272,15 @@ export default function GorillaVsMenSimulator() {
     // Renderers
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(width, height);
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     mountRef.current.innerHTML = "";
     mountRef.current.appendChild(renderer.domElement);
+
+    // Over-the-top animation state
+    let shockwaveMesh: THREE.Mesh | null = null;
+    let shockwaveAge = 0;
+    let flashIntensity = 0;
 
     // Refs to objects for updates (can be Mesh or Group)
     const meshes: THREE.Object3D[] = [];
@@ -420,12 +457,35 @@ export default function GorillaVsMenSimulator() {
 
     let animId: number;
     function animate() {
+      // Dramatic orbit camera for over-the-top action
+      let now = Date.now();
+      let dt = Math.min(1, (now - camLastSwitch) / (camTarget.duration || 1800));
+      camTransition = Math.min(1, camTransition + 0.045);
+
+      // Camera lerp
+      camera.position.lerpVectors(camPrev.pos, camTarget.pos, camTransition);
+      let lookVec = new THREE.Vector3().lerpVectors(camPrev.look, camTarget.look, camTransition);
+      camera.lookAt(lookVec);
+
+      // Over-the-top "orbit": every so often, orbit camera
+      if (camTarget.name === "orbit") {
+        let t = Date.now() / 1000;
+        camera.position.set(Math.cos(t) * 23, 12, Math.sin(t) * 23);
+        camera.lookAt(0, 0.9, 0);
+      }
+
       // Update object positions and health bars
       meshes.forEach((group, idx) => {
         // group: THREE.Object3D (Group or Mesh)
         const f = fighters.filter(f => f.alive)[idx];
         if (f && group) {
-          group.position.copy(f.position);
+          // Animate "flying" for the men who were thrown in last step
+          if (f.recentAttack && !f.isGorilla && f.armSwingAngle && f.armSwingAngle > Math.PI / 2) {
+            // Fly back on Y for dramatic effect
+            group.position.copy(f.position.clone().add(new THREE.Vector3(0, Math.min(3, f.armSwingAngle * 2), 0)));
+          } else {
+            group.position.copy(f.position);
+          }
           // Update health bar (bar is always first child)
           if (
             "children" in group &&
@@ -446,6 +506,28 @@ export default function GorillaVsMenSimulator() {
           }
         }
       });
+
+      // Shockwave effect: massive gorilla attack or KO
+      if (shockwaveMesh) {
+        shockwaveAge += 1;
+        shockwaveMesh.scale.x = 2 + shockwaveAge * 0.65;
+        shockwaveMesh.scale.y = 2 + shockwaveAge * 0.65;
+        (shockwaveMesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.25 - shockwaveAge * 0.01);
+        if ((shockwaveMesh.material as THREE.MeshBasicMaterial).opacity <= 0) {
+          scene.remove(shockwaveMesh);
+          shockwaveMesh.geometry.dispose();
+          shockwaveMesh = null;
+        }
+      }
+
+      // Dramatic white flash on KO or heavy hit
+      if (flashIntensity > 0) {
+        renderer.setClearColor(new THREE.Color(1, 1, 1).lerp(new THREE.Color(0xb8e2ff), 1 - flashIntensity), 1);
+        flashIntensity *= 0.90;
+      } else {
+        renderer.setClearColor(skyTex, 1);
+      }
+
       renderer.render(scene, camera);
       animId = requestAnimationFrame(animate);
     }
@@ -478,6 +560,23 @@ export default function GorillaVsMenSimulator() {
         const gorillaAlive = next[0].alive;
         const menAlive = next.slice(1).some(f => f.alive);
 
+        // Dramatic moments: create shockwave, camera switch, flash
+        let overTheTop = false;
+        if (gorillaAlive && !menAlive && !winner) {
+          overTheTop = true;
+        }
+        if (next[0].recentAttack && Math.random() < 0.3) {
+          overTheTop = true;
+        }
+        if (overTheTop && typeof window !== "undefined" && typeof (window as any).switchCamera === "function") {
+          (window as any).switchCamera(true);
+        }
+
+        // Add a shockwave mesh for big attacks or KO
+        if (overTheTop && typeof window !== "undefined" && typeof (window as any).addShockwave === "function") {
+          (window as any).addShockwave();
+        }
+
         if (!gorillaAlive && !winner) {
           setWinner("The 100 men have defeated the gorilla!");
           setSimulationState(SimulationState.Ended);
@@ -495,14 +594,37 @@ export default function GorillaVsMenSimulator() {
         }));
       });
 
+      // Switch camera positions every few steps for drama
+      if (typeof window !== "undefined" && typeof (window as any).switchCamera === "function") {
+        if (Math.random() < 0.28) {
+          (window as any).switchCamera();
+        }
+      }
+
       if (!stopped) {
-        animationRef.current = window.setTimeout(runStep, 320); // much slower for more drama
+        animationRef.current = window.setTimeout(runStep, 350); // slower for more drama
       }
     }
-    animationRef.current = window.setTimeout(runStep, 320);
+    // Attach camera/sfx handlers to window for simulation loop
+    (window as any).switchCamera = switchCamera;
+    (window as any).addShockwave = () => {
+      if (!shockwaveMesh) {
+        const shockGeom = new THREE.RingGeometry(2.2, 2.7, 35);
+        const shockMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 });
+        shockwaveMesh = new THREE.Mesh(shockGeom, shockMat);
+        shockwaveMesh.position.y = 0.04;
+        scene.add(shockwaveMesh);
+        shockwaveAge = 0;
+        flashIntensity = 1;
+      }
+    };
+
+    animationRef.current = window.setTimeout(runStep, 350);
 
     return () => {
       if (animationRef.current) clearTimeout(animationRef.current);
+      (window as any).switchCamera = undefined;
+      (window as any).addShockwave = undefined;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [simulationState]);
@@ -531,9 +653,9 @@ export default function GorillaVsMenSimulator() {
         <br />
         <span style={{ color: "#222" }}>● Gorilla (large dark figure)</span>
         <br />
-        <span style={{ color: "#7c7c7c" }}>● Men (simple stick figures)</span>
+        <span style={{ color: "#7c7c7c" }}>● Men (simple stick figures, blue shirts)</span>
         <br />
-        <b>Simulation:</b> Now with visual action: Fighters swing arms and flash when attacking or being hit. The gorilla is even more powerful!
+        <b>Simulation:</b> Now with over-the-top action: Fighters swing, fly, shockwaves and flashes explode on big hits, and the camera swoops for max drama!
       </div>
     </div>
   );
