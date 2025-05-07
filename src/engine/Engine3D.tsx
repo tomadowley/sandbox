@@ -7,10 +7,12 @@ import * as dat from "dat.gui";
 import StatsJS from "stats.js";
 
 // 1. Ground plane component for physics
+import { Mesh } from "three";
+
 function Plane(props: any) {
   const [ref] = usePlane(() => ({ rotation: [-Math.PI / 2, 0, 0], ...props }));
   return (
-    <mesh ref={ref} receiveShadow>
+    <mesh ref={ref as React.Ref<Mesh>} receiveShadow>
       <planeGeometry args={[10, 10]} />
       <meshStandardMaterial color="#888" />
     </mesh>
@@ -41,7 +43,7 @@ function PhysicsBox(props: any) {
   }, [api, props.position]);
 
   return (
-    <mesh ref={ref} castShadow>
+    <mesh ref={ref as React.Ref<Mesh>} castShadow>
       <boxGeometry args={[1, 1, 1]} />
       <meshStandardMaterial color="#ff005b" />
     </mesh>
