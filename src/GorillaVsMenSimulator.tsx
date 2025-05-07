@@ -179,27 +179,65 @@ export default function GorillaVsMenSimulator() {
     const height = 480;
 
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xeeeeee);
+
+    // Add a gentle sky gradient background
+    const canvas = document.createElement('canvas');
+    canvas.width = 32;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d')!;
+    const grad = ctx.createLinearGradient(0, 0, 0, 256);
+    grad.addColorStop(0, '#b8e2ff');
+    grad.addColorStop(1, '#e9f8fe');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 32, 256);
+    const skyTex = new THREE.Texture(canvas);
+    skyTex.needsUpdate = true;
+    scene.background = skyTex;
 
     // Camera
-    const camera = new THREE.PerspectiveCamera(55, width / height, 0.1, 100);
-    camera.position.set(0, 18, 28);
-    camera.lookAt(0, 0, 0);
+    const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
+    camera.position.set(0, 17, 28);
+    camera.lookAt(0, 0.6, 0);
 
-    // Lights
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    // Lights (brighter, more dramatic)
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(ambientLight);
-    const dirLight = new THREE.DirectionalLight(0xffffff, 0.7);
-    dirLight.position.set(0, 20, 10);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.1);
+    dirLight.position.set(10, 23, 10);
+    dirLight.castShadow = true;
+    dirLight.shadow.mapSize.width = 1024;
+    dirLight.shadow.mapSize.height = 1024;
     scene.add(dirLight);
 
-    // Floor
+    // Floor (darker, subtle pattern)
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x6b8e5e, metalness: 0.16, roughness: 0.68 });
     const floor = new THREE.Mesh(
-      new THREE.CircleGeometry(16, 40),
-      new THREE.MeshLambertMaterial({ color: 0x77aa77 })
+      new THREE.CircleGeometry(16, 50),
+      floorMat
     );
+    floor.receiveShadow = true;
     floor.rotation.x = -Math.PI / 2;
     scene.add(floor);
+
+    // Add a subtle ring boundary to the arena
+    const ringGeom = new THREE.RingGeometry(15.3, 16, 60);
+    const ringMat = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.18, transparent: true });
+    const ring = new THREE.Mesh(ringGeom, ringMat);
+    ring.rotation.x = -Math.PI / 2;
+    ring.position.y = 0.01;
+    scene.add(ring);
+
+    // Add "shadow" under fighters for depth
+    const shadowMat = new THREE.MeshBasicMaterial({ color: 0x000000, transparent: true, opacity: 0.18 });
+    function addShadow(group: THREE.Group, y = 0.02, r = 0.4) {
+      const shadow = new THREE.Mesh(
+        new THREE.CircleGeometry(r, 20),
+        shadowMat
+      );
+      shadow.rotation.x = -Math.PI / 2;
+      shadow.position.y = y;
+      group.add(shadow);
+    }
 
     // Renderers
     const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -227,84 +265,129 @@ export default function GorillaVsMenSimulator() {
           new THREE.Color(0x00ff00),
           hpRatio
         );
-        const barGeometry = new THREE.BoxGeometry(f.isGorilla ? 2 : 0.7, 0.13, 0.13);
+        const barGeometry = new THREE.BoxGeometry(f.isGorilla ? 2.4 : 0.7, 0.13, 0.13);
         const barMaterial = new THREE.MeshBasicMaterial({ color: barColor });
         const barMesh = new THREE.Mesh(barGeometry, barMaterial);
-        barMesh.position.set(0, f.isGorilla ? 2.7 : 1.25, 0);
+        barMesh.position.set(0, f.isGorilla ? 3.7 : 1.25, 0);
         barMesh.scale.x = hpRatio;
         group.add(barMesh);
 
+        // Add a soft shadow under each fighter
+        addShadow(group, 0.02, f.isGorilla ? 1.05 : 0.38);
+
         if (f.isGorilla) {
-          // Gorilla: bulky body, head, limbs
+          // Gorilla: bulkier, more imposing, darker, "heroic" posture
           // Body
           const body = new THREE.Mesh(
-            new THREE.SphereGeometry(1.15, 22, 22),
-            new THREE.MeshLambertMaterial({ color: GORILLA_STATS.color })
+            new THREE.SphereGeometry(1.5, 30, 30),
+            new THREE.MeshStandardMaterial({ color: GORILLA_STATS.color, roughness: 0.38, metalness: 0.17 })
           );
-          body.position.set(0, 1.3, 0);
+          body.position.set(0, 1.7, 0);
           group.add(body);
+          // Chest
+          const chest = new THREE.Mesh(
+            new THREE.SphereGeometry(0.8, 18, 18),
+            new THREE.MeshStandardMaterial({ color: 0x2c2c2c, roughness: 0.32, metalness: 0.09 })
+          );
+          chest.position.set(0, 2.4, 0.17);
+          chest.scale.x = 1.18;
+          group.add(chest);
           // Head
           const head = new THREE.Mesh(
-            new THREE.SphereGeometry(0.7, 18, 18),
-            new THREE.MeshLambertMaterial({ color: 0x333333 })
+            new THREE.SphereGeometry(0.9, 20, 20),
+            new THREE.MeshStandardMaterial({ color: 0x0d0d0d, roughness: 0.28, metalness: 0.15 })
           );
-          head.position.set(0, 2.1, 0.15);
+          head.position.set(0, 3.07, 0.17);
           group.add(head);
+          // "Face" spot
+          const face = new THREE.Mesh(
+            new THREE.SphereGeometry(0.36, 10, 10),
+            new THREE.MeshStandardMaterial({ color: 0x56515b, roughness: 0.14, metalness: 0.25 })
+          );
+          face.position.set(0, 3.18, 0.6);
+          group.add(face);
           // Arms (upper/lower)
           for (let side of [-1, 1]) {
             const upperArm = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.24, 0.32, 1.1, 12),
-              new THREE.MeshLambertMaterial({ color: 0x444444 })
+              new THREE.CylinderGeometry(0.32, 0.38, 1.7, 13),
+              new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.24, metalness: 0.13 })
             );
-            upperArm.position.set(0.75 * side, 1.4, 0);
+            upperArm.position.set(1.05 * side, 2.2, -0.08);
             // Animate arm swing on attack
-            upperArm.rotation.z = (Math.PI / 5) * side + (f.armSwingAngle || 0) * side;
+            upperArm.rotation.z = (Math.PI / 7) * side + (f.armSwingAngle || 0) * side;
+            upperArm.rotation.x = Math.PI / 12;
             group.add(upperArm);
 
             const lowerArm = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.22, 0.24, 1.1, 12),
-              new THREE.MeshLambertMaterial({ color: 0x444444 })
+              new THREE.CylinderGeometry(0.24, 0.31, 1.45, 13),
+              new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.24, metalness: 0.13 })
             );
-            lowerArm.position.set(1.18 * side, 0.75, 0);
-            lowerArm.rotation.z = (Math.PI / 8) * side + (f.armSwingAngle || 0) * side * 0.7;
+            lowerArm.position.set(1.72 * side, 1.36, 0.03);
+            lowerArm.rotation.z = (Math.PI / 10) * side + (f.armSwingAngle || 0) * side * 0.8;
+            lowerArm.rotation.x = Math.PI / 14;
             group.add(lowerArm);
+
+            // Fist
+            const fist = new THREE.Mesh(
+              new THREE.SphereGeometry(0.32, 11, 11),
+              new THREE.MeshStandardMaterial({ color: 0x1a1417, roughness: 0.18, metalness: 0.22 })
+            );
+            fist.position.set(2.22 * side, 0.79, 0.03);
+            group.add(fist);
           }
           // Legs
           for (let side of [-1, 1]) {
             const upperLeg = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.29, 0.23, 1.2, 13),
-              new THREE.MeshLambertMaterial({ color: 0x333333 })
+              new THREE.CylinderGeometry(0.41, 0.30, 1.35, 14),
+              new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.22, metalness: 0.11 })
             );
-            upperLeg.position.set(0.45 * side, 0.45, 0);
+            upperLeg.position.set(0.53 * side, 0.65, 0.089);
             upperLeg.rotation.z = Math.PI / 17 * side;
             group.add(upperLeg);
+            // Feet
+            const foot = new THREE.Mesh(
+              new THREE.SphereGeometry(0.22, 9, 9),
+              new THREE.MeshStandardMaterial({ color: 0x191919, roughness: 0.22, metalness: 0.09 })
+            );
+            foot.position.set(0.53 * side, 0.02, 0.28);
+            group.add(foot);
           }
           // If recently attacked, flash
           if (f.recentAttack) {
-            body.material = new THREE.MeshLambertMaterial({ color: 0x991111, emissive: 0x330000 });
-            head.material = new THREE.MeshLambertMaterial({ color: 0x991111, emissive: 0x330000 });
+            body.material = new THREE.MeshStandardMaterial({ color: 0x991111, emissive: 0x330000 });
+            head.material = new THREE.MeshStandardMaterial({ color: 0x991111, emissive: 0x330000 });
+            chest.material = new THREE.MeshStandardMaterial({ color: 0x991111, emissive: 0x330000 });
           }
         } else {
-          // Man: simple stick figure
-          // Body
-          const body = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.18, 0.18, 0.7, 8),
-            new THREE.MeshLambertMaterial({ color: 0xcfcfcf })
+          // Man: stick figure with pants/shirt color, various head colors
+          // Pants
+          const pants = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.18, 0.36, 8),
+            new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.25 })
           );
-          body.position.set(0, 0.85, 0);
+          pants.position.set(0, 0.67, 0);
+          group.add(pants);
+          // Body (shirt)
+          const body = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.18, 0.38, 8),
+            new THREE.MeshStandardMaterial({ color: 0x7ecbe7, roughness: 0.33 })
+          );
+          body.position.set(0, 0.92, 0);
           group.add(body);
           // Head
+          const headColors = [0xf5e3c3, 0xeac086, 0xb68e61, 0x9b6a3f, 0x7a4d27];
+          const headColor = headColors[f.id % headColors.length];
           const head = new THREE.Mesh(
             new THREE.SphereGeometry(0.23, 10, 10),
-            new THREE.MeshLambertMaterial({ color: 0xf5e3c3 })
+            new THREE.MeshStandardMaterial({ color: headColor, roughness: 0.21 })
           );
-          head.position.set(0, 1.3, 0);
+          head.position.set(0, 1.28, 0);
           group.add(head);
           // Arms
           for (let side of [-1, 1]) {
             const arm = new THREE.Mesh(
               new THREE.CylinderGeometry(0.08, 0.07, 0.6, 7),
-              new THREE.MeshLambertMaterial({ color: 0xcfcfcf })
+              new THREE.MeshStandardMaterial({ color: 0xddc8b0, roughness: 0.19 })
             );
             arm.position.set(0.23 * side, 1.07, 0);
             // Animate arm swing on attack
@@ -314,17 +397,17 @@ export default function GorillaVsMenSimulator() {
           // Legs
           for (let side of [-1, 1]) {
             const leg = new THREE.Mesh(
-              new THREE.CylinderGeometry(0.09, 0.08, 0.66, 7),
-              new THREE.MeshLambertMaterial({ color: 0xcfcfcf })
+              new THREE.CylinderGeometry(0.09, 0.08, 0.34, 7),
+              new THREE.MeshStandardMaterial({ color: 0x2c3e50, roughness: 0.25 })
             );
-            leg.position.set(0.12 * side, 0.48, 0);
+            leg.position.set(0.12 * side, 0.5, 0);
             leg.rotation.z = Math.PI / 18 * side;
             group.add(leg);
           }
           // If recently attacked, flash
           if (f.recentAttack) {
-            body.material = new THREE.MeshLambertMaterial({ color: 0x991111 });
-            head.material = new THREE.MeshLambertMaterial({ color: 0x991111 });
+            body.material = new THREE.MeshStandardMaterial({ color: 0x991111 });
+            head.material = new THREE.MeshStandardMaterial({ color: 0x991111 });
           }
         }
         group.position.copy(f.position);
