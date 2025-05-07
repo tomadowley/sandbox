@@ -1,14 +1,15 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import React from 'react';
+import React, { Suspense } from 'react';
 
-// Prevent ThreeDemo from rendering in the test environment (jsdom)
-const isTest = typeof process !== "undefined" &&
-  process.env &&
-  (process.env.NODE_ENV === "test" || process.env.JEST_WORKER_ID !== undefined);
-
-const ThreeDemo = !isTest ? require('./ThreeDemo').default : () => null;
+// Only load ThreeDemo in the browser
+const isBrowser = typeof window !== "undefined" && typeof document !== "undefined";
+const ThreeDemo = React.lazy(() =>
+  isBrowser
+    ? import('./ThreeDemo')
+    : Promise.resolve({ default: () => null })
+);
 
 function App() {
   return (
@@ -29,7 +30,9 @@ function App() {
       </header>
       <section style={{ marginTop: 32 }}>
         <h2>3D Rendering Demo</h2>
-        <ThreeDemo />
+        <Suspense fallback={null}>
+          <ThreeDemo />
+        </Suspense>
       </section>
     </div>
   );
