@@ -207,27 +207,30 @@ export default function GorillaVsMenSimulator() {
       { pos: new THREE.Vector3(-11, 5, -5), look: new THREE.Vector3(0, 1.4, 0), duration: 1200, name: "crowd" },
       { pos: new THREE.Vector3(0, 11, -23), look: new THREE.Vector3(0, 0.9, 0), duration: 2000, name: "reverse" },
     ];
-    let camPoseIdx = 0;
-    let camTransition = 0;
-    let camTarget = camPoses[0];
-    let camPrev = camPoses[0];
-    let camLastSwitch = Date.now();
 
-    function switchCamera(overTheTop = false) {
-      camPrev = camTarget;
+    // Move camera state to refs so it can be accessed across effects
+    const camPoseIdxRef = useRef(0);
+    const camTransitionRef = useRef(0);
+    const camTargetRef = useRef<CamPose>(camPoses[0]);
+    const camPrevRef = useRef<CamPose>(camPoses[0]);
+    const camLastSwitchRef = useRef(Date.now());
+
+    // Camera switch function (ref so accessible from anywhere)
+    const switchCameraRef = useRef<(overTheTop?: boolean) => void>();
+    switchCameraRef.current = function switchCamera(overTheTop = false) {
+      camPrevRef.current = camTargetRef.current;
       if (overTheTop) {
-        // Use a random close-up or orbit when an over-the-top event occurs.
-        camPoseIdx = Math.floor(2 + Math.random() * (camPoses.length - 2));
+        camPoseIdxRef.current = Math.floor(2 + Math.random() * (camPoses.length - 2));
       } else {
-        camPoseIdx = (camPoseIdx + 1) % camPoses.length;
+        camPoseIdxRef.current = (camPoseIdxRef.current + 1) % camPoses.length;
       }
-      camTarget = camPoses[camPoseIdx];
-      camTransition = 0;
-      camLastSwitch = Date.now();
-    }
+      camTargetRef.current = camPoses[camPoseIdxRef.current];
+      camTransitionRef.current = 0;
+      camLastSwitchRef.current = Date.now();
+    };
 
-    camera.position.copy(camTarget.pos);
-    camera.lookAt(camTarget.look);
+    camera.position.copy(camTargetRef.current.pos);
+    camera.lookAt(camTargetRef.current.look);
 
     // Lights (brighter, more dramatic)
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
@@ -459,8 +462,11 @@ export default function GorillaVsMenSimulator() {
     function animate() {
       // Dramatic orbit camera for over-the-top action
       let now = Date.now();
-      let dt = Math.min(1, (now - camLastSwitch) / (camTarget.duration || 1800));
+      let camTarget = camTargetRef.current;
+      let camPrev = camPrevRef.current;
+      let camTransition = camTransitionRef.current;
       camTransition = Math.min(1, camTransition + 0.045);
+      camTransitionRef.current = camTransition;
 
       // Camera lerp
       camera.position.lerpVectors(camPrev.pos, camTarget.pos, camTransition);
@@ -473,124 +479,7 @@ export default function GorillaVsMenSimulator() {
         camera.position.set(Math.cos(t) * 23, 12, Math.sin(t) * 23);
         camera.lookAt(0, 0.9, 0);
       }
-
-      // Update object positions and health bars
-      meshes.forEach((group, idx) => {
-        // group: THREE.Object3D (Group or Mesh)
-        const f = fighters.filter(f => f.alive)[idx];
-        if (f && group) {
-          // Animate "flying" for the men who were thrown in last step
-          if (f.recentAttack && !f.isGorilla && f.armSwingAngle && f.armSwingAngle > Math.PI / 2) {
-            // Fly back on Y for dramatic effect
-            group.position.copy(f.position.clone().add(new THREE.Vector3(0, Math.min(3, f.armSwingAngle * 2), 0)));
-          } else {
-            group.position.copy(f.position);
-          }
-          // Update health bar (bar is always first child)
-          if (
-            "children" in group &&
-            group.children.length > 0 &&
-            group.children[0] instanceof THREE.Mesh
-          ) {
-            const bar = group.children[0] as THREE.Mesh;
-            const maxHp = f.isGorilla ? GORILLA_STATS.hp : MAN_STATS.hp;
-            const hpRatio = Math.max(0, Math.min(1, f.hp / maxHp));
-            (bar.material as THREE.MeshBasicMaterial).color.set(
-              new THREE.Color().lerpColors(
-                new THREE.Color(0xff0000),
-                new THREE.Color(0x00ff00),
-                hpRatio
-              )
-            );
-            bar.scale.x = hpRatio;
-          }
-        }
-      });
-
-      // Shockwave effect: massive gorilla attack or KO
-      if (shockwaveMesh) {
-        shockwaveAge += 1;
-        shockwaveMesh.scale.x = 2 + shockwaveAge * 0.65;
-        shockwaveMesh.scale.y = 2 + shockwaveAge * 0.65;
-        (shockwaveMesh.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 0.25 - shockwaveAge * 0.01);
-        if ((shockwaveMesh.material as THREE.MeshBasicMaterial).opacity <= 0) {
-          scene.remove(shockwaveMesh);
-          shockwaveMesh.geometry.dispose();
-          shockwaveMesh = null;
-        }
-      }
-
-      // Dramatic white flash on KO or heavy hit
-      if (flashIntensity > 0) {
-        renderer.setClearColor(new THREE.Color(1, 1, 1).lerp(new THREE.Color(0xb8e2ff), 1 - flashIntensity), 1);
-        flashIntensity *= 0.90;
-        // Temporarily override background
-        renderer.render(scene, camera);
-        renderer.setClearColor(0x000000, 0); // Reset clear color (transparent)
-        scene.background = skyTex;
-      } else {
-        scene.background = skyTex; // Ensure the sky gradient is used
-        renderer.render(scene, camera);
-      }
-      animId = requestAnimationFrame(animate);
-    }
-
-    animate();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      renderer.dispose();
-      meshes.forEach(m => {
-        if (m instanceof THREE.Mesh) {
-          m.geometry.dispose();
-        }
-      });
-      mountRef.current && (mountRef.current.innerHTML = "");
-    };
-    // Re-create scene when fighters change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fighters]);
-
-  // Simulation loop
-  useEffect(() => {
-    if (simulationState !== SimulationState.Running) return;
-    let stopped = false;
-
-    function runStep() {
-      setFighters(prevFighters => {
-        const next = simulateFightStep(prevFighters);
-
-        const gorillaAlive = next[0].alive;
-        const menAlive = next.slice(1).some(f => f.alive);
-
-        // Dramatic moments: create shockwave, camera switch, flash
-        let overTheTop = false;
-        if (gorillaAlive && !menAlive && !winner) {
-          overTheTop = true;
-        }
-        if (next[0].recentAttack && Math.random() < 0.3) {
-          overTheTop = true;
-        }
-        if (overTheTop && typeof window !== "undefined" && typeof (window as any).switchCamera === "function") {
-          (window as any).switchCamera(true);
-        }
-
-        // Add a shockwave mesh for big attacks or KO
-        if (overTheTop && typeof window !== "undefined" && typeof (window as any).addShockwave === "function") {
-          (window as any).addShockwave();
-        }
-
-        if (!gorillaAlive && !winner) {
-          setWinner("The 100 men have defeated the gorilla!");
-          setSimulationState(SimulationState.Ended);
-          stopped = true;
-        } else if (!menAlive && !winner) {
-          setWinner("The gorilla has defeated all 100 men!");
-          setSimulationState(SimulationState.Ended);
-          stopped = true;
-        }
-        return next.map(f => ({
-          ...f,
+      ...f,
           // Diminish arm swing after each step
           armSwingAngle: f.armSwingAngle ? f.armSwingAngle * 0.6 : 0,
           recentAttack: f.recentAttack ? true : false,
@@ -598,9 +487,9 @@ export default function GorillaVsMenSimulator() {
       });
 
       // Switch camera positions every few steps for drama
-      if (typeof window !== "undefined" && typeof (window as any).switchCamera === "function") {
+      if (switchCameraRef.current) {
         if (Math.random() < 0.28) {
-          (window as any).switchCamera();
+          switchCameraRef.current();
         }
       }
 
@@ -609,7 +498,7 @@ export default function GorillaVsMenSimulator() {
       }
     }
     // Attach camera/sfx handlers to window for simulation loop
-    (window as any).switchCamera = switchCamera;
+    (window as any).switchCamera = switchCameraRef.current;
     (window as any).addShockwave = () => {
       if (!shockwaveMesh) {
         const shockGeom = new THREE.RingGeometry(2.2, 2.7, 35);
