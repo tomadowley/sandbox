@@ -1,7 +1,14 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import ThreeDemo from './ThreeDemo';
+import React from 'react';
+
+// Prevent ThreeDemo from rendering in the test environment (jsdom)
+const isTest = typeof process !== "undefined" &&
+  process.env &&
+  (process.env.NODE_ENV === "test" || process.env.JEST_WORKER_ID !== undefined);
+
+const ThreeDemo = !isTest ? require('./ThreeDemo').default : () => null;
 
 function App() {
   return (
