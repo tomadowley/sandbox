@@ -231,6 +231,7 @@ export default function GorillaVsMenSimulator() {
 
     camera.position.copy(camTargetRef.current.pos);
     camera.lookAt(camTargetRef.current.look);
+  // <-- This closing bracket was likely missing to properly end the Three.js setup effect
 
     // Lights (brighter, more dramatic)
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
