@@ -1,15 +1,8 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import React, { Suspense } from 'react';
-
-// Only load ThreeDemo in the browser
-const isBrowser = typeof window !== "undefined" && typeof document !== "undefined";
-const ThreeDemo = React.lazy(() =>
-  isBrowser
-    ? import('./ThreeDemo')
-    : Promise.resolve({ default: () => null })
-);
+import React from 'react';
+import ThreeDemoLoader from './ThreeDemoLoader';
 
 function App() {
   return (
@@ -30,9 +23,7 @@ function App() {
       </header>
       <section style={{ marginTop: 32 }}>
         <h2>3D Rendering Demo</h2>
-        <Suspense fallback={null}>
-          <ThreeDemo />
-        </Suspense>
+        <ThreeDemoLoader />
       </section>
     </div>
   );
