@@ -1,6 +1,8 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import ThreeDemoLoader from './ThreeDemoLoader';
 
 function App() {
   return (
@@ -19,6 +21,10 @@ function App() {
           Learn React
         </a>
       </header>
+      <section style={{ marginTop: 32 }}>
+        <h2>3D Rendering Demo</h2>
+        <ThreeDemoLoader />
+      </section>
     </div>
   );
 }
