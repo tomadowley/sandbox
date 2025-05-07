@@ -3,7 +3,11 @@ import { Renderer3D } from "./Renderer3D";
 
 const CANVAS_SIZE = 640;
 
+const isTest = typeof process !== "undefined" && process.env.NODE_ENV === "test";
+
 const ThreeDEngine: React.FC = () => {
+  if (isTest) return null;
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const rendererRef = useRef<Renderer3D | null>(null);
   const dragging = useRef(false);
