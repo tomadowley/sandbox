@@ -194,43 +194,9 @@ export default function GorillaVsMenSimulator() {
     skyTex.needsUpdate = true;
     scene.background = skyTex;
 
-    // Camera system: multiple dramatic positions
+    // Camera: orbit mode!
     const camera = new THREE.PerspectiveCamera(50, width / height, 0.1, 100);
-
-    // Camera states to cycle through (wide, overhead, close gorilla, orbit, etc.)
-    type CamPose = { pos: THREE.Vector3; look: THREE.Vector3; duration: number; name: string };
-    const camPoses: CamPose[] = [
-      { pos: new THREE.Vector3(0, 17, 28), look: new THREE.Vector3(0, 0.6, 0), duration: 3200, name: "wide" },
-      { pos: new THREE.Vector3(0, 40, 0), look: new THREE.Vector3(0, 0, 0), duration: 1600, name: "overhead" },
-      { pos: new THREE.Vector3(0, 5, 9), look: new THREE.Vector3(0, 1.5, 0), duration: 1200, name: "gorilla_close" },
-      { pos: new THREE.Vector3(9, 4, 2), look: new THREE.Vector3(0, 1.6, 0), duration: 900, name: "side_pan" },
-      { pos: new THREE.Vector3(-11, 5, -5), look: new THREE.Vector3(0, 1.4, 0), duration: 1200, name: "crowd" },
-      { pos: new THREE.Vector3(0, 11, -23), look: new THREE.Vector3(0, 0.9, 0), duration: 2000, name: "reverse" },
-    ];
-
-    // Move camera state to refs so it can be accessed across effects
-    const camPoseIdxRef = useRef(0);
-    const camTransitionRef = useRef(0);
-    const camTargetRef = useRef<CamPose>(camPoses[0]);
-    const camPrevRef = useRef<CamPose>(camPoses[0]);
-    const camLastSwitchRef = useRef(Date.now());
-
-    // Camera switch function (ref so accessible from anywhere)
-    const switchCameraRef = useRef<(overTheTop?: boolean) => void>();
-    switchCameraRef.current = function switchCamera(overTheTop = false) {
-      camPrevRef.current = camTargetRef.current;
-      if (overTheTop) {
-        camPoseIdxRef.current = Math.floor(2 + Math.random() * (camPoses.length - 2));
-      } else {
-        camPoseIdxRef.current = (camPoseIdxRef.current + 1) % camPoses.length;
-      }
-      camTargetRef.current = camPoses[camPoseIdxRef.current];
-      camTransitionRef.current = 0;
-      camLastSwitchRef.current = Date.now();
-    };
-
-    camera.position.copy(camTargetRef.current.pos);
-    camera.lookAt(camTargetRef.current.look);
+    // Initial position will be set in animate
   // <-- This closing bracket was likely missing to properly end the Three.js setup effect
 
     // Lights (brighter, more dramatic)
@@ -461,25 +427,16 @@ export default function GorillaVsMenSimulator() {
 
     let animId: number;
     function animate() {
-      // Dramatic orbit camera for over-the-top action
-      let now = Date.now();
-      let camTarget = camTargetRef.current;
-      let camPrev = camPrevRef.current;
-      let camTransition = camTransitionRef.current;
-      camTransition = Math.min(1, camTransition + 0.045);
-      camTransitionRef.current = camTransition;
-
-      // Camera lerp
-      camera.position.lerpVectors(camPrev.pos, camTarget.pos, camTransition);
-      let lookVec = new THREE.Vector3().lerpVectors(camPrev.look, camTarget.look, camTransition);
-      camera.lookAt(lookVec);
-
-      // Over-the-top "orbit": every so often, orbit camera
-      if (camTarget.name === "orbit") {
-        let t = Date.now() / 1000;
-        camera.position.set(Math.cos(t) * 23, 12, Math.sin(t) * 23);
-        camera.lookAt(0, 0.9, 0);
-      }
+      // Camera orbits smoothly around the arena at all times
+      const t = Date.now() * 0.00020; // adjust speed as needed
+      const radius = 25;
+      const height = 12 + Math.sin(Date.now() * 0.00016) * 2.3; // some vertical motion
+      camera.position.set(
+        Math.cos(t) * radius,
+        height,
+        Math.sin(t) * radius
+      );
+      camera.lookAt(0, 1.3, 0);
       ...f,
           // Diminish arm swing after each step
           armSwingAngle: f.armSwingAngle ? f.armSwingAngle * 0.6 : 0,
@@ -487,19 +444,13 @@ export default function GorillaVsMenSimulator() {
         }));
       });
 
-      // Switch camera positions every few steps for drama
-      if (switchCameraRef.current) {
-        if (Math.random() < 0.28) {
-          switchCameraRef.current();
-        }
-      }
+      // No more camera switching logic -- just orbit!
 
       if (!stopped) {
         animationRef.current = window.setTimeout(runStep, 350); // slower for more drama
       }
     }
-    // Attach camera/sfx handlers to window for simulation loop
-    (window as any).switchCamera = switchCameraRef.current;
+    // Only attach the shockwave handler for dramatic effects
     (window as any).addShockwave = () => {
       if (!shockwaveMesh) {
         const shockGeom = new THREE.RingGeometry(2.2, 2.7, 35);
@@ -516,7 +467,6 @@ export default function GorillaVsMenSimulator() {
 
     return () => {
       if (animationRef.current) clearTimeout(animationRef.current);
-      (window as any).switchCamera = undefined;
       (window as any).addShockwave = undefined;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
