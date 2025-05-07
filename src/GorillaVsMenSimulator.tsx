@@ -432,11 +432,12 @@ export default function GorillaVsMenSimulator() {
       const radius = 25;
       const height = 12 + Math.sin(Date.now() * 0.00016) * 2.3; // some vertical motion
       camera.position.set(
-        Math.cos(t) * radius,
-        height,
-        Math.sin(t) * radius
-      );
-      camera.lookAt(0, 1.3, 0);
+      Math.cos(t) * radius,
+      height,
+      Math.sin(t) * radius
+    );
+    camera.lookAt(0, 1.3, 0);
+  } // <-- This closes the Three.js effect or setup block
       ...f,
           // Diminish arm swing after each step
           armSwingAngle: f.armSwingAngle ? f.armSwingAngle * 0.6 : 0,
