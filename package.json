@@ -22,7 +22,7 @@
     "dat.gui": "^0.7.9",
     "stats.js": "^0.17.0",
     "cannon-es": "^0.20.0",
-    "@react-three/cannon": "^7.0.2"
+    "@react-three/cannon": "^6.6.0"
   },
   "scripts": {
     "start": "react-scripts start",
