@@ -31,7 +31,7 @@ function PhysicsBox(props: any) {
       posY: props.position[1],
       posZ: props.position[2],
       color: "#ff005b",
-      reset: () => api.position.set(...props.position),
+      reset: () => api.position.set(...(props.position as [number, number, number])),
     };
 
     gui.add(params, "posX", -5, 5).onChange((v: number) => api.position.set(v, params.posY, params.posZ));
