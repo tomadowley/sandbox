@@ -524,11 +524,14 @@ export default function GorillaVsMenSimulator() {
       if (flashIntensity > 0) {
         renderer.setClearColor(new THREE.Color(1, 1, 1).lerp(new THREE.Color(0xb8e2ff), 1 - flashIntensity), 1);
         flashIntensity *= 0.90;
+        // Temporarily override background
+        renderer.render(scene, camera);
+        renderer.setClearColor(0x000000, 0); // Reset clear color (transparent)
+        scene.background = skyTex;
       } else {
-        renderer.setClearColor(skyTex, 1);
+        scene.background = skyTex; // Ensure the sky gradient is used
+        renderer.render(scene, camera);
       }
-
-      renderer.render(scene, camera);
       animId = requestAnimationFrame(animate);
     }
 
