@@ -14,7 +14,15 @@
     "react-dom": "^18.3.1",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "three": "^0.154.0",
+    "@types/three": "^0.154.0",
+    "@react-three/fiber": "^8.13.7",
+    "@react-three/drei": "^9.89.3",
+    "dat.gui": "^0.7.9",
+    "stats.js": "^0.17.0",
+    "cannon-es": "^0.20.0",
+    "@react-three/cannon": "^7.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
