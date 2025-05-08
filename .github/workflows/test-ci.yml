@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build-and-test-the-thing-that-is-the-thing-i-built:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +25,7 @@ jobs:
           cache: "npm"
 
       # Step 3: Install dependencies
-      - name: Install dependencies which are needed by the thing
+      - name: Install dependencies
         run: npm install
 
       # Step 4: Run unit tests
