@@ -35,12 +35,11 @@ function getRandomPosOnCircle(radius: number, idx: number, total: number) {
 }
 
 function randomAttackDamage(type: "gorilla" | "man") {
-  if (type === "gorilla")
-    return GORILLA_HP === 1
-      ? 1
-      : ATTACK_DAMAGE_GORILLA[Math.floor(Math.random() * ATTACK_DAMAGE_GORILLA.length)];
-  else
+  if (type === "gorilla") {
+    return ATTACK_DAMAGE_GORILLA[Math.floor(Math.random() * ATTACK_DAMAGE_GORILLA.length)];
+  } else {
     return ATTACK_DAMAGE_MAN[Math.floor(Math.random() * ATTACK_DAMAGE_MAN.length)];
+  }
 }
 
 function randomFightingMove(type: "gorilla" | "man") {
