@@ -273,8 +273,8 @@ function useFightSimulation(restartTrigger: number) {
         }
 
         // Animate attacker
-        const attackerMove = randomFightingMove(attacker.type);
-        const defenderMove = randomFightingMove(defender.type);
+        const attackerMoveName = randomFightingMove(attacker.type);
+        const defenderMoveName = randomFightingMove(defender.type);
         const attackDir = getDirection(attacker.pos, defender.pos);
 
         // Animate attack
@@ -306,7 +306,7 @@ function useFightSimulation(restartTrigger: number) {
 
         // Log text
         setFightLog((log) => [
-          `${attacker.type === "man" ? "The man" : `Gorilla ${attacker.id}`} uses ${attackerMove} on ${
+          `${attacker.type === "man" ? "The man" : `Gorilla ${attacker.id}`} uses ${attackerMoveName} on ${
             defender.type === "man" ? "the man" : `gorilla ${defender.id}`
           } with ${dmg} damage!`,
           ...log,
