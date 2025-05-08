@@ -277,14 +277,10 @@ function useFightSimulation(restartTrigger: number) {
         const defenderMoveName = randomFightingMove(defender.type);
         const attackDir = getDirection(attacker.pos, defender.pos);
 
-        // Animate attack
-        attacker.anim = { t: 0, move: "attack", direction: attackDir };
-        defender.anim = { t: 0, move: "hit", direction: [-attackDir[0], 0, -attackDir[2]] };
-
         // Compute damage
         const dmg = randomAttackDamage(attacker.type);
 
-        // Update HP and log
+        // Update HP and animation state in a new array (no mutation)
         const updated = prev.map((f) => {
           if (f.id === defender.id) {
             const newHp = Math.max(0, f.hp - dmg);
@@ -292,13 +288,23 @@ function useFightSimulation(restartTrigger: number) {
               ...f,
               hp: newHp,
               alive: newHp > 0,
-              anim: { ...f.anim, move: "hit", t: 0, direction: f.anim.direction },
+              anim: {
+                ...f.anim,
+                move: "hit" as const,
+                t: 0,
+                direction: [-attackDir[0], 0, -attackDir[2]],
+              },
             };
           }
           if (f.id === attacker.id) {
             return {
               ...f,
-              anim: { ...f.anim, move: "attack", t: 0, direction: attackDir },
+              anim: {
+                ...f.anim,
+                move: "attack" as const,
+                t: 0,
+                direction: attackDir,
+              },
             };
           }
           return f;
