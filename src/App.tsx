@@ -85,6 +85,10 @@ function App() {
     { x: 120, y: 210, w: 170, h: 14 },
   ];
 
+  // Control: track jump "buffer" to avoid repeat jumps while holding stick up
+  const jumpRequested = useRef(false);
+  const lastJoystickY = useRef(0);
+
   // Game loop
   useEffect(() => {
     let anim: number;
@@ -104,6 +108,8 @@ function App() {
         { x: 100, y: 500, w: 16, h: 24 },
         { x: 300, y: 250, w: 16, h: 24 },
       ];
+      jumpRequested.current = false;
+      lastJoystickY.current = 0;
     }
 
     function spawnPint() {
@@ -123,13 +129,27 @@ function App() {
     function gameStep(dt: number) {
       // Player movement via joystick
       let inputX = joystick.active ? joystick.dx : 0;
+      // Deadzone for stick
+      if (Math.abs(inputX) < 0.20) inputX = 0;
       playerVel.current.x = inputX * moveSpeed;
 
-      // Jump if joystick pushed up and on ground
-      if (joystick.active && joystick.dy < -0.5 && onGround.current) {
+      // Jump only on joystick up "press" event (not hold)
+      if (
+        joystick.active &&
+        joystick.dy < -0.5 &&
+        lastJoystickY.current >= -0.5 &&
+        onGround.current &&
+        !jumpRequested.current
+      ) {
         playerVel.current.y = -jumpSpeed - Math.abs(joystick.dy * 3);
         onGround.current = false;
+        jumpRequested.current = true;
       }
+      // Reset jump request when stick returns to neutral/down
+      if (!(joystick.active && joystick.dy < -0.5)) {
+        jumpRequested.current = false;
+      }
+      lastJoystickY.current = joystick.dy;
 
       // Apply gravity
       playerVel.current.y += gravity;
