@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
+// Responsive game area (canvas) constants
+const ASPECT_RATIO = 2; // width:height = 2:1 (orig 800:400)
 const GAME_WIDTH = 800;
 const GAME_HEIGHT = 400;
 const GROUND_HEIGHT = 60;
@@ -44,20 +46,99 @@ function rectsCollide(
   );
 }
 
-const platforms: Platform[] = [
+// Platforms defined for original GAME_WIDTH/GAME_HEIGHT
+const platformsOrig: Platform[] = [
   { x: 0, y: GAME_HEIGHT - GROUND_HEIGHT, w: GAME_WIDTH, h: GROUND_HEIGHT },
   { x: 120, y: 290, w: 160, h: 16 },
   { x: 340, y: 220, w: 130, h: 16 },
   { x: 540, y: 140, w: 120, h: 16 },
 ];
 
-const getRandomYPlatform = () => {
+const getRandomYPlatform = (platforms: Platform[]) => {
   // Returns a random platform (not the ground)
   const idx = Math.floor(Math.random() * (platforms.length - 1)) + 1;
   return platforms[idx];
 };
 
+const isTouchDevice = () =>
+  !!(
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints)
+  );
+
+// Mobile: on-screen controls
+const ControlButton: React.FC<{
+  label: string;
+  onPress: () => void;
+  onRelease: () => void;
+  style?: React.CSSProperties;
+}> = ({ label, onPress, onRelease, style }) => (
+  <button
+    style={{
+      width: 56,
+      height: 56,
+      fontSize: 22,
+      margin: 4,
+      borderRadius: "50%",
+      border: "2px solid #357ab7",
+      background: "#e3f3fa",
+      color: "#357ab7",
+      fontWeight: "bold",
+      touchAction: "none",
+      ...style,
+    }}
+    onTouchStart={e => {
+      e.preventDefault();
+      onPress();
+    }}
+    onTouchEnd={e => {
+      e.preventDefault();
+      onRelease();
+    }}
+    onMouseDown={e => {
+      e.preventDefault();
+      onPress();
+    }}
+    onMouseUp={e => {
+      e.preventDefault();
+      onRelease();
+    }}
+    aria-label={label}
+  >
+    {label}
+  </button>
+);
+
 const EskimoPenguinGame: React.FC = () => {
+  // Responsive canvas size
+  const [canvasDims, setCanvasDims] = useState({ width: GAME_WIDTH, height: GAME_HEIGHT });
+  const [scale, setScale] = useState(1);
+
+  // On resize, set canvas size to fit viewport
+  useEffect(() => {
+    function handleResize() {
+      const margin = 16;
+      let w = window.innerWidth - margin * 2;
+      let h = window.innerHeight - 120;
+      // Keep aspect ratio
+      if (w / h > ASPECT_RATIO) {
+        w = h * ASPECT_RATIO;
+      } else {
+        h = w / ASPECT_RATIO;
+      }
+      w = Math.max(320, Math.min(w, GAME_WIDTH));
+      h = w / ASPECT_RATIO;
+      setCanvasDims({ width: Math.round(w), height: Math.round(h) });
+      setScale(w / GAME_WIDTH);
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Responsive platforms/entities
+  const platforms = platformsOrig;
+
   // Player state
   const [player, setPlayer] = useState({
     x: 40,
@@ -74,7 +155,7 @@ const EskimoPenguinGame: React.FC = () => {
   const [score, setScore] = useState(0);
   const [gameState, setGameState] = useState<GameState>("playing");
 
-  // Keys
+  // Keys (simulate for mobile controls too)
   const keys = useRef<{ [key: string]: boolean }>({});
 
   // Spawning timer
@@ -82,6 +163,9 @@ const EskimoPenguinGame: React.FC = () => {
 
   // Canvas ref for drawing
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Mobile: touch controls
+  const [showTouchControls, setShowTouchControls] = useState(isTouchDevice());
 
   // Reset game
   const resetGame = () => {
@@ -234,7 +318,7 @@ const EskimoPenguinGame: React.FC = () => {
       // 70% penguin, 30% polar bear
       if (Math.random() < 0.7) {
         // Penguin
-        const plat = getRandomYPlatform();
+        const plat = getRandomYPlatform(platforms);
         setEntities((prev) => [
           ...prev,
           {
@@ -250,7 +334,7 @@ const EskimoPenguinGame: React.FC = () => {
         ]);
       } else {
         // Polar bear
-        const plat = getRandomYPlatform();
+        const plat = getRandomYPlatform(platforms);
         setEntities((prev) => [
           ...prev,
           {
@@ -274,12 +358,15 @@ const EskimoPenguinGame: React.FC = () => {
     return () => {
       if (spawnTimer.current) clearTimeout(spawnTimer.current);
     };
-  }, [gameState]);
+  }, [gameState, platforms]);
 
   // Drawing
   useEffect(() => {
     const ctx = canvasRef.current?.getContext("2d");
     if (!ctx) return;
+
+    // Scale for responsive canvas
+    ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
     ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
@@ -389,13 +476,13 @@ const EskimoPenguinGame: React.FC = () => {
       );
       ctx.font = "18px Arial";
       ctx.fillText(
-        "Press R to restart",
+        "Press R or tap Restart",
         GAME_WIDTH / 2,
         GAME_HEIGHT / 2 + 44
       );
       ctx.textAlign = "start";
     }
-  }, [player, entities, score, gameState]);
+  }, [player, entities, score, gameState, scale, platforms]);
 
   // Restart game key
   useEffect(() => {
@@ -409,24 +496,134 @@ const EskimoPenguinGame: React.FC = () => {
     // eslint-disable-next-line
   }, [gameState]);
 
+  // Touch controls: left/right/jump
+  // Set key state on touch press/release
+  const handleTouchControl = (key: string, pressed: boolean) => {
+    keys.current[key] = pressed;
+  };
+
+  // On mobile, allow tap on game over screen to restart
+  const handleCanvasTap = () => {
+    if (gameState === "gameover") {
+      resetGame();
+    }
+  };
+
   return (
-    <div style={{ textAlign: "center", marginTop: 24 }}>
-      <h2>Eskimo Penguin Hunt</h2>
-      <canvas
-        ref={canvasRef}
-        width={GAME_WIDTH}
-        height={GAME_HEIGHT}
+    <div
+      style={{
+        textAlign: "center",
+        margin: 0,
+        padding: 0,
+        minHeight: "100vh",
+        background: "linear-gradient(to bottom, #aeefff 60%, #e0f7fa 100%)",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-start",
+      }}
+    >
+      <h2 style={{
+        fontSize: "clamp(1.2rem, 4vw, 2.2rem)",
+        marginTop: 16,
+        marginBottom: 10,
+        color: "#24618A",
+        letterSpacing: "1px",
+      }}>
+        Eskimo Penguin Hunt
+      </h2>
+      <div
         style={{
-          border: "3px solid #357ab7",
-          background: "#e0f7fa",
-          borderRadius: 8,
+          position: "relative",
+          width: canvasDims.width,
+          height: canvasDims.height,
+          maxWidth: "98vw",
+          maxHeight: "60vh",
+          margin: "0 auto",
         }}
-      />
-      <div style={{ marginTop: 12, color: "#345" }}>
+      >
+        <canvas
+          ref={canvasRef}
+          width={GAME_WIDTH}
+          height={GAME_HEIGHT}
+          style={{
+            width: canvasDims.width,
+            height: canvasDims.height,
+            border: "3px solid #357ab7",
+            background: "#e0f7fa",
+            borderRadius: 8,
+            touchAction: "manipulation",
+            display: "block",
+            boxShadow: "0 3px 16px 0 #357ab733",
+            margin: "0 auto",
+          }}
+          onClick={handleCanvasTap}
+          onTouchEnd={handleCanvasTap}
+        />
+        {showTouchControls && (
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 12,
+              display: "flex",
+              flexDirection: "row",
+              justifyContent: "center",
+              gap: 12,
+              zIndex: 2,
+              pointerEvents: "none",
+            }}
+          >
+            <div style={{ pointerEvents: "auto" }}>
+              <ControlButton
+                label="⯇"
+                onPress={() => handleTouchControl("ArrowLeft", true)}
+                onRelease={() => handleTouchControl("ArrowLeft", false)}
+              />
+            </div>
+            <div style={{ pointerEvents: "auto" }}>
+              <ControlButton
+                label="⯈"
+                onPress={() => handleTouchControl("ArrowRight", true)}
+                onRelease={() => handleTouchControl("ArrowRight", false)}
+              />
+            </div>
+            <div style={{ pointerEvents: "auto" }}>
+              <ControlButton
+                label="⯅"
+                onPress={() => handleTouchControl(" ", true)}
+                onRelease={() => handleTouchControl(" ", false)}
+                style={{ background: "#e0f7fa", color: "#357ab7" }}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+      <div style={{ marginTop: 8, color: "#345", fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)" }}>
         <span>
-          Controls: <b>Left/Right</b> to move, <b>Up/Space</b> to jump, hunt penguins, avoid polar bears!
+          Controls: <b>←/→</b> to move, <b>↑/Space</b> to jump.<br />
+          {showTouchControls ? "Use on-screen buttons!" : "Hunt penguins, avoid polar bears!"}
         </span>
       </div>
+      {gameState === "gameover" && (
+        <button
+          style={{
+            marginTop: 18,
+            fontSize: "1.1rem",
+            padding: "10px 24px",
+            borderRadius: 8,
+            background: "#357ab7",
+            color: "#fff",
+            border: "none",
+            fontWeight: "bold",
+            boxShadow: "0 2px 8px #357ab733",
+          }}
+          onClick={resetGame}
+        >
+          Restart Game
+        </button>
+      )}
     </div>
   );
 };
