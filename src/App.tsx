@@ -111,8 +111,7 @@ function App() {
         { x: 100, y: 500, w: 16, h: 24 },
         { x: 300, y: 250, w: 16, h: 24 },
       ];
-      jumpRequested.current = false;
-      lastJoystickY.current = 0;
+      jumpBuffer.current = false;
     }
 
     function spawnPint() {
