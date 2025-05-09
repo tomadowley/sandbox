@@ -292,7 +292,7 @@ function useFightSimulation(restartTrigger: number) {
                 ...f.anim,
                 move: "hit" as const,
                 t: 0,
-                direction: [-attackDir[0], 0, -attackDir[2]],
+                direction: [-attackDir[0], 0, -attackDir[2]] as [number, number, number],
               },
             };
           }
@@ -303,7 +303,7 @@ function useFightSimulation(restartTrigger: number) {
                 ...f.anim,
                 move: "attack" as const,
                 t: 0,
-                direction: attackDir,
+                direction: attackDir as [number, number, number],
               },
             };
           }
