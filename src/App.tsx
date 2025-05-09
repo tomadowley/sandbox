@@ -366,6 +366,7 @@ function App() {
   // Handle joystick input
   function handleJoystickStart(e: React.TouchEvent | React.MouseEvent) {
     e.preventDefault();
+    // For mouse, start tracking movement on mousedown
     setJoystick((js) => ({ ...js, active: true }));
   }
   function handleJoystickMove(e: React.TouchEvent | React.MouseEvent) {
@@ -376,15 +377,18 @@ function App() {
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
     } else {
+      // only update if mouse is down
+      if (!joystick.active && e.type !== "mousedown") return;
       clientX = e.clientX;
       clientY = e.clientY;
     }
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    // Joystick pad center
-    const padX = rect.left + rect.width - JOYSTICK_PAD_RADIUS - 25;
-    const padY = rect.top + rect.height - JOYSTICK_PAD_RADIUS - 25;
+
+    // Calculate position relative to the joystick pad
+    const padElem = (e.target as HTMLElement).closest(".JoystickPad") as HTMLElement | null;
+    if (!padElem) return;
+    const rect = padElem.getBoundingClientRect();
+    const padX = rect.left + rect.width / 2;
+    const padY = rect.top + rect.height / 2;
     const dx = clientX - padX;
     const dy = clientY - padY;
     const dist = Math.sqrt(dx * dx + dy * dy);
@@ -467,7 +471,7 @@ function App() {
         onTouchMove={handleJoystickMove}
         onTouchEnd={handleJoystickEnd}
         onMouseDown={handleJoystickStart}
-        onMouseMove={(e) => joystick.active && handleJoystickMove(e)}
+        onMouseMove={handleJoystickMove}
         onMouseUp={handleJoystickEnd}
         onMouseLeave={handleJoystickEnd}
       >
