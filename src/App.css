@@ -1,38 +1,63 @@
-.App {
-  text-align: center;
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  background: #181d1f;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.overlay-ui {
+  position: absolute;
+  left: 28px;
+  top: 28px;
+  background: rgba(18, 22, 24, 0.93);
+  color: #eee;
+  padding: 18px 22px 14px 22px;
+  border-radius: 9px;
+  min-width: 250px;
+  box-shadow: 0 2px 16px #0007;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  z-index: 1000;
+  font-size: 1.1rem;
+  max-width: 350px;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.overlay-ui button {
+  background: #6065c0;
+  color: #fff;
+  border: none;
+  padding: 8px 18px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+  font-size: 1rem;
+  transition: background 0.15s;
+}
+.overlay-ui button:hover {
+  background: #494fa3;
 }
 
-.App-link {
-  color: #61dafb;
+.overlay-ui h2 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  letter-spacing: 1.2px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.overlay-ui ul {
+  padding-left: 14px;
+  margin-bottom: 0;
+}
+
+.overlay-ui b {
+  color: #b5d3ff;
+}
+
+.overlay-ui span {
+  color: #ffd9ae;
 }
