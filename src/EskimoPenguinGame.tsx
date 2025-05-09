@@ -66,7 +66,7 @@ const isTouchDevice = () =>
     ("ontouchstart" in window || navigator.maxTouchPoints)
   );
 
-// Mobile: on-screen controls
+// Mobile: on-screen controls (smaller, less intrusive)
 const ControlButton: React.FC<{
   label: string;
   onPress: () => void;
@@ -75,10 +75,10 @@ const ControlButton: React.FC<{
 }> = ({ label, onPress, onRelease, style }) => (
   <button
     style={{
-      width: 56,
-      height: 56,
-      fontSize: 22,
-      margin: 4,
+      width: 38,
+      height: 38,
+      fontSize: 18,
+      margin: 2,
       borderRadius: "50%",
       border: "2px solid #357ab7",
       background: "#e3f3fa",
@@ -203,11 +203,12 @@ const EskimoPenguinGame: React.FC = () => {
     };
   }, []);
 
-  // Main game loop
+  // Main game loop, with "drop down" mechanic
   useEffect(() => {
     if (gameState !== "playing") return;
 
     let animationId: number;
+    let dropping = false;
 
     const update = () => {
       // Controls
@@ -220,6 +221,22 @@ const EskimoPenguinGame: React.FC = () => {
       let y = player.y;
       let x = player.x;
       let onGround = player.onGround;
+
+      // Drop down mechanic
+      let dropPressed =
+        keys.current["ArrowDown"] ||
+        keys.current["s"] ||
+        keys.current["S"] ||
+        keys.current["Down"];
+
+      // Only allow dropping through non-ground platforms
+      let dropped = false;
+      if (dropPressed && onGround && y + PLAYER_HEIGHT < GAME_HEIGHT - GROUND_HEIGHT - 1) {
+        // Move player down a little to fall through platform
+        y += 6;
+        onGround = false;
+        dropped = true;
+      }
 
       if (
         (keys.current["ArrowUp"] || keys.current["w"] || keys.current[" "]) &&
@@ -236,12 +253,15 @@ const EskimoPenguinGame: React.FC = () => {
       // Platform collision
       onGround = false;
       for (const plat of platforms) {
-        // Only check if falling
+        // Only check if falling and NOT dropping
+        // If dropping, skip collision with non-ground platforms
+        const isGround = plat.y === GAME_HEIGHT - GROUND_HEIGHT;
         if (
           y + PLAYER_HEIGHT > plat.y &&
           y + PLAYER_HEIGHT - vy <= plat.y &&
           x + PLAYER_WIDTH > plat.x &&
-          x < plat.x + plat.w
+          x < plat.x + plat.w &&
+          (!dropPressed || isGround)
         ) {
           // Land on platform
           y = plat.y - PLAYER_HEIGHT;
@@ -537,8 +557,8 @@ const EskimoPenguinGame: React.FC = () => {
           position: "relative",
           width: canvasDims.width,
           height: canvasDims.height,
-          maxWidth: "98vw",
-          maxHeight: "60vh",
+          maxWidth: "99vw",
+          maxHeight: "80vh",
           margin: "0 auto",
         }}
       >
@@ -556,6 +576,8 @@ const EskimoPenguinGame: React.FC = () => {
             display: "block",
             boxShadow: "0 3px 16px 0 #357ab733",
             margin: "0 auto",
+            maxWidth: "99vw",
+            maxHeight: "80vh",
           }}
           onClick={handleCanvasTap}
           onTouchEnd={handleCanvasTap}
@@ -566,13 +588,15 @@ const EskimoPenguinGame: React.FC = () => {
               position: "absolute",
               left: 0,
               right: 0,
-              bottom: 12,
+              bottom: 8,
               display: "flex",
               flexDirection: "row",
               justifyContent: "center",
-              gap: 12,
+              gap: 2,
               zIndex: 2,
               pointerEvents: "none",
+              width: "100%",
+              maxWidth: "100%",
             }}
           >
             <div style={{ pointerEvents: "auto" }}>
@@ -597,13 +621,23 @@ const EskimoPenguinGame: React.FC = () => {
                 style={{ background: "#e0f7fa", color: "#357ab7" }}
               />
             </div>
+            <div style={{ pointerEvents: "auto" }}>
+              <ControlButton
+                label="⯆"
+                onPress={() => handleTouchControl("ArrowDown", true)}
+                onRelease={() => handleTouchControl("ArrowDown", false)}
+                style={{ background: "#e0f7fa", color: "#357ab7" }}
+              />
+            </div>
           </div>
         )}
       </div>
       <div style={{ marginTop: 8, color: "#345", fontSize: "clamp(0.9rem, 2.5vw, 1.2rem)" }}>
         <span>
-          Controls: <b>←/→</b> to move, <b>↑/Space</b> to jump.<br />
-          {showTouchControls ? "Use on-screen buttons!" : "Hunt penguins, avoid polar bears!"}
+          Controls: <b>←/→</b> to move, <b>↑/Space</b> to jump, <b>↓</b> to drop down.<br />
+          {showTouchControls
+            ? "Use on-screen buttons (↑=jump, ↓=drop through platform)!"
+            : "Hunt penguins, avoid polar bears!"}
         </span>
       </div>
       {gameState === "gameover" && (
