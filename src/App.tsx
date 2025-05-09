@@ -85,9 +85,12 @@ function App() {
     { x: 120, y: 210, w: 170, h: 14 },
   ];
 
-  // Control: track jump "buffer" to avoid repeat jumps while holding stick up
-  const jumpRequested = useRef(false);
-  const lastJoystickY = useRef(0);
+  // Control: Track button-press state for each direction
+  const [controls, setControls] = useState<{left: boolean; right: boolean; up: boolean; down: boolean}>({
+    left: false, right: false, up: false, down: false
+  });
+  // Prevent repeated jumps on hold
+  const jumpBuffer = useRef(false);
 
   // Game loop
   useEffect(() => {
@@ -127,29 +130,26 @@ function App() {
     }
 
     function gameStep(dt: number) {
-      // Player movement via joystick
-      let inputX = joystick.active ? joystick.dx : 0;
-      // Deadzone for stick
-      if (Math.abs(inputX) < 0.20) inputX = 0;
+      // Player movement via buttons
+      let inputX = 0;
+      if (controls.left) inputX -= 1;
+      if (controls.right) inputX += 1;
       playerVel.current.x = inputX * moveSpeed;
 
-      // Jump only on joystick up "press" event (not hold)
-      if (
-        joystick.active &&
-        joystick.dy < -0.5 &&
-        lastJoystickY.current >= -0.5 &&
-        onGround.current &&
-        !jumpRequested.current
-      ) {
-        playerVel.current.y = -jumpSpeed - Math.abs(joystick.dy * 3);
+      // Jump only when up is pressed and not repeating
+      if (controls.up && onGround.current && !jumpBuffer.current) {
+        playerVel.current.y = -jumpSpeed;
         onGround.current = false;
-        jumpRequested.current = true;
+        jumpBuffer.current = true;
       }
-      // Reset jump request when stick returns to neutral/down
-      if (!(joystick.active && joystick.dy < -0.5)) {
-        jumpRequested.current = false;
+      if (!controls.up) {
+        jumpBuffer.current = false;
       }
-      lastJoystickY.current = joystick.dy;
+
+      // (Optional: allow down to drop faster if desired)
+      if (controls.down && !onGround.current) {
+        playerVel.current.y += gravity * 0.7;
+      }
 
       // Apply gravity
       playerVel.current.y += gravity;
@@ -363,50 +363,9 @@ function App() {
     // eslint-disable-next-line
   }, [gameOver, highScore]);
 
-  // Handle joystick input
-  function handleJoystickStart(e: React.TouchEvent | React.MouseEvent) {
-    e.preventDefault();
-    // For mouse, start tracking movement on mousedown
-    setJoystick((js) => ({ ...js, active: true }));
-  }
-  function handleJoystickMove(e: React.TouchEvent | React.MouseEvent) {
-    e.preventDefault();
-    let clientX: number, clientY: number;
-    if ("touches" in e) {
-      if (e.touches.length === 0) return;
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      // only update if mouse is down
-      if (!joystick.active && e.type !== "mousedown") return;
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
-
-    // Calculate position relative to the joystick pad
-    const padElem = (e.target as HTMLElement).closest(".JoystickPad") as HTMLElement | null;
-    if (!padElem) return;
-    const rect = padElem.getBoundingClientRect();
-    const padX = rect.left + rect.width / 2;
-    const padY = rect.top + rect.height / 2;
-    const dx = clientX - padX;
-    const dy = clientY - padY;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    let normDx = dx / JOYSTICK_PAD_RADIUS;
-    let normDy = dy / JOYSTICK_PAD_RADIUS;
-    if (dist > JOYSTICK_PAD_RADIUS) {
-      normDx *= JOYSTICK_PAD_RADIUS / dist;
-      normDy *= JOYSTICK_PAD_RADIUS / dist;
-    }
-    setJoystick({
-      active: true,
-      dx: clamp(normDx, -1, 1),
-      dy: clamp(normDy, -1, 1),
-    });
-  }
-  function handleJoystickEnd(e: React.TouchEvent | React.MouseEvent) {
-    e.preventDefault();
-    setJoystick({ active: false, dx: 0, dy: 0 });
+  // Button controls for mobile/desktop
+  function handleControl(direction: "left" | "right" | "up" | "down", pressed: boolean) {
+    setControls((prev) => ({ ...prev, [direction]: pressed }));
   }
 
   // Responsive canvas: fullscreen, mobile-first
@@ -454,70 +413,107 @@ function App() {
         tabIndex={0}
       />
 
-      {/* Joystick overlay */}
+      {/* Directional button controls */}
       <div
-        className="JoystickPad"
+        className="ControlsPad"
         style={{
           position: "fixed",
-          right: 25,
-          bottom: 25,
-          width: JOYSTICK_PAD_RADIUS * 2,
-          height: JOYSTICK_PAD_RADIUS * 2,
+          left: 0,
+          right: 0,
+          bottom: 10,
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "flex-end",
           zIndex: 10,
-          touchAction: "none",
+          gap: 24,
+          pointerEvents: "none",
           userSelect: "none",
         }}
-        onTouchStart={handleJoystickStart}
-        onTouchMove={handleJoystickMove}
-        onTouchEnd={handleJoystickEnd}
-        onMouseDown={handleJoystickStart}
-        onMouseMove={handleJoystickMove}
-        onMouseUp={handleJoystickEnd}
-        onMouseLeave={handleJoystickEnd}
       >
-        {/* Outer pad */}
-        <svg
-          width={JOYSTICK_PAD_RADIUS * 2}
-          height={JOYSTICK_PAD_RADIUS * 2}
-          style={{ pointerEvents: "none", position: "absolute", left: 0, top: 0 }}
-        >
-          <circle
-            cx={JOYSTICK_PAD_RADIUS}
-            cy={JOYSTICK_PAD_RADIUS}
-            r={JOYSTICK_PAD_RADIUS}
-            fill="#444b"
-          />
-        </svg>
-        {/* Inner stick */}
-        {joystick.active && (
-          <svg
-            width={JOYSTICK_PAD_RADIUS * 2}
-            height={JOYSTICK_PAD_RADIUS * 2}
-            style={{
-              pointerEvents: "none",
-              position: "absolute",
-              left: 0,
-              top: 0,
-            }}
+        {/* Left/Right/Up/Down Buttons */}
+        <div style={{
+          display: "flex",
+          flexDirection: "row",
+          gap: 24,
+          pointerEvents: "auto"
+        }}>
+          {/* Left */}
+          <button
+            className="ControlBtn"
+            style={buttonStyle}
+            onTouchStart={e => (e.preventDefault(), handleControl("left", true))}
+            onTouchEnd={e => (e.preventDefault(), handleControl("left", false))}
+            onMouseDown={e => (e.preventDefault(), handleControl("left", true))}
+            onMouseUp={e => (e.preventDefault(), handleControl("left", false))}
+            onMouseLeave={e => handleControl("left", false)}
+            aria-label="Left"
           >
-            <circle
-              cx={
-                JOYSTICK_PAD_RADIUS +
-                joystick.dx * (JOYSTICK_PAD_RADIUS - JOYSTICK_RADIUS)
-              }
-              cy={
-                JOYSTICK_PAD_RADIUS +
-                joystick.dy * (JOYSTICK_PAD_RADIUS - JOYSTICK_RADIUS)
-              }
-              r={JOYSTICK_RADIUS}
-              fill="#1e88e5"
-              opacity={0.9}
-            />
-          </svg>
-        )}
+            &#8592;
+          </button>
+          {/* Down */}
+          <button
+            className="ControlBtn"
+            style={buttonStyle}
+            onTouchStart={e => (e.preventDefault(), handleControl("down", true))}
+            onTouchEnd={e => (e.preventDefault(), handleControl("down", false))}
+            onMouseDown={e => (e.preventDefault(), handleControl("down", true))}
+            onMouseUp={e => (e.preventDefault(), handleControl("down", false))}
+            onMouseLeave={e => handleControl("down", false)}
+            aria-label="Down"
+          >
+            &#8595;
+          </button>
+          {/* Up */}
+          <button
+            className="ControlBtn"
+            style={buttonStyle}
+            onTouchStart={e => (e.preventDefault(), handleControl("up", true))}
+            onTouchEnd={e => (e.preventDefault(), handleControl("up", false))}
+            onMouseDown={e => (e.preventDefault(), handleControl("up", true))}
+            onMouseUp={e => (e.preventDefault(), handleControl("up", false))}
+            onMouseLeave={e => handleControl("up", false)}
+            aria-label="Up"
+          >
+            &#8593;
+          </button>
+          {/* Right */}
+          <button
+            className="ControlBtn"
+            style={buttonStyle}
+            onTouchStart={e => (e.preventDefault(), handleControl("right", true))}
+            onTouchEnd={e => (e.preventDefault(), handleControl("right", false))}
+            onMouseDown={e => (e.preventDefault(), handleControl("right", true))}
+            onMouseUp={e => (e.preventDefault(), handleControl("right", false))}
+            onMouseLeave={e => handleControl("right", false)}
+            aria-label="Right"
+          >
+            &#8594;
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+
+// Mobile-friendly button style
+const buttonStyle: React.CSSProperties = {
+  width: 64,
+  height: 64,
+  borderRadius: "50%",
+  background: "#222",
+  color: "#fff",
+  fontSize: 34,
+  border: "2px solid #1e88e5",
+  margin: 0,
+  outline: "none",
+  boxShadow: "0 2px 8px #0005",
+  touchAction: "none",
+  userSelect: "none",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  fontWeight: "bold",
+};
 
 export default App;
