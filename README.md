@@ -1,5 +1,9 @@
 # Getting Started with Create React App
 
+What do you call fake spaghetti?
+
+An impasta!
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
