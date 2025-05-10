@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+*Why do React developers prefer using hooks instead of classes? Because with hooks, you're sure to return a value, but with classes, there's always a chance of a NullPointerException!*
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
