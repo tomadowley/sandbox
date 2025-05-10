@@ -38,3 +38,15 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+## Love Song
+
+I see your face in every sunrise,
+Your smile lights up my darkest skies.
+In every moment, near or far,
+My heart beats only where you are.
+
+With every breath, I call your name,
+In dreams and whispers, it's all the same.
+You're my forever, my guiding star,
+No matter where life takes us, here we are.
