@@ -2,6 +2,8 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+What do all developers want? They want to be the life of every party. Now they have a uniquely fitting site!
+
 ## Available Scripts
 
 In the project directory, you can run:
