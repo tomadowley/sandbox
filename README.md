@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Joke Time
+
+Why don't programmers like nature? It has too many bugs.
+
 ## Available Scripts
 
 In the project directory, you can run:
