@@ -1,26 +1,116 @@
 {
+  /* 
+   * TypeScript Configuration File
+   * This file controls the TypeScript compiler options for the project.
+   * It defines how TypeScript files are compiled to JavaScript and specifies
+   * various type-checking behaviors.
+   */
   "compilerOptions": {
+    /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019', 'ES2020', or 'ESNEXT'.
+     * This determines which JavaScript features are downleveled and which are preserved.
+     * 'es5' ensures compatibility with older browsers like IE11.
+     */
     "target": "es5",
+    
+    /* Specify library files to be included in the compilation.
+     * These provide type definitions for built-in JavaScript APIs and browser/DOM APIs.
+     * 'dom' includes browser APIs, 'dom.iterable' adds support for iterable DOM elements,
+     * 'esnext' includes latest ECMAScript features.
+     */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    
+    /* Allow JavaScript files to be compiled.
+     * Enables using JavaScript files alongside TypeScript in the project.
+     * Useful for gradual migration from JavaScript to TypeScript.
+     */
     "allowJs": true,
+    
+    /* Skip type checking of declaration files.
+     * Improves performance by skipping type-checking of third-party declaration files.
+     * Particularly useful when using third-party libraries with incomplete typing.
+     */
     "skipLibCheck": true,
+    
+    /* Enables emit interoperability between CommonJS and ES Modules.
+     * Allows importing CommonJS modules with ES module syntax using default imports.
+     * Essential for compatibility with Node.js modules.
+     */
     "esModuleInterop": true,
+    
+    /* Allows import from modules with a '.js' extension.
+     * Enables importing modules that don't have TypeScript declaration files.
+     * Particularly useful when working with libraries that are distributed as ES modules with .js extension.
+     */
     "allowSyntheticDefaultImports": true,
+    
+    /* Enable all strict type-checking options.
+     * Enables a wide range of type checking features for more robust code:
+     * - noImplicitAny: disallow implicit any types
+     * - strictNullChecks: enable strict null checking
+     * - strictFunctionTypes: enable strict checking of function types
+     * - strictBindCallApply: enable strict 'bind', 'call', and 'apply' methods on functions
+     */
     "strict": true,
+    
+    /* Ensure that casing is correct in imports.
+     * Prevents imports from referencing files with incorrect casing on case-sensitive file systems.
+     * Avoids deployment issues when moving between different operating systems.
+     */
     "forceConsistentCasingInFileNames": true,
+    
+    /* Report errors for fallthrough cases in switch statements.
+     * Helps catch unintentional fallthroughs in switch statements where a case block
+     * doesn't have a break or return statement.
+     */
     "noFallthroughCasesInSwitch": true,
+    
+    /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', 'es2020', or 'ESNext'.
+     * Determines the module system used in the generated JavaScript files.
+     * 'esnext' uses the latest available ECMAScript module syntax, which is optimal for webpack.
+     */
     "module": "esnext",
+    
+    /* Specify module resolution strategy.
+     * 'node' uses Node.js resolution algorithm, resolving modules from node_modules directory.
+     * This is standard for projects using npm packages.
+     */
     "moduleResolution": "node",
+    
+    /* Include modules imported with '.json' extension.
+     * Allows directly importing JSON files as modules with automatic type generation.
+     * Useful for configuration files or data files in JSON format.
+     */
     "resolveJsonModule": true,
+    
+    /* Ensure each file can be safely transpiled without relying on other imports.
+     * Required when using Babel alongside TypeScript for transpilation.
+     * Prevents TypeScript from doing cross-file optimizations that Babel can't handle.
+     */
     "isolatedModules": true,
+    
+    /* Do not emit compiler output files.
+     * TypeScript will only perform type checking without generating JavaScript files.
+     * This is common in Create React App projects where Babel handles the actual transpilation.
+     */
     "noEmit": true,
+    
+    /* Support JSX in .tsx files: 'preserve', 'react-native', 'react', 'react-jsx'.
+     * 'react-jsx' uses the new JSX transform from React 17+, which doesn't require importing React.
+     * This enables JSX syntax for React components without the need for `import React from 'react'`.
+     */
     "jsx": "react-jsx"
   },
+  
+  /* Specify files to include in compilation.
+   * This tells TypeScript which directories to include in the compilation process.
+   * Including only 'src' ensures that TypeScript only processes source files and not build artifacts or node_modules.
+   */
   "include": [
     "src"
   ]
 }
+```# DONE

@@ -16,24 +16,37 @@
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4"
   },
+  "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11"
+  },
+  "//scripts": "NPM scripts for running development, testing, and build commands",
   "scripts": {
+    "//start": "Starts the development server with hot-reloading at http://localhost:3000",
     "start": "react-scripts start",
+    "//build": "Creates an optimized production build in the build/ directory",
     "build": "react-scripts build",
+    "//test": "Runs tests in interactive watch mode, re-running tests on file changes",
     "test": "react-scripts test",
+    "//eject": "Ejects the create-react-app configuration for full customization (irreversible)",
     "eject": "react-scripts eject"
   },
+  "//eslintConfig": "Configuration for ESLint to enforce code quality and consistency",
   "eslintConfig": {
+    "//extends": "Uses the predefined rule sets for React and Jest testing",
     "extends": [
       "react-app",
       "react-app/jest"
     ]
   },
+  "//browserslist": "Defines which browsers should be supported in production and development",
   "browserslist": {
+    "//production": "Browser targets for the production build, balancing compatibility and performance",
     "production": [
       ">0.2%",
       "not dead",
       "not op_mini all"
     ],
+    "//development": "Browser targets for development, focusing on modern browsers for faster builds",
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
