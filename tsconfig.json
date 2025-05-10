@@ -1,25 +1,43 @@
 {
+  /* TypeScript configuration file for the React application */
+  /* Controls how TypeScript compiles the code */
   "compilerOptions": {
+    /* Specify ECMAScript target version: 'es5' for broader browser compatibility */
     "target": "es5",
+    /* Specify library files to be included in the compilation */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    /* Allow JavaScript files to be compiled */
     "allowJs": true,
+    /* Skip type checking of declaration files for better performance */
     "skipLibCheck": true,
+    /* Enables emit interoperability between CommonJS and ES Modules */
     "esModuleInterop": true,
+    /* Allows default imports from modules with no default export */
     "allowSyntheticDefaultImports": true,
+    /* Enable all strict type checking options */
     "strict": true,
+    /* Ensure consistent casing in file references */
     "forceConsistentCasingInFileNames": true,
+    /* Report errors for fallthrough cases in switch statements */
     "noFallthroughCasesInSwitch": true,
+    /* Specify module code generation: 'esnext' for dynamic imports */
     "module": "esnext",
+    /* Specify module resolution strategy */
     "moduleResolution": "node",
+    /* Allow importing JSON modules */
     "resolveJsonModule": true,
+    /* Ensure each file can be safely transpiled without relying on other imports */
     "isolatedModules": true,
+    /* Do not emit outputs (let bundler handle it) */
     "noEmit": true,
+    /* Support JSX in .tsx files: 'react-jsx' for React 17+ new transform */
     "jsx": "react-jsx"
   },
+  /* Specify files to include in compilation */
   "include": [
     "src"
   ]
