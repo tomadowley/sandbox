@@ -1,18 +1,42 @@
+/* 
+ * App.css
+ * Main stylesheet for the React application.
+ * Contains styles for the app layout, header, logo animations, and links.
+ * Follows a consistent pattern of component-specific class naming.
+ */
+
+/* Main app container - centers all text content within the application */
 .App {
   text-align: center;
 }
 
+/* 
+ * App logo styling 
+ * Sets appropriate size with viewport-relative units
+ * Prevents mouse interaction with the logo element
+ */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
 }
 
+/* 
+ * Accessibility-focused animation control
+ * Only applies rotation animation when reduced motion is not preferred
+ * Respects user preferences for motion sensitivity
+ */
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;
   }
 }
 
+/* 
+ * Main header container styling
+ * Creates a full-height, vertically-centered layout using flexbox
+ * Uses dark background with light text for strong visual contrast
+ * Responsive font sizing with calc() for better readability across devices
+ */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,10 +48,20 @@
   color: white;
 }
 
+/* 
+ * Link styling within the app 
+ * Uses React's signature light blue (#61dafb) for brand consistency
+ */
 .App-link {
   color: #61dafb;
 }
 
+/* 
+ * Keyframe animation definition for the logo
+ * Creates a smooth 360-degree rotation effect
+ * Adds visual interest and engagement to the interface
+ * Used by .App-logo when animation is appropriate
+ */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
