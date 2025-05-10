@@ -1,26 +1,44 @@
 {
+  /* TypeScript configuration file that defines compiler options and project settings */
   "compilerOptions": {
+    /* Specifies ECMAScript target version: 'ES5' is widely compatible with browsers */
     "target": "es5",
+    /* List of library files to be included in the compilation */
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    /* Allow JavaScript files to be compiled */
     "allowJs": true,
+    /* Skip type checking of declaration files */
     "skipLibCheck": true,
+    /* Enables interoperability between CommonJS and ES Modules */
     "esModuleInterop": true,
+    /* Allows default imports from modules with no default export */
     "allowSyntheticDefaultImports": true,
+    /* Enable all strict type-checking options */
     "strict": true,
+    /* Ensure consistent casing in file references */
     "forceConsistentCasingInFileNames": true,
+    /* Report errors for fallthrough cases in switch statements */
     "noFallthroughCasesInSwitch": true,
+    /* Specify module code generation: 'esnext' for dynamic imports */
     "module": "esnext",
+    /* Specify module resolution strategy */
     "moduleResolution": "node",
+    /* Allow importing JSON modules */
     "resolveJsonModule": true,
+    /* Ensure each file can be safely transpiled without relying on other imports */
     "isolatedModules": true,
+    /* Do not emit outputs (compiled JS files) */
     "noEmit": true,
+    /* Support JSX in .tsx files: 'react-jsx' for React 17+ new transform */
     "jsx": "react-jsx"
   },
+  /* Specifies an array of filenames or patterns to include in the program */
   "include": [
-    "src"
+    "src",
+    "src/setupTests.ts"
   ]
 }
