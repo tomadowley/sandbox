@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+If you want to skip all these steps and run some other code... maybe you should just pick another repo
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
