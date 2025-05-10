@@ -2,6 +2,11 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+### Joke of the week:
+
+Why do developers prefer dark mode?
+Dark mode let us stay in the dark, quietly shunning mornings (and people).
+
 ## Available Scripts
 
 In the project directory, you can run:
