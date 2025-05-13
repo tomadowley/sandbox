@@ -2,9 +2,9 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders learn react link", () => {
+test("renders AI Detection Challenge somewhere", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-  expect(false).toBe(true);
+  // There should be at least one occurrence of this text somewhere
+  const elements = screen.getAllByText(/AI Detection Challenge/i);
+  expect(elements.length).toBeGreaterThan(0);
 });
