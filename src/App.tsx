@@ -29,6 +29,10 @@ type CharacterType = "niall" | "ali";
 
 function App() {
   const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState<number>(() => {
+    const stored = localStorage.getItem("niall_high_score");
+    return stored !== null ? parseInt(stored, 10) : 0;
+  });
   const [timeLeft, setTimeLeft] = useState(GAME_TIME);
   const [gameActive, setGameActive] = useState(false);
   const [characterPos, setCharacterPos] = useState(getRandomPosition());
@@ -38,6 +42,15 @@ function App() {
   const [message, setMessage] = useState<string | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const charTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Update high score when game ends and player beats it
+  useEffect(() => {
+    if (!gameActive && timeLeft === 0 && score > highScore) {
+      setHighScore(score);
+      localStorage.setItem("niall_high_score", String(score));
+    }
+    // eslint-disable-next-line
+  }, [gameActive, timeLeft, score, highScore]);
 
   // Game timer
   useEffect(() => {
@@ -125,6 +138,7 @@ function App() {
         <h1>We're Angry at Niall!</h1>
         <div className="score-timer">
           <span>Score: <strong>{score}</strong></span>
+          <span>High: <strong>{highScore}</strong></span>
           <span>Time: <strong>{timeLeft}</strong>s</span>
         </div>
         {!gameActive ? (

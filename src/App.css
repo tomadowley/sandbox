@@ -69,9 +69,9 @@
 
 .game-area {
   flex: 1 1 auto;
-  min-height: 170px;
-  height: 32vh;
-  max-height: 210px;
+  min-height: 340px;
+  height: 64vh;
+  max-height: 420px;
   position: relative;
   background: #fff8;
   border-radius: 1em;
@@ -128,9 +128,9 @@
 
 @media (max-width: 600px) {
   .game-area {
-    min-height: 120px;
-    height: 28vh;
-    max-height: 150px;
+    min-height: 240px;
+    height: 56vh;
+    max-height: 300px;
     margin: 0.55em 2vw 0.7em 2vw;
   }
   .character {
