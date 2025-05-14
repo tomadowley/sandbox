@@ -40,7 +40,9 @@ function App() {
       return;
     }
     timerRef.current = setTimeout(() => setTimeLeft(t => t - 1), 1000);
-    return () => timerRef.current && clearTimeout(timerRef.current);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
   }, [gameActive, timeLeft, score]);
 
   // Niall popping up
