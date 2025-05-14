@@ -1,27 +1,141 @@
+/* Mobile-first: full viewport, bold colors, easy tap targets */
 .App {
+  min-height: 100vh;
+  background: #ff9a8b;
+  background: linear-gradient(135deg, #ff6a88 0%, #ff99ac 100%);
+  font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.game-header {
+  padding: 1.2em 0 0.6em 0;
+  background: rgba(255, 255, 255, 0.12);
+  color: #222;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.game-header h1 {
+  margin: 0 0 0.25em 0;
+  font-size: 2.1em;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #c0392b;
+  text-shadow: 1px 2px 10px #fff5;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.score-timer {
+  display: flex;
+  justify-content: center;
+  gap: 2em;
+  font-size: 1.2em;
+  margin-bottom: 0.5em;
+}
+
+.start-btn {
+  margin: 0.6em auto 0.3em auto;
+  padding: 0.8em 2.2em;
+  font-size: 1.2em;
+  color: #fff;
+  background: #c0392b;
+  border: none;
+  border-radius: 2em;
+  box-shadow: 0 2px 8px #d54e4e44;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+.start-btn:hover,
+.start-btn:focus {
+  background: #b13224;
+  outline: none;
+}
+
+.game-message {
+  margin: 0.8em 0 0.2em 0;
+  font-size: 1.2em;
+  color: #222;
+  background: #fff8;
+  border-radius: 1em;
+  padding: 0.6em 1.2em;
+  display: inline-block;
+}
+
+.game-area {
+  flex: 1 1 auto;
+  min-height: 350px;
+  position: relative;
+  background: #fff8;
+  border-radius: 1em;
+  margin: 0.7em 1vw 0.8em 1vw;
+  box-shadow: 0 2px 12px #faafaf25;
+  overflow: hidden;
+}
+
+.niall {
+  position: absolute;
+  width: 70px;
+  height: 70px;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  user-select: none;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  z-index: 2;
+  outline: none;
+}
+
+.niall:active,
+.niall:focus {
+  outline: 2px solid #c0392b;
+}
+
+.niall-face {
+  font-size: 2.5em;
+  filter: drop-shadow(1px 2px 8px #c0392b44);
+}
+
+.niall-label {
+  margin-top: -0.2em;
+  font-size: 1em;
+  color: #c0392b;
+  font-weight: bold;
+  letter-spacing: 0.2em;
+  text-shadow: 0 2px 4px #fff8;
+}
+
+.game-tip {
+  position: absolute;
+  left: 50%;
+  top: 45%;
+  transform: translate(-50%, -50%);
+  color: #b13224;
+  font-size: 1.3em;
+  opacity: 0.9;
+}
+
+.game-footer {
+  padding: 0.8em 0 0.5em 0;
+  font-size: 1em;
+  color: #7c1f1f;
+  background: none;
+}
+
+@media (max-width: 600px) {
+  .game-area {
+    min-height: 250px;
+    margin: 1em 2vw 1.2em 2vw;
+  }
+  .niall {
+    width: 54px;
+    height: 54px;
+  }
+  .niall-face {
+    font-size: 2em;
+  }
 }
 
 .App-link {
