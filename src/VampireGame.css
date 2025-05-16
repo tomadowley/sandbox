@@ -1,0 +1,103 @@
+.vampire-game-root {
+  box-shadow: 0 0 20px #0ff6;
+  user-select: none;
+  font-family: 'Orbitron', 'Segoe UI', Arial, sans-serif;
+}
+
+.score-bar {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  font-size: 22px;
+  color: #fff;
+  z-index: 2;
+  text-shadow: 0 2px 8px #000, 2px 0px 8px #00d9ff99;
+}
+
+.npc {
+  background: #101a25aa;
+  border-radius: 50%;
+  box-shadow: 0 2px 10px #0ff8, 0 0 1px #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  border: 2px solid #0ff5;
+  transition: background 0.3s, border 0.2s;
+}
+.npc.draining {
+  background: #f402;
+  border: 2px solid #f04;
+  filter: brightness(1.2);
+  animation: draining 0.8s ease-in-out;
+}
+@keyframes draining {
+  0% { filter: brightness(1.2);}
+  60% { filter: brightness(1.9);}
+  100% { filter: brightness(1.0);}
+}
+
+.city-skyline {
+  position: absolute;
+  width: 100%;
+  height: 100px;
+  bottom: 0;
+  left: 0;
+  background: 
+    linear-gradient(to top, #0ff2 80%, transparent 100%),
+    repeating-linear-gradient(90deg, #0ff4 0 10px, #095 10px 20px);
+  z-index: 1;
+  opacity: 0.7;
+  border-bottom-left-radius: 16px;
+  border-bottom-right-radius: 16px;
+  box-shadow: 0 4px 32px #0ff6;
+}
+.game-over-screen {
+  position: absolute;
+  top: 120px;
+  left: 0;
+  width: 100%;
+  height: 220px;
+  background: rgba(15,0,32,0.86);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: 20px;
+  box-shadow: 0 0 40px #f045, 0 0 9px #0ff8;
+}
+
+.restart-btn {
+  padding: 10px 26px;
+  font-size: 18px;
+  border-radius: 30px;
+  background: linear-gradient(90deg,#0ff 40%,#f04 100%);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 12px #0ff5;
+  letter-spacing: 1.5px;
+  transition: background 0.2s, color 0.2s;
+}
+.restart-btn:hover {
+  background: linear-gradient(90deg,#f04,#0ff 60%);
+  color: #000;
+}
+
+.game-title {
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 0 0 18px #f04, 0 0 10px #0ff7, 0 2px 6px #000;
+  letter-spacing: 2px;
+  z-index: 5;
+  pointer-events: none;
+}
