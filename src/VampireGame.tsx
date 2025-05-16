@@ -1,19 +1,23 @@
 import React, { useRef, useState, useEffect } from "react";
 import "./VampireGame.css";
 
+type NpcType = "good" | "bad";
+
 interface NPC {
   id: number;
   x: number;
   y: number;
   draining: boolean;
+  type: NpcType;
+  speed: number; // px/sec
 }
 
 const GAME_WIDTH = 360; // px, for mobile
 const GAME_HEIGHT = 600;
 
-const NPC_SPAWN_INTERVAL = 1200; // ms
-const NPC_MOVE_SPEED = 60; // px/sec
-const DRAIN_TIME = 900; // ms to drain fully
+const NPC_SPAWN_INTERVAL = 1000; // ms (faster)
+const NPC_SPEED_RANGE = { min: 80, max: 165 }; // px/sec, all faster + varied
+const DRAIN_TIME = 800; // ms to drain fully
 
 export default function VampireGame() {
   const [npcs, setNpcs] = useState<NPC[]>([]);
@@ -26,6 +30,12 @@ export default function VampireGame() {
   useEffect(() => {
     if (gameOver) return;
     const interval = setInterval(() => {
+      // 25% chance for a "bad" NPC
+      const isBad = Math.random() < 0.25;
+      // Random speed in range (all faster, some much faster)
+      const speed =
+        NPC_SPEED_RANGE.min +
+        Math.random() * (NPC_SPEED_RANGE.max - NPC_SPEED_RANGE.min);
       setNpcs((prev) => [
         ...prev,
         {
@@ -33,6 +43,8 @@ export default function VampireGame() {
           x: Math.random() * (GAME_WIDTH - 56),
           y: 0,
           draining: false,
+          type: isBad ? "bad" : "good",
+          speed,
         },
       ]);
     }, NPC_SPAWN_INTERVAL);
@@ -48,7 +60,7 @@ export default function VampireGame() {
           .map((npc) =>
             npc.draining
               ? npc
-              : { ...npc, y: npc.y + (NPC_MOVE_SPEED * 0.03) }
+              : { ...npc, y: npc.y + (npc.speed * 0.03) }
           )
           .filter((npc) => {
             if (npc.y > GAME_HEIGHT - 60 && !npc.draining) {
@@ -77,8 +89,18 @@ export default function VampireGame() {
       )
     );
     setTimeout(() => {
-      setNpcs((prev) => prev.filter((npc) => npc.id !== id));
-      setScore((s) => s + 1);
+      let drainedNpc: NPC | undefined;
+      setNpcs((prev) => {
+        drainedNpc = prev.find((npc) => npc.id === id);
+        return prev.filter((npc) => npc.id !== id);
+      });
+      if (drainedNpc) {
+        if (drainedNpc.type === "bad") {
+          setScore((s) => Math.max(0, s - 2));
+        } else {
+          setScore((s) => s + 1);
+        }
+      }
     }, DRAIN_TIME);
   }
 
@@ -121,7 +143,9 @@ export default function VampireGame() {
       {npcs.map((npc) => (
         <div
           key={npc.id}
-          className={`npc ${npc.draining ? "draining" : ""}`}
+          className={`npc ${npc.draining ? "draining" : ""} ${
+            npc.type === "bad" ? "bad-npc" : ""
+          }`}
           style={{
             left: npc.x,
             top: npc.y,
@@ -132,6 +156,7 @@ export default function VampireGame() {
           }}
           onTouchStart={() => !npc.draining && handleDrain(npc.id)}
           onMouseDown={() => !npc.draining && handleDrain(npc.id)}
+          title={npc.type === "bad" ? "Do not drain!" : "Drain this human"}
         >
           {/* Futuristic human - SVG */}
           <svg width="56" height="56" viewBox="0 0 56 56">
@@ -140,8 +165,16 @@ export default function VampireGame() {
               cy="24"
               rx="14"
               ry="18"
-              fill={npc.draining ? "#900" : "#7ff"}
-              stroke="#ffe"
+              fill={
+                npc.type === "bad"
+                  ? npc.draining
+                    ? "#4a004a"
+                    : "#fa0"
+                  : npc.draining
+                  ? "#900"
+                  : "#7ff"
+              }
+              stroke={npc.type === "bad" ? "#fa0" : "#ffe"}
               strokeWidth="2"
             />
             {/* Eyes */}
@@ -170,7 +203,7 @@ export default function VampireGame() {
               width="24"
               height="3"
               rx="1"
-              fill="#0ff"
+              fill={npc.type === "bad" ? "#fa0" : "#0ff"}
               opacity="0.7"
             />
             {/* Fangs if draining */}
@@ -179,6 +212,30 @@ export default function VampireGame() {
                 <rect x="24" y="37" width="2" height="7" fill="#fff" />
                 <rect x="30" y="37" width="2" height="7" fill="#fff" />
               </>
+            )}
+            {/* BAD icon */}
+            {npc.type === "bad" && (
+              <g>
+                <rect
+                  x="20"
+                  y="42"
+                  width="16"
+                  height="9"
+                  rx="4"
+                  fill="#fa0"
+                  opacity="0.8"
+                />
+                <text
+                  x="28"
+                  y="49"
+                  textAnchor="middle"
+                  fontSize="8"
+                  fill="#222"
+                  fontWeight="bold"
+                >
+                  BAD
+                </text>
+              </g>
             )}
           </svg>
         </div>

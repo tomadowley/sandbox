@@ -35,6 +35,15 @@
   filter: brightness(1.2);
   animation: draining 0.8s ease-in-out;
 }
+.npc.bad-npc {
+  background: #fa0e;
+  border: 2px solid #fa0;
+  box-shadow: 0 2px 16px #fa08, 0 0 1px #000;
+}
+.npc.bad-npc.draining {
+  background: #4a004a;
+  border: 2px solid #fa0;
+}
 @keyframes draining {
   0% { filter: brightness(1.2);}
   60% { filter: brightness(1.9);}
