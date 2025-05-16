@@ -2,9 +2,9 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import App from "./App";
 
-test("renders learn react link", () => {
+test("renders vampire 2500 game title", () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-  expect(false).toBe(true);
+  // The title is split into two spans: "VAMPIRE" and "2500"
+  expect(screen.getByText(/vampire/i)).toBeInTheDocument();
+  expect(screen.getByText(/2500/i)).toBeInTheDocument();
 });
