@@ -113,9 +113,13 @@ const App: React.FC = () => {
     // --- Game loop ---
     function loop() {
       if (gameOver.current || win.current) {
-        drawEndScreen(ctx);
+        if (ctx) drawEndScreen(ctx);
         return;
       }
+      updateGame();
+      drawGame(ctx);
+      animationRef.current = requestAnimationFrame(loop);
+    }
       updateGame();
       drawGame(ctx);
       animationRef.current = requestAnimationFrame(loop);
