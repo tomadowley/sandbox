@@ -111,18 +111,8 @@ const App: React.FC = () => {
     canvas.addEventListener("touchend", handleTouchEnd);
 
     // --- Game loop ---
-    function loop() {
-      if (gameOver.current || win.current) {
-        if (ctx) drawEndScreen(ctx);
-        return;
-      }
-      updateGame();
-      drawGame(ctx);
-      animationRef.current = requestAnimationFrame(loop);
-    }
-
     // --- Game logic ---
-    function updateGame() {
+    const updateGame = () => {
       // Player move
       if (leftPressed.current) {
         playerX.current = Math.max(0, playerX.current - PLAYER_SPEED);
@@ -243,10 +233,9 @@ const App: React.FC = () => {
       if (invaders.current.every((inv) => !inv.alive)) {
         win.current = true;
       }
-    } // <-- make sure this closing brace is present and properly placed
-    }
+    };
 
-    function drawGame(ctx: CanvasRenderingContext2D) {
+    const drawGame = (ctx: CanvasRenderingContext2D) => {
       // Clear
       ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -284,9 +273,9 @@ const App: React.FC = () => {
       ctx.fillStyle = "#fff";
       ctx.font = "16px monospace";
       ctx.fillText("Score: " + score.current, 12, 24);
-    }
+    };
 
-    function drawEndScreen(ctx: CanvasRenderingContext2D) {
+    const drawEndScreen = (ctx: CanvasRenderingContext2D) => {
       // Overlay
       ctx.fillStyle = "#000";
       ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -300,7 +289,17 @@ const App: React.FC = () => {
       ctx.fillText("Score: " + score.current, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 24);
       ctx.font = "16px monospace";
       ctx.fillText("Tap or press R to restart", CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2 + 50);
-    }
+    };
+
+    const loop = () => {
+      if (gameOver.current || win.current) {
+        if (ctx) drawEndScreen(ctx);
+        return;
+      }
+      updateGame();
+      drawGame(ctx!);
+      animationRef.current = requestAnimationFrame(loop);
+    };
 
     // --- Restart logic ---
     const restart = () => {
