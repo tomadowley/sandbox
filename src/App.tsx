@@ -120,10 +120,6 @@ const App: React.FC = () => {
       drawGame(ctx);
       animationRef.current = requestAnimationFrame(loop);
     }
-      updateGame();
-      drawGame(ctx);
-      animationRef.current = requestAnimationFrame(loop);
-    }
 
     // --- Game logic ---
     function updateGame() {
@@ -187,7 +183,7 @@ const App: React.FC = () => {
       if (Math.random() < INVADER_SHOOT_RATE) {
         // Pick a random alive invader from bottom row
         const columns: { [col: number]: Invader[] } = {};
-        invaders.current.forEach((inv, idx) => {
+        invaders.current.forEach((inv) => {
           if (!inv.alive) return;
           const col = Math.round((inv.x - INVADER_X_OFFSET) / (INVADER_WIDTH + INVADER_H_GAP));
           if (!columns[col]) columns[col] = [];
@@ -247,6 +243,7 @@ const App: React.FC = () => {
       if (invaders.current.every((inv) => !inv.alive)) {
         win.current = true;
       }
+    } // <-- make sure this closing brace is present and properly placed
     }
 
     function drawGame(ctx: CanvasRenderingContext2D) {
