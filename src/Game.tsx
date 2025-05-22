@@ -499,7 +499,7 @@ const Game: React.FC = () => {
   // --- Keyboard Controls (Disabled during game over sequence) ---
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (!state.started || state.gameOverSequence) return;
+      if (!state.started || state.cutscenePlaying || state.cutsceneFinished || state.gameOver) return;
       let dx = 0, dy = 0;
       if (e.key === "ArrowUp") dy = -24;
       else if (e.key === "ArrowDown") dy = 24;
@@ -510,7 +510,7 @@ const Game: React.FC = () => {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
     // eslint-disable-next-line
-  }, [state.started, state.gameOverSequence, state.player]);
+  }, [state.started, state.cutscenePlaying, state.cutsceneFinished, state.gameOver, state.player]);
 
   // Mobile Swipe/Touch Controls (Disabled during game over sequence)
   function onTouchStart(e: React.TouchEvent) {
