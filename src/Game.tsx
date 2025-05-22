@@ -467,20 +467,6 @@ const Game: React.FC = () => {
     return () => interval && clearInterval(interval);
     // eslint-disable-next-line
   }, [state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished]);
-    if (state.started && !state.gameOverSequence) {
-      interval = setInterval(() => {
-        setAliIdx((prev) => {
-          let next;
-          do {
-            next = Math.floor(Math.random() * ALI_APPEARANCES.length);
-          } while (next === prev && ALI_APPEARANCES.length > 1);
-          return next;
-        });
-      }, 700 + Math.random() * 400);
-    }
-    return () => interval && clearInterval(interval);
-    // eslint-disable-next-line
-  }, [state.started, state.gameOverSequence]);
 
   // --- Taunt logic ---
   useEffect(() => {
