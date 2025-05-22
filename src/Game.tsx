@@ -571,14 +571,14 @@ const Game: React.FC = () => {
         // Leave a blood block trail behind Ali
         let newBloodTrail = [
           ...bloodTrail,
-          { x: enemy.x + ENEMY_SIZE / 2 - 7, y: enemy.y + ENEMY_SIZE / 2 - 7, t: animFrame }
-        ].filter((b) => animFrame - b.t < 60); // fade after 60 frames
+          { x: enemy.x + ENEMY_SIZE / 2 - 7, y: enemy.y + ENEMY_SIZE / 2 - 7, t: prev.animFrame }
+        ].filter((b) => prev.animFrame - b.t < 60); // fade after 60 frames
         return { ...prev, enemy: newEnemy, bloodTrail: newBloodTrail };
       });
     }, 200);
     return () => clearInterval(interval);
     // eslint-disable-next-line
-  }, [state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished, animFrame]);
+  }, [state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished]);
 
   // Main Game Loop (collisions, treat collection, hazards, game over)
   useEffect(() => {
