@@ -131,7 +131,6 @@ const Enemy = ({
       userSelect: "none",
       flexDirection: "column",
       textShadow: appearance.blood ? "0 2px 8px #f00, 0 0px 2px #000" : "0 1px 2px #000",
-      positionLabel: "Ali-Enemy",
       zIndex: 20,
       transition: "background 0.2s, border 0.2s"
     }}
