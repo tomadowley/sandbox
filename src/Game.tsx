@@ -294,6 +294,10 @@ const Game: React.FC = () => {
   // Used for animation/game loop
   const [_, setTick] = useState(0);
 
+  // Focus management for keyboard/game container
+  const gameContainerRef = useRef<HTMLDivElement>(null);
+  const [isFocused, setIsFocused] = useState(false);
+
   // --- Ali appearance cycling ---
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
@@ -369,7 +373,7 @@ const Game: React.FC = () => {
     if (!touchStart.current) return;
     const dx = e.changedTouches[0].clientX - touchStart.current.x;
     const dy = e.changedTouches[0].clientY - touchStart.current.y;
-    const threshold = 24;
+    const threshold = 12; // Lowered from 24px to 12px for more responsive control
     if (Math.abs(dx) > Math.abs(dy)) {
       if (dx > threshold) movePlayer(24, 0);
       else if (dx < -threshold) movePlayer(-24, 0);
@@ -489,6 +493,10 @@ const Game: React.FC = () => {
     setState(getInitialState());
     setTimeout(() => {
       setState((prev) => ({ ...prev, started: true }));
+      // Focus game container after the overlay disappears
+      if (gameContainerRef.current) {
+        gameContainerRef.current.focus();
+      }
     }, 200);
     setTaunt(null);
     setTauntPos(null);
@@ -500,24 +508,30 @@ const Game: React.FC = () => {
   // Render UI Overlay
   return (
     <div
+      ref={gameContainerRef}
       style={{
         width: GAME_WIDTH * scale,
         height: GAME_HEIGHT * scale,
         margin: "24px auto",
         position: "relative",
-        border: "2px solid #2226",
+        border: isFocused ? "3px solid #2196f3" : "2px solid #2226",
         borderRadius: 12,
         background: "linear-gradient(175deg,#e3f2fd 60%,#fffde7)",
         overflow: "hidden",
         touchAction: "none",
-        boxShadow: "0 4px 24px #3333",
+        boxShadow: isFocused
+          ? "0 0 0 4px #90caf9, 0 4px 24px #3333"
+          : "0 4px 24px #3333",
         maxWidth: "95vw",
         maxHeight: "90vh",
-        transition: "box-shadow 0.2s",
+        transition: "box-shadow 0.2s, border 0.2s",
         animation: shake
           ? "shake-screen 0.14s cubic-bezier(.36,.07,.19,.97) 0s 6 alternate"
           : undefined,
+        outline: "none"
       }}
+      onFocus={() => setIsFocused(true)}
+      onBlur={() => setIsFocused(false)}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       tabIndex={0}
@@ -666,6 +680,22 @@ const Game: React.FC = () => {
           >
             Arlo's Treat Chase!
           </h2>
+          <div
+            style={{
+              color: "#fff",
+              background: "#1565c0ee",
+              borderRadius: 10,
+              padding: "12px 22px",
+              marginBottom: 16,
+              fontSize: 18 * scale,
+              boxShadow: "0 2px 8px #2227",
+              fontWeight: 500,
+              maxWidth: 300,
+              textAlign: "center",
+            }}
+          >
+            Use <b>arrow keys</b> (desktop) or <b>swipe</b> (mobile) to move Arlo.
+          </div>
           <button
             style={{
               fontSize: 22 * scale,
