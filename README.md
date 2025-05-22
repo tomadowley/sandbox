@@ -1,40 +1,70 @@
-# Getting Started with Create React App
+# Arlo's Nightmare Feast
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Arlo's Nightmare Feast** is a gruesome, mobile-first, 8-bit horror game that throws you into a relentless chase for survival. Guide Arlo as he flees from the monstrous Ali, desperately collecting meat to stave off starvation. Every mistake is met with explicit, animated horror cutscenes—this is not a game for the faint of heart.
 
-## Available Scripts
+## 🕹️ Gameplay
 
-In the project directory, you can run:
+You control Arlo, a terrified survivor trapped in a pixelated nightmare. Your objectives:
+- **Flee from Ali:** Ali relentlessly pursues you across the map. Outrun him or face a grisly demise.
+- **Collect Meat:** Scattered across the level, meat keeps you alive and boosts your score.
+- **Avoid Hazards:** Spikes, traps, and grotesque surprises lurk everywhere—one wrong move and you're dead.
+- **Witness Horror:** Death triggers explicit 8-bit horror cutscenes—animated, gory, and guaranteed to shock.
 
-### `npm start`
+The game is fast, punishing, and packed with jump scares, taunts, and disturbing effects designed to keep you on edge.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 🎮 Controls
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+**Desktop:**
+- Move: `Arrow Keys` (Up, Down, Left, Right)
 
-### `npm test`
+**Mobile:**
+- Move: `Swipe` in the desired direction
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 🔥 Core Features
 
-### `npm run build`
+- **Animated Blood & Gore:** Explicit pixel-art violence in both gameplay and cutscenes
+- **Jump Scares:** Sudden audio-visual shocks to keep you terrified
+- **Taunts:** Ali mocks you with randomized, chilling messages
+- **Enemy AI:** Ali adapts to your movement and becomes more aggressive over time
+- **Sound Effects:** 8-bit shrieks, squelches, and atmospheric audio
+- **Responsive Design:** Fully playable on mobile and desktop—controls and layout adapt to your device
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚀 Setup Instructions
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+2. **Start the Game (Development)**
+   ```bash
+   npm start
+   ```
+   The game will open in your browser at [http://localhost:3000](http://localhost:3000)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. **Build for Production**
+   ```bash
+   npm run build
+   ```
+   The optimized build will be in the `build/` folder.
 
-### `npm run eject`
+## 🛠️ Tech Stack
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- [React](https://reactjs.org/) – UI and game rendering
+- [react-game-engine](https://github.com/bberak/react-game-engine) – Game loop and entity management
+- [TypeScript](https://www.typescriptlang.org/) – Type safety
+- [CSS](https://developer.mozilla.org/en-US/docs/Web/CSS) – Styling and responsive layout
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 🎨 Credits
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- **Sound Effects & Music:** [Pixabay](https://pixabay.com/) (public domain/royalty-free)
+- **8-Bit Sprites & Emojis:** Emoji assets (open standard), custom pixel art, and public domain sources
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+If you are the creator of an asset used in this project and wish to be credited or have your work removed, please open an issue.
+
+## 📄 License
+
+This project is licensed under the [MIT License](LICENSE).
+
+---
+
+**Warning:** This game contains explicit horror imagery and sudden effects. Play at your own risk!
