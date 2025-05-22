@@ -450,7 +450,7 @@ const Game: React.FC = () => {
   // --- Ali appearance cycling ---
   useEffect(() => {
     let interval: NodeJS.Timeout | undefined;
-    if (state.started && !state.gameOver) {
+    if (state.started && !state.gameOverSequence) {
       interval = setInterval(() => {
         setAliIdx((prev) => {
           let next;
@@ -463,7 +463,7 @@ const Game: React.FC = () => {
     }
     return () => interval && clearInterval(interval);
     // eslint-disable-next-line
-  }, [state.started, state.gameOver]);
+  }, [state.started, state.gameOverSequence]);
 
   // --- Taunt logic ---
   useEffect(() => {
@@ -496,7 +496,7 @@ const Game: React.FC = () => {
   // --- Keyboard Controls (Disabled during game over sequence) ---
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
-      if (!state.started || state.gameOver || state.gameOverSequence) return;
+      if (!state.started || state.gameOverSequence) return;
       let dx = 0, dy = 0;
       if (e.key === "ArrowUp") dy = -24;
       else if (e.key === "ArrowDown") dy = 24;
@@ -507,11 +507,11 @@ const Game: React.FC = () => {
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
     // eslint-disable-next-line
-  }, [state.started, state.gameOver, state.gameOverSequence, state.player]);
+  }, [state.started, state.gameOverSequence, state.player]);
 
   // Mobile Swipe/Touch Controls (Disabled during game over sequence)
   function onTouchStart(e: React.TouchEvent) {
-    if (state.gameOver || state.gameOverSequence) return;
+    if (state.gameOverSequence) return;
     if (e.touches.length > 0) {
       touchStart.current = {
         x: e.touches[0].clientX,
@@ -520,7 +520,7 @@ const Game: React.FC = () => {
     }
   }
   function onTouchEnd(e: React.TouchEvent) {
-    if (state.gameOver || state.gameOverSequence) return;
+    if (state.gameOverSequence) return;
     if (!touchStart.current) return;
     const dx = e.changedTouches[0].clientX - touchStart.current.x;
     const dy = e.changedTouches[0].clientY - touchStart.current.y;
@@ -538,7 +538,7 @@ const Game: React.FC = () => {
   // Move player and update state
   function movePlayer(dx: number, dy: number) {
     setState((prev) => {
-      if (!prev.started || prev.gameOver || prev.gameOverSequence) return prev;
+      if (!prev.started || prev.gameOverSequence) return prev;
       const newX = Math.max(0, Math.min(GAME_WIDTH - PLAYER_SIZE, prev.player.x + dx));
       const newY = Math.max(0, Math.min(GAME_HEIGHT - PLAYER_SIZE, prev.player.y + dy));
       return { ...prev, player: { x: newX, y: newY } };
@@ -547,10 +547,10 @@ const Game: React.FC = () => {
 
   // Enemy AI Movement (Add blood trail)
   useEffect(() => {
-    if (!state.started || state.gameOver) return;
+    if (!state.started || state.gameOverSequence) return;
     const interval = setInterval(() => {
       setState((prev) => {
-        if (!prev.started || prev.gameOver) return prev;
+        if (!prev.started || prev.gameOverSequence) return prev;
         // Move enemy towards player
         const { enemy, player, bloodTrail } = prev;
         let dx = player.x - enemy.x;
@@ -573,11 +573,11 @@ const Game: React.FC = () => {
     }, 200);
     return () => clearInterval(interval);
     // eslint-disable-next-line
-  }, [state.started, state.gameOver, state.enemy, state.player, animFrame]);
+  }, [state.started, state.gameOverSequence, state.enemy, state.player, animFrame]);
 
   // Main Game Loop (collisions, treat collection, hazards, game over)
   useEffect(() => {
-    if (!state.started || state.gameOver || state.gameOverSequence) return;
+    if (!state.started || state.gameOverSequence) return;
     // Check treat collection
     let collected = false;
     let treats = state.treats.filter((t) => {
@@ -638,7 +638,7 @@ const Game: React.FC = () => {
       }
     }
     // eslint-disable-next-line
-  }, [state.player, state.enemy, state.treats, state.started, state.gameOver, state.gameOverSequence]);
+  }, [state.player, state.enemy, state.treats, state.started, state.gameOverSequence]);
 
   // Responsive sizing (auto scale for mobile)
   const [scale, setScale] = useState(1);
@@ -655,9 +655,9 @@ const Game: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Always play horror heartbeat while game is running (stop on game over)
+  // Always play horror heartbeat while game is running (stop on game over sequence)
   useEffect(() => {
-    if (state.started && !state.gameOver) {
+    if (state.started && !state.gameOverSequence) {
       if (heartbeatRef.current) {
         heartbeatRef.current.loop = true;
         heartbeatRef.current.volume = 0.6;
@@ -669,7 +669,7 @@ const Game: React.FC = () => {
         heartbeatRef.current.currentTime = 0;
       }
     }
-  }, [state.started, state.gameOver]);
+  }, [state.started, state.gameOverSequence]);
 
   // Start/Restart
   function handleStart() {
