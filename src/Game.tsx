@@ -541,7 +541,7 @@ const Game: React.FC = () => {
   // Move player and update state
   function movePlayer(dx: number, dy: number) {
     setState((prev) => {
-      if (!prev.started || prev.gameOverSequence) return prev;
+      if (!prev.started || prev.cutscenePlaying || prev.cutsceneFinished || prev.gameOver) return prev;
       const newX = Math.max(0, Math.min(GAME_WIDTH - PLAYER_SIZE, prev.player.x + dx));
       const newY = Math.max(0, Math.min(GAME_HEIGHT - PLAYER_SIZE, prev.player.y + dy));
       return { ...prev, player: { x: newX, y: newY } };
