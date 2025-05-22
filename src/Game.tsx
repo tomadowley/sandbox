@@ -253,7 +253,6 @@ const Oven = ({ position, animFrame }: { position: Vec2; animFrame: number }) =>
       fontSize: 18 + (animFrame % 4),
       color: "#fff",
       boxShadow: `0 0 16px 3px #ff174499, 0 0 8px #c62828`,
-      position: "absolute",
       overflow: "visible",
     }}
     aria-label="Oven"
