@@ -75,6 +75,7 @@ const dpadButtons: { key: DirKey; label: string }[] = [
 // --- Main Game Component ---
 type ActionType = "Eat" | "Steal Food" | "Drink Alcohol" | "Sit" | "Pee" | null;
 type Feedback = { text: string; color: string; time: number }; // time = ms remaining
+type Puddle = { col: number; row: number; alpha: number };
 
 export default function Game() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -96,6 +97,9 @@ export default function Game() {
   const [drunk, setDrunk] = useState(false);
   const drunkTimer = useRef(0);
 
+  // Puddles on floor
+  const [puddles, setPuddles] = useState<Puddle[]>([]);
+
   // Player position in px (for smooth movement)
   const player = useRef({
     ...initialPlayer,
@@ -110,6 +114,9 @@ export default function Game() {
   // -- Contextual action logic --
   const [action, setAction] = useState<ActionType>(null);
   const [actionTarget, setActionTarget] = useState<any>(null);
+
+  // --- Game over state ---
+  const [gameOver, setGameOver] = useState<null | { reason: string }>(null);
 
   // --- Nearest interactable detection ---
   function getNearbyAction(px: number, py: number) : {action: ActionType, target: any} {
@@ -178,8 +185,34 @@ export default function Game() {
       setStats(s => ({ ...s, adorability: Math.min(s.adorability + 10, MAX_ADOR) }));
       popup("Sat on lap!", "#e74c3c");
     } else if (action === "Pee") {
-      setStats(s => ({ ...s, adorability: Math.max(s.adorability - 15, MIN_ADOR) }));
-      popup("Pee'd on floor...", "#f1c40f");
+      // Add puddle at player's tile
+      const px = player.current.x / TILE_SIZE;
+      const py = player.current.y / TILE_SIZE;
+      const col = Math.floor(px);
+      const row = Math.floor(py);
+
+      // Check if near coworker
+      let nearCoworker = false;
+      for (const c of coworkers) {
+        if (Math.hypot(c.col + 0.5 - px, c.row + 0.5 - py) < 1.2) {
+          nearCoworker = true;
+          break;
+        }
+      }
+      setPuddles(p => [...p, { col, row, alpha: 1 }]);
+      if (nearCoworker) {
+        setStats(s => ({
+          ...s,
+          adorability: Math.max(s.adorability - 30, MIN_ADOR)
+        }));
+        popup("Coworker grossed out!", "#e67e22");
+      } else {
+        setStats(s => ({
+          ...s,
+          adorability: Math.max(s.adorability - 15, MIN_ADOR)
+        }));
+        popup("Pee'd on floor...", "#f1c40f");
+      }
     }
 
     // Stamina cost (except peeing, which is free)
@@ -268,9 +301,11 @@ export default function Game() {
         const tileY = Math.floor(py / (TILE_SIZE * scale));
         if (tileX < 0 || tileY < 0 || tileX >= MAP_COLS || tileY >= MAP_ROWS) return false;
         if (officeMap[tileY][tileX] === 1) return false;
+        // Block objects
         for (const obj of objects) {
           if (obj.col === tileX && obj.row === tileY) return false;
         }
+        // Block coworkers
         for (const coworker of coworkers) {
           if (coworker.col === tileX && coworker.row === tileY) return false;
         }
@@ -312,6 +347,25 @@ export default function Game() {
           ctx.strokeRect(0, 0, TILE_SIZE * scale, TILE_SIZE * scale);
           ctx.restore();
         }
+      }
+
+      // 2b. Draw puddles (fading)
+      for (const puddle of puddles) {
+        if (puddle.alpha <= 0) continue;
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, puddle.alpha);
+        ctx.translate(
+          offsetX + (puddle.col + 0.5) * TILE_SIZE * scale,
+          offsetY + (puddle.row + 0.7) * TILE_SIZE * scale
+        );
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 16 * scale, 8 * scale, 0, 0, Math.PI * 2);
+        ctx.fillStyle = "#cae4f7";
+        ctx.fill();
+        ctx.strokeStyle = "#87b2c8";
+        ctx.lineWidth = 1.5 * scale;
+        ctx.stroke();
+        ctx.restore();
       }
 
       // 3. Draw interactive objects
@@ -413,7 +467,7 @@ export default function Game() {
     };
     anim = requestAnimationFrame(render);
     return () => cancelAnimationFrame(anim);
-  }, [stats, drunk, feedbacks, action]);
+  }, [stats, drunk, feedbacks, action, puddles]);
 
   // -- Touch D-pad handlers (mobile) --
   const handleDpad = (key: DirKey, pressed: boolean) => {
@@ -527,6 +581,14 @@ export default function Game() {
         hunger = Math.min(MAX_HUNGER, hunger);
         adorability = Math.max(MIN_ADOR, Math.min(MAX_ADOR, adorability));
         stamina = Math.max(MIN_STAMINA, Math.min(MAX_STAMINA, stamina));
+
+        // GAME OVER detection
+        if (!gameOver) {
+          if (hunger <= MIN_HUNGER) setGameOver({ reason: "Starved! Too hungry." });
+          else if (stamina <= MIN_STAMINA) setGameOver({ reason: "Collapsed! Too tired." });
+          else if (adorability <= MIN_ADOR) setGameOver({ reason: "Fired! Too un-adorable." });
+        }
+
         return {
           hunger: Math.round(hunger),
           adorability: Math.round(adorability),
@@ -549,10 +611,17 @@ export default function Game() {
           .map((fb) => ({ ...fb, time: fb.time - 100 }))
           .filter((fb) => fb.time > 0)
       );
+
+      // Fade puddles
+      setPuddles((list) =>
+        list
+          .map((p) => ({ ...p, alpha: p.alpha - 0.012 }))
+          .filter((p) => p.alpha > 0)
+      );
     }, 100);
     return () => clearInterval(interval);
     // eslint-disable-next-line
-  }, [drunk, popup]);
+  }, [drunk, popup, gameOver]);
 
   // --- Main render ---
   return (
@@ -665,6 +734,76 @@ export default function Game() {
           }}
         >
           [Space] {action}
+        </div>
+      )}
+
+      {/* Game Over Modal */}
+      {gameOver && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            zIndex: 1000,
+            background: "rgba(20,20,20,0.87)",
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              background: "#282c34",
+              color: "#fff",
+              padding: "2.5em 2em",
+              borderRadius: "1em",
+              textAlign: "center",
+              boxShadow: "0 0 32px #0009",
+              maxWidth: 340,
+            }}
+          >
+            <div style={{ fontSize: 34, fontWeight: 700, marginBottom: 16 }}>
+              GAME OVER
+            </div>
+            <div style={{ fontSize: 20, marginBottom: 30 }}>
+              {gameOver.reason}
+            </div>
+            <button
+              style={{
+                fontSize: 20,
+                padding: "0.6em 1.3em",
+                borderRadius: "0.8em",
+                background: "#27ae60",
+                color: "#fff",
+                border: "none",
+                fontWeight: 700,
+                letterSpacing: "0.1em",
+                boxShadow: "0 4px 20px #1116",
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                // Reset all state
+                setStats({
+                  hunger: 80,
+                  adorability: 60,
+                  stamina: 90,
+                });
+                setDrunk(false);
+                drunkTimer.current = 0;
+                setFeedbacks([]);
+                setPuddles([]);
+                player.current.x = initialPlayer.col * TILE_SIZE + TILE_SIZE / 2;
+                player.current.y = initialPlayer.row * TILE_SIZE + TILE_SIZE / 2;
+                player.current.lastAction = 0;
+                setGameOver(null);
+              }}
+            >
+              Restart
+            </button>
+          </div>
         </div>
       )}
     </div>
