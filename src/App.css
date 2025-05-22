@@ -1,27 +1,83 @@
-.App {
-  text-align: center;
+/* Reset default body margin/padding for fullscreen canvas */
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  overscroll-behavior: none;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.game-root {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #222;
+  touch-action: none;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.game-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: block;
+  background: #111;
+  z-index: 0;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+/* D-pad for mobile (show only on small screens) */
+.dpad {
+  position: absolute;
+  bottom: 5vw;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   flex-direction: column;
   align-items: center;
+  user-select: none;
+  z-index: 2;
+  gap: 0.7em;
+  pointer-events: none;
+}
+
+.dpad-btn {
+  font-size: 2rem;
+  background: #444;
+  color: #fff;
+  border: none;
+  border-radius: 0.5em;
+  padding: 0.7em 1.1em;
+  margin: 0.1em;
+  opacity: 0.9;
+  pointer-events: all;
+  touch-action: none;
+  transition: background 0.15s;
+}
+.dpad-btn:active {
+  background: #2980b9;
+}
+
+.dpad-row {
+  display: flex;
+  flex-direction: row;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  align-items: center;
+}
+.dpad-center {
+  width: 2em;
+  height: 2em;
+  display: inline-block;
+}
+
+@media (min-width: 700px) {
+  .dpad {
+    display: none;
+  }
 }
 
 .App-link {
