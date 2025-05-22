@@ -374,10 +374,10 @@ type GameState = {
   goreProps: { pos: Vec2; kind: typeof GORE_PARTS[0] }[];
   bloodTrail: BloodTrail[];
   score: number;
-  gameOver: boolean;
   started: boolean;
-  jumpscare: boolean;
-  gameOverSequence: boolean;
+  gameOver: boolean; // Game has ended (static overlay shown)
+  cutscenePlaying: boolean; // Jump scare/cutscene is running (true only during cutscene, then false)
+  cutsceneFinished: boolean; // Cutscene has finished (static game over shown)
 };
 
 function getInitialState(): GameState {
@@ -390,10 +390,10 @@ function getInitialState(): GameState {
     goreProps: initialGore.map((g) => ({ pos: { ...g.pos }, kind: g.kind })),
     bloodTrail: [],
     score: 0,
-    gameOver: false,
     started: false,
-    jumpscare: false,
-    gameOverSequence: false,
+    gameOver: false,
+    cutscenePlaying: false,
+    cutsceneFinished: false,
   };
 }
 
@@ -435,6 +435,9 @@ const Game: React.FC = () => {
   // Sound refs
   const heartbeatRef = useRef<HTMLAudioElement>(null);
   const screamRef = useRef<HTMLAudioElement>(null);
+
+  // For managing the game over cutscene timer (so we can clean up on restart)
+  const cutsceneTimeouts = useRef<NodeJS.Timeout[]>([]);
 
   // --- Animation/game loop for blood trail and horror flicker ---
   useEffect(() => {
@@ -547,10 +550,12 @@ const Game: React.FC = () => {
 
   // Enemy AI Movement (Add blood trail)
   useEffect(() => {
-    if (!state.started || state.gameOverSequence) return;
+    // Ali moves only when: started, not gameOver, not during or after cutscene
+    if (!state.started || state.gameOver || state.cutscenePlaying || state.cutsceneFinished) return;
     const interval = setInterval(() => {
       setState((prev) => {
-        if (!prev.started || prev.gameOverSequence) return prev;
+        // Only move if still actively running (double-check inside interval)
+        if (!prev.started || prev.gameOver || prev.cutscenePlaying || prev.cutsceneFinished) return prev;
         // Move enemy towards player
         const { enemy, player, bloodTrail } = prev;
         let dx = player.x - enemy.x;
@@ -573,11 +578,11 @@ const Game: React.FC = () => {
     }, 200);
     return () => clearInterval(interval);
     // eslint-disable-next-line
-  }, [state.started, state.gameOverSequence, state.enemy, state.player, animFrame]);
+  }, [state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished, animFrame]);
 
   // Main Game Loop (collisions, treat collection, hazards, game over)
   useEffect(() => {
-    if (!state.started || state.gameOverSequence) return;
+    if (!state.started || state.gameOver || state.cutscenePlaying || state.cutsceneFinished) return;
     // Check treat collection
     let collected = false;
     let treats = state.treats.filter((t) => {
@@ -608,25 +613,45 @@ const Game: React.FC = () => {
     // Enemy touches player: game over
     let enemyTouch = rectsOverlap(state.player, PLAYER_SIZE, state.enemy, ENEMY_SIZE);
 
-    if (hitHazard || enemyTouch) {
-      // Start horror game over sequence
+    if ((hitHazard || enemyTouch)) {
+      // If already in game over or cutscene, do nothing
       setShowBlood(true);
       setShake(true);
-      setTimeout(() => setShake(false), 800);
-      setState((prev) => ({ ...prev, gameOver: true, gameOverSequence: true }));
-      // Heartbeat stops, scream plays, then jump scare
-      setTimeout(() => {
-        if (heartbeatRef.current) {
-          heartbeatRef.current.pause();
-          heartbeatRef.current.currentTime = 0;
-        }
-        if (screamRef.current) screamRef.current.play();
-        setState((prev) => ({ ...prev, jumpscare: true }));
-      }, 600);
-      setTimeout(() => {
-        setState((prev) => ({ ...prev, jumpscare: false, gameOverSequence: false }));
-        setShowBlood(false);
-      }, 2000);
+      // Prevent retrigger
+      setState((prev) => {
+        // Only trigger once per run
+        if (prev.gameOver || prev.cutscenePlaying || prev.cutsceneFinished) return prev;
+        return { ...prev, cutscenePlaying: true, gameOver: false, cutsceneFinished: false };
+      });
+
+      // Clear any previous timeouts
+      cutsceneTimeouts.current.forEach(clearTimeout);
+      cutsceneTimeouts.current = [];
+      // Sequence: shake, scream, cutscene, then finish
+      cutsceneTimeouts.current.push(
+        setTimeout(() => setShake(false), 800)
+      );
+      cutsceneTimeouts.current.push(
+        setTimeout(() => {
+          if (heartbeatRef.current) {
+            heartbeatRef.current.pause();
+            heartbeatRef.current.currentTime = 0;
+          }
+          if (screamRef.current) screamRef.current.play();
+        }, 600)
+      );
+      // Show cutscene for 2 seconds, then show static game over overlay
+      cutsceneTimeouts.current.push(
+        setTimeout(() => {
+          setShowBlood(false);
+          setState((prev) => ({
+            ...prev,
+            cutscenePlaying: false,
+            cutsceneFinished: true,
+            gameOver: true,
+          }));
+        }, 2000)
+      );
     } else {
       // Update state if changed
       if (collected || treats.length !== state.treats.length) {
@@ -638,7 +663,7 @@ const Game: React.FC = () => {
       }
     }
     // eslint-disable-next-line
-  }, [state.player, state.enemy, state.treats, state.started, state.gameOverSequence]);
+  }, [state.player, state.enemy, state.treats, state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished]);
 
   // Responsive sizing (auto scale for mobile)
   const [scale, setScale] = useState(1);
@@ -655,9 +680,9 @@ const Game: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Always play horror heartbeat while game is running (stop on game over sequence)
+  // Always play horror heartbeat while game is running (stop on cutscene/game over)
   useEffect(() => {
-    if (state.started && !state.gameOverSequence) {
+    if (state.started && !state.cutscenePlaying && !state.cutsceneFinished && !state.gameOver) {
       if (heartbeatRef.current) {
         heartbeatRef.current.loop = true;
         heartbeatRef.current.volume = 0.6;
@@ -669,10 +694,13 @@ const Game: React.FC = () => {
         heartbeatRef.current.currentTime = 0;
       }
     }
-  }, [state.started, state.gameOverSequence]);
+  }, [state.started, state.cutscenePlaying, state.cutsceneFinished, state.gameOver]);
 
   // Start/Restart
   function handleStart() {
+    // Clear all cutscene/game over timeouts
+    cutsceneTimeouts.current.forEach(clearTimeout);
+    cutsceneTimeouts.current = [];
     setState(getInitialState());
     setTimeout(() => {
       setState((prev) => ({ ...prev, started: true }));
@@ -985,13 +1013,13 @@ const Game: React.FC = () => {
         </div>
       )}
 
-      {/* Game Over: horror sequence */}
-      {(state.gameOver || state.jumpscare || state.gameOverSequence) && (
+      {/* Game Over/Cutscene Overlay */}
+      {(state.cutscenePlaying || state.cutsceneFinished) && (
         <div
           style={{
             position: "absolute",
             inset: 0,
-            background: state.jumpscare
+            background: state.cutscenePlaying
               ? "radial-gradient(circle, #ff1744 70%, #000 100%)"
               : "radial-gradient(circle, #1a0000 90%, #000 100%)",
             display: "flex",
@@ -1003,8 +1031,8 @@ const Game: React.FC = () => {
             overflow: "hidden",
           }}
         >
-          {/* Jump scare: Ali morphs and zooms in */}
-          {state.jumpscare ? (
+          {/* Jump scare/cutscene: Ali devours Arlo (only if cutscene is playing) */}
+          {state.cutscenePlaying ? (
             <div style={{
               animation: "jump-scare-zoom 0.66s cubic-bezier(.1,2.8,.9,1) 0s 1",
               display: "flex",
@@ -1041,7 +1069,7 @@ const Game: React.FC = () => {
             </div>
           ) : (
             <>
-              {/* Animated gore: Ali devours/cooks Arlo */}
+              {/* Static game over screen, shown only after cutscene has finished */}
               <div style={{ position: "relative", width: 160, height: 120, marginBottom: 14 }}>
                 <Enemy position={{ x: 60, y: 10 }} appearance={ALI_APPEARANCES[aliIdx]} animFrame={animFrame + 17} />
                 {/* Cooked/dismembered Arlo */}
@@ -1148,9 +1176,9 @@ const Game: React.FC = () => {
                   textShadow: "0 2px 8px #0008"
                 }}
                 onClick={handleStart}
-                disabled={state.gameOverSequence}
+                disabled={state.cutscenePlaying}
               >
-                {state.gameOverSequence ? "..." : "RESURRECT"}
+                {state.cutscenePlaying ? "..." : "RESURRECT"}
               </button>
             </>
           )}
