@@ -132,6 +132,8 @@ const Enemy = ({
       flexDirection: "column",
       textShadow: appearance.blood ? "0 2px 8px #f00, 0 0px 2px #000" : "0 1px 2px #000",
       positionLabel: "Ali-Enemy",
+      zIndex: 20,
+      transition: "background 0.2s, border 0.2s"
     }}
     aria-label={appearance.label}
   >
@@ -263,9 +265,29 @@ function getInitialState(): GameState {
 }
 
 // ----- Main Game Component -----
+const BLOOD_SPLATTERS = [
+  { left: 80, top: 160, size: 60, rot: 15, opacity: 0.75 },
+  { left: 160, top: 220, size: 38, rot: -25, opacity: 0.65 },
+  { left: 210, top: 100, size: 32, rot: 10, opacity: 0.7 },
+  { left: 70, top: 300, size: 44, rot: -16, opacity: 0.6 },
+  { left: 200, top: 380, size: 70, rot: 22, opacity: 0.55 },
+];
+const TAUNT_DISTANCE = 80;
+
 const Game: React.FC = () => {
   // State controlled outside GameEngine for UI and mobile input
   const [state, setState] = useState<GameState>(getInitialState());
+
+  // Ali evil appearance state and timer
+  const [aliIdx, setAliIdx] = useState(() => Math.floor(Math.random() * ALI_APPEARANCES.length));
+
+  // For taunt logic
+  const [taunt, setTaunt] = useState<string | null>(null);
+  const [tauntPos, setTauntPos] = useState<{ x: number; y: number } | null>(null);
+
+  // For screen shake and blood splatter
+  const [shake, setShake] = useState(false);
+  const [showBlood, setShowBlood] = useState(false);
 
   // For mobile swipe/touch
   const touchStart = useRef<{ x: number; y: number } | null>(null);
@@ -273,7 +295,53 @@ const Game: React.FC = () => {
   // Used for animation/game loop
   const [_, setTick] = useState(0);
 
-  // Keyboard Controls
+  // --- Ali appearance cycling ---
+  useEffect(() => {
+    let interval: NodeJS.Timeout | undefined;
+    if (state.started && !state.gameOver) {
+      interval = setInterval(() => {
+        setAliIdx((prev) => {
+          let next;
+          do {
+            next = Math.floor(Math.random() * ALI_APPEARANCES.length);
+          } while (next === prev && ALI_APPEARANCES.length > 1);
+          return next;
+        });
+      }, 1000);
+    }
+    return () => interval && clearInterval(interval);
+    // eslint-disable-next-line
+  }, [state.started, state.gameOver]);
+
+  // --- Taunt logic ---
+  useEffect(() => {
+    if (!state.started || state.gameOver) {
+      if (state.gameOver) {
+        // Centered taunt on game over
+        setTaunt(ALI_TAUNTS[Math.floor(Math.random() * ALI_TAUNTS.length)]);
+        setTauntPos(null);
+      } else {
+        setTaunt(null);
+        setTauntPos(null);
+      }
+      return;
+    }
+    // If Ali is close to player, show a taunt above Ali
+    const px = state.player.x + PLAYER_SIZE / 2;
+    const py = state.player.y + PLAYER_SIZE / 2;
+    const ex = state.enemy.x + ENEMY_SIZE / 2;
+    const ey = state.enemy.y + ENEMY_SIZE / 2;
+    const dist = Math.hypot(px - ex, py - ey);
+    if (dist < TAUNT_DISTANCE) {
+      setTaunt(ALI_TAUNTS[Math.floor(Math.random() * ALI_TAUNTS.length)]);
+      setTauntPos({ x: state.enemy.x + ENEMY_SIZE / 2, y: state.enemy.y });
+    } else {
+      setTaunt(null);
+      setTauntPos(null);
+    }
+  }, [state.player, state.enemy, state.started, state.gameOver]);
+
+  // --- Keyboard Controls ---
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
       if (!state.started || state.gameOver) return;
@@ -383,6 +451,11 @@ const Game: React.FC = () => {
     let enemyTouch = rectsOverlap(state.player, PLAYER_SIZE, state.enemy, ENEMY_SIZE);
 
     if (hitHazard || enemyTouch) {
+      // Shake and blood splatter on game over
+      setShake(true);
+      setShowBlood(true);
+      setTimeout(() => setShake(false), 600);
+      setTimeout(() => setShowBlood(false), 1000);
       setState((prev) => ({ ...prev, gameOver: true }));
     } else {
       // Update state if changed
@@ -418,6 +491,11 @@ const Game: React.FC = () => {
     setTimeout(() => {
       setState((prev) => ({ ...prev, started: true }));
     }, 200);
+    setTaunt(null);
+    setTauntPos(null);
+    setShake(false);
+    setShowBlood(false);
+    setAliIdx(Math.floor(Math.random() * ALI_APPEARANCES.length));
   }
 
   // Render UI Overlay
@@ -437,6 +515,9 @@ const Game: React.FC = () => {
         maxWidth: "95vw",
         maxHeight: "90vh",
         transition: "box-shadow 0.2s",
+        animation: shake
+          ? "shake-screen 0.14s cubic-bezier(.36,.07,.19,.97) 0s 6 alternate"
+          : undefined,
       }}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
@@ -444,7 +525,7 @@ const Game: React.FC = () => {
     >
       {/* Game Entities */}
       <Player position={state.player} />
-      <Enemy position={state.enemy} />
+      <Enemy position={state.enemy} appearance={ALI_APPEARANCES[aliIdx]} />
       {state.treats.map((t, i) => (
         <Treat key={i} position={t} />
       ))}
@@ -454,6 +535,93 @@ const Game: React.FC = () => {
       {state.seasonings.map((s, i) => (
         <Seasoning key={i} position={s} />
       ))}
+
+      {/* Evil Taunt */}
+      {taunt && tauntPos && state.started && !state.gameOver && (
+        <div
+          style={{
+            position: "absolute",
+            left: tauntPos.x - 80,
+            top: tauntPos.y - 34,
+            width: 160,
+            textAlign: "center",
+            zIndex: 25,
+            pointerEvents: "none",
+            color: "#d50000",
+            fontSize: 18 * scale,
+            fontWeight: "bold",
+            textShadow: "0 2px 8px #000, 0 0px 4px #fff4",
+            filter: shake ? "blur(1px)" : undefined,
+            transition: "opacity 0.1s",
+            opacity: shake ? 0.85 : 1,
+            fontFamily: "'Creepster', 'monospace', cursive, sans-serif",
+            userSelect: "none",
+          }}
+        >
+          {taunt}
+        </div>
+      )}
+      {taunt && !tauntPos && state.gameOver && (
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            right: 0,
+            top: 60 * scale,
+            textAlign: "center",
+            zIndex: 25,
+            pointerEvents: "none",
+            color: "#d50000",
+            fontSize: 20 * scale,
+            fontWeight: "bold",
+            textShadow: "0 2px 8px #000, 0 0px 4px #fff4",
+            filter: shake ? "blur(1px)" : undefined,
+            transition: "opacity 0.1s",
+            opacity: shake ? 0.85 : 1,
+            fontFamily: "'Creepster', 'monospace', cursive, sans-serif",
+            userSelect: "none",
+          }}
+        >
+          {taunt}
+        </div>
+      )}
+
+      {/* Blood Splatter Effect */}
+      {showBlood && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            zIndex: 90,
+            background: "rgba(120,0,0,0.15)",
+            animation: "fade-blood 0.8s linear 0s 1",
+          }}
+        >
+          {BLOOD_SPLATTERS.map((s, i) => (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                background:
+                  "radial-gradient(circle at 60% 40%, #d32f2f 55%, #b71c1c 90%)",
+                borderRadius: "50%",
+                opacity: s.opacity,
+                transform: `rotate(${s.rot}deg) scale(${0.95 + Math.random() * 0.15})`,
+                boxShadow:
+                  "0 0 24px 2px rgba(180,0,0,0.38), 0 0 0 6px #b71c1c22",
+                filter: "blur(0.5px)",
+                zIndex: 91,
+                pointerEvents: "none",
+              }}
+            ></div>
+          ))}
+        </div>
+      )}
 
       {/* HUD */}
       <div
@@ -572,6 +740,25 @@ const Game: React.FC = () => {
           </button>
         </div>
       )}
+
+      {/* Animations */}
+      <style>
+        {`
+        @keyframes shake-screen {
+          0% { transform: translate(0px, 0px) rotate(0deg);}
+          20% { transform: translate(-6px, 6px) rotate(-2deg);}
+          40% { transform: translate(7px, -4px) rotate(1deg);}
+          60% { transform: translate(-4px, 6px) rotate(1deg);}
+          80% { transform: translate(4px, -6px) rotate(-2deg);}
+          100% { transform: translate(0, 0) rotate(0deg);}
+        }
+        @keyframes fade-blood {
+          0% { opacity: 1;}
+          90% { opacity: 1;}
+          100% { opacity: 0;}
+        }
+        `}
+      </style>
     </div>
   );
 };
