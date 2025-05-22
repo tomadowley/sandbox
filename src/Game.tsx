@@ -1,0 +1,496 @@
+import React, { useRef, useState, useEffect } from "react";
+import { GameEngine } from "react-game-engine";
+
+type Vec2 = { x: number; y: number };
+
+const GAME_WIDTH = 320;
+const GAME_HEIGHT = 480;
+const PLAYER_SIZE = 40;
+const ENEMY_SIZE = 40;
+const ITEM_SIZE = 24;
+const HAZARD_SIZE = 32;
+
+const INITIAL_PLAYER: Vec2 = { x: 40, y: GAME_HEIGHT / 2 - PLAYER_SIZE / 2 };
+const INITIAL_ENEMY: Vec2 = { x: GAME_WIDTH - 80, y: GAME_HEIGHT / 2 - ENEMY_SIZE / 2 };
+
+function getRandomPos(margin: number = 0): Vec2 {
+  return {
+    x: margin + Math.floor(Math.random() * (GAME_WIDTH - margin * 2 - ITEM_SIZE)),
+    y: margin + Math.floor(Math.random() * (GAME_HEIGHT - margin * 2 - ITEM_SIZE)),
+  };
+}
+
+// ----- Entity Renderers -----
+const Player = ({ position }: { position: Vec2 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: position.x,
+      top: position.y,
+      width: PLAYER_SIZE,
+      height: PLAYER_SIZE,
+      background: "#4caf50",
+      borderRadius: 6,
+      boxShadow: "0 1px 4px #2225",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontWeight: "bold",
+      color: "#fff",
+      fontSize: 18,
+      userSelect: "none",
+      backgroundImage: "linear-gradient(135deg,#7be,#4caf50)", // placeholder 8-bit dog
+    }}
+    aria-label="Arlo-Dog"
+  >
+    🐶
+  </div>
+);
+
+const Enemy = ({ position }: { position: Vec2 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: position.x,
+      top: position.y,
+      width: ENEMY_SIZE,
+      height: ENEMY_SIZE,
+      background: "#e53935",
+      borderRadius: 6,
+      boxShadow: "0 1px 4px #3305",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      color: "#fff",
+      fontWeight: "bold",
+      fontSize: 18,
+      userSelect: "none",
+    }}
+    aria-label="Ali-Enemy"
+  >
+    👾
+  </div>
+);
+
+const Treat = ({ position }: { position: Vec2 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: position.x,
+      top: position.y,
+      width: ITEM_SIZE,
+      height: ITEM_SIZE,
+      background: "#ffeb3b",
+      borderRadius: "50%",
+      border: "2px solid #fbc02d",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 16,
+      color: "#b48a00",
+    }}
+    aria-label="Treat"
+  >
+    🍖
+  </div>
+);
+
+const Oven = ({ position }: { position: Vec2 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: position.x,
+      top: position.y,
+      width: HAZARD_SIZE,
+      height: HAZARD_SIZE,
+      background: "#777",
+      borderRadius: 5,
+      border: "2px solid #444",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 16,
+      color: "#fff",
+    }}
+    aria-label="Oven"
+  >
+    🔥
+  </div>
+);
+
+const Seasoning = ({ position }: { position: Vec2 }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: position.x,
+      top: position.y,
+      width: HAZARD_SIZE,
+      height: HAZARD_SIZE,
+      background: "#ce93d8",
+      borderRadius: 5,
+      border: "2px solid #7b1fa2",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 16,
+      color: "#fff",
+    }}
+    aria-label="Seasoning"
+  >
+    🧂
+  </div>
+);
+
+// ----- Game Logic System -----
+function rectsOverlap(a: Vec2, as: number, b: Vec2, bs: number) {
+  return (
+    a.x < b.x + bs &&
+    a.x + as > b.x &&
+    a.y < b.y + bs &&
+    a.y + as > b.y
+  );
+}
+
+const initialTreats = Array.from({ length: 3 }, () => getRandomPos(10));
+const initialOvens = [getRandomPos(30)];
+const initialSeasonings = [getRandomPos(30)];
+
+type GameState = {
+  player: Vec2;
+  enemy: Vec2;
+  treats: Vec2[];
+  ovens: Vec2[];
+  seasonings: Vec2[];
+  score: number;
+  gameOver: boolean;
+  started: boolean;
+};
+
+function getInitialState(): GameState {
+  return {
+    player: { ...INITIAL_PLAYER },
+    enemy: { ...INITIAL_ENEMY },
+    treats: initialTreats.map((t) => ({ ...t })),
+    ovens: initialOvens.map((o) => ({ ...o })),
+    seasonings: initialSeasonings.map((s) => ({ ...s })),
+    score: 0,
+    gameOver: false,
+    started: false,
+  };
+}
+
+// ----- Main Game Component -----
+const Game: React.FC = () => {
+  // State controlled outside GameEngine for UI and mobile input
+  const [state, setState] = useState<GameState>(getInitialState());
+
+  // For mobile swipe/touch
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+
+  // Used for animation/game loop
+  const [_, setTick] = useState(0);
+
+  // Keyboard Controls
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (!state.started || state.gameOver) return;
+      let dx = 0, dy = 0;
+      if (e.key === "ArrowUp") dy = -24;
+      else if (e.key === "ArrowDown") dy = 24;
+      else if (e.key === "ArrowLeft") dx = -24;
+      else if (e.key === "ArrowRight") dx = 24;
+      if (dx !== 0 || dy !== 0) movePlayer(dx, dy);
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+    // eslint-disable-next-line
+  }, [state.started, state.gameOver, state.player]);
+
+  // Mobile Swipe/Touch Controls
+  function onTouchStart(e: React.TouchEvent) {
+    if (e.touches.length > 0) {
+      touchStart.current = {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY,
+      };
+    }
+  }
+  function onTouchEnd(e: React.TouchEvent) {
+    if (!touchStart.current) return;
+    const dx = e.changedTouches[0].clientX - touchStart.current.x;
+    const dy = e.changedTouches[0].clientY - touchStart.current.y;
+    const threshold = 24;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > threshold) movePlayer(24, 0);
+      else if (dx < -threshold) movePlayer(-24, 0);
+    } else {
+      if (dy > threshold) movePlayer(0, 24);
+      else if (dy < -threshold) movePlayer(0, -24);
+    }
+    touchStart.current = null;
+  }
+
+  // Move player and update state
+  function movePlayer(dx: number, dy: number) {
+    setState((prev) => {
+      if (!prev.started || prev.gameOver) return prev;
+      const newX = Math.max(0, Math.min(GAME_WIDTH - PLAYER_SIZE, prev.player.x + dx));
+      const newY = Math.max(0, Math.min(GAME_HEIGHT - PLAYER_SIZE, prev.player.y + dy));
+      return { ...prev, player: { x: newX, y: newY } };
+    });
+  }
+
+  // Enemy AI Movement
+  useEffect(() => {
+    if (!state.started || state.gameOver) return;
+    const interval = setInterval(() => {
+      setState((prev) => {
+        if (!prev.started || prev.gameOver) return prev;
+        // Move enemy towards player
+        const { enemy, player } = prev;
+        let dx = player.x - enemy.x;
+        let dy = player.y - enemy.y;
+        const step = 14;
+        let moveX = Math.abs(dx) > step ? (dx > 0 ? step : -step) : dx;
+        let moveY = Math.abs(dy) > step ? (dy > 0 ? step : -step) : dy;
+        // Enemy moves both axes for more challenge
+        let newEnemy = {
+          x: Math.max(0, Math.min(GAME_WIDTH - ENEMY_SIZE, enemy.x + moveX)),
+          y: Math.max(0, Math.min(GAME_HEIGHT - ENEMY_SIZE, enemy.y + moveY)),
+        };
+        return { ...prev, enemy: newEnemy };
+      });
+      setTick((tick) => tick + 1); // trigger re-render
+    }, 220);
+    return () => clearInterval(interval);
+    // eslint-disable-next-line
+  }, [state.started, state.gameOver, state.enemy, state.player]);
+
+  // Main Game Loop (collisions, treat collection, hazards, game over)
+  useEffect(() => {
+    if (!state.started || state.gameOver) return;
+    // Check treat collection
+    let collected = false;
+    let treats = state.treats.filter((t) => {
+      if (
+        rectsOverlap(state.player, PLAYER_SIZE, t, ITEM_SIZE)
+      ) {
+        collected = true;
+        return false; // remove collected treat
+      }
+      return true;
+    });
+    // If all treats collected, respawn
+    if (treats.length === 0 && collected) {
+      treats = Array.from({ length: 3 }, () => getRandomPos(10));
+    }
+    // If collected, add score
+    let score = state.score;
+    if (collected) score += 1;
+
+    // Check hazards
+    const hazards = [
+      ...state.ovens.map((o) => ({ pos: o, size: HAZARD_SIZE })),
+      ...state.seasonings.map((s) => ({ pos: s, size: HAZARD_SIZE })),
+    ];
+    let hitHazard = hazards.some((hz) =>
+      rectsOverlap(state.player, PLAYER_SIZE, hz.pos, hz.size)
+    );
+    // Enemy touches player: game over
+    let enemyTouch = rectsOverlap(state.player, PLAYER_SIZE, state.enemy, ENEMY_SIZE);
+
+    if (hitHazard || enemyTouch) {
+      setState((prev) => ({ ...prev, gameOver: true }));
+    } else {
+      // Update state if changed
+      if (collected || treats.length !== state.treats.length) {
+        setState((prev) => ({
+          ...prev,
+          treats,
+          score,
+        }));
+      }
+    }
+    // eslint-disable-next-line
+  }, [state.player, state.enemy, state.treats, state.started, state.gameOver]);
+
+  // Responsive sizing (auto scale for mobile)
+  const [scale, setScale] = useState(1);
+  useEffect(() => {
+    function handleResize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      // Fit to width, with margin
+      let s = Math.min(w / (GAME_WIDTH + 8), h / (GAME_HEIGHT + 8), 1.2);
+      setScale(s);
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Start/Restart
+  function handleStart() {
+    setState(getInitialState());
+    setTimeout(() => {
+      setState((prev) => ({ ...prev, started: true }));
+    }, 200);
+  }
+
+  // Render UI Overlay
+  return (
+    <div
+      style={{
+        width: GAME_WIDTH * scale,
+        height: GAME_HEIGHT * scale,
+        margin: "24px auto",
+        position: "relative",
+        border: "2px solid #2226",
+        borderRadius: 12,
+        background: "linear-gradient(175deg,#e3f2fd 60%,#fffde7)",
+        overflow: "hidden",
+        touchAction: "none",
+        boxShadow: "0 4px 24px #3333",
+        maxWidth: "95vw",
+        maxHeight: "90vh",
+        transition: "box-shadow 0.2s",
+      }}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      tabIndex={0}
+    >
+      {/* Game Entities */}
+      <Player position={state.player} />
+      <Enemy position={state.enemy} />
+      {state.treats.map((t, i) => (
+        <Treat key={i} position={t} />
+      ))}
+      {state.ovens.map((o, i) => (
+        <Oven key={i} position={o} />
+      ))}
+      {state.seasonings.map((s, i) => (
+        <Seasoning key={i} position={s} />
+      ))}
+
+      {/* HUD */}
+      <div
+        style={{
+          position: "absolute",
+          top: 8,
+          left: 8,
+          background: "#fff9",
+          borderRadius: 8,
+          padding: "6px 18px",
+          fontWeight: "bold",
+          fontSize: 18 * scale,
+          color: "#333",
+          boxShadow: "0 1px 6px #0002",
+          zIndex: 10,
+          userSelect: "none",
+        }}
+      >
+        Score: {state.score}
+      </div>
+
+      {/* Overlay Screens */}
+      {!state.started && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "#222a",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 20,
+          }}
+        >
+          <h2
+            style={{
+              color: "#fff",
+              fontSize: 32 * scale,
+              marginBottom: 16,
+              letterSpacing: 1.2,
+            }}
+          >
+            Arlo's Treat Chase!
+          </h2>
+          <button
+            style={{
+              fontSize: 22 * scale,
+              padding: "14px 36px",
+              borderRadius: 12,
+              background: "#4caf50",
+              color: "#fff",
+              fontWeight: "bold",
+              border: "none",
+              boxShadow: "0 2px 8px #2224",
+              marginTop: 12,
+              cursor: "pointer",
+              transition: "background 0.2s",
+            }}
+            onClick={handleStart}
+          >
+            Start Game
+          </button>
+        </div>
+      )}
+      {state.gameOver && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            background: "#222c",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 30,
+          }}
+        >
+          <h2
+            style={{
+              color: "#fff",
+              fontSize: 32 * scale,
+              marginBottom: 8,
+              letterSpacing: 1.2,
+            }}
+          >
+            Game Over!
+          </h2>
+          <div
+            style={{
+              color: "#ffeb3b",
+              fontWeight: "bold",
+              fontSize: 22 * scale,
+              marginBottom: 12,
+              textShadow: "0 2px 6px #0008",
+            }}
+          >
+            Final Score: {state.score}
+          </div>
+          <button
+            style={{
+              fontSize: 20 * scale,
+              padding: "11px 30px",
+              borderRadius: 10,
+              background: "#e53935",
+              color: "#fff",
+              fontWeight: "bold",
+              border: "none",
+              boxShadow: "0 2px 8px #2226",
+              marginTop: 8,
+              cursor: "pointer",
+            }}
+            onClick={handleStart}
+          >
+            Restart
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default Game;
