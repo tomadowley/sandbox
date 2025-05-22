@@ -514,7 +514,7 @@ const Game: React.FC = () => {
 
   // Mobile Swipe/Touch Controls (Disabled during game over sequence)
   function onTouchStart(e: React.TouchEvent) {
-    if (state.gameOverSequence) return;
+    if (state.cutscenePlaying || state.cutsceneFinished || state.gameOver) return;
     if (e.touches.length > 0) {
       touchStart.current = {
         x: e.touches[0].clientX,
@@ -523,7 +523,7 @@ const Game: React.FC = () => {
     }
   }
   function onTouchEnd(e: React.TouchEvent) {
-    if (state.gameOverSequence) return;
+    if (state.cutscenePlaying || state.cutsceneFinished || state.gameOver) return;
     if (!touchStart.current) return;
     const dx = e.changedTouches[0].clientX - touchStart.current.x;
     const dy = e.changedTouches[0].clientY - touchStart.current.y;
