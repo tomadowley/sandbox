@@ -368,6 +368,7 @@ type BloodTrail = { x: number; y: number; t: number };
 type GameState = {
   player: Vec2;
   enemy: Vec2;
+  enemyVel: Vec2; // Ali's velocity (vx, vy)
   treats: Vec2[];
   ovens: Vec2[];
   seasonings: Vec2[];
@@ -384,6 +385,7 @@ function getInitialState(): GameState {
   return {
     player: { ...INITIAL_PLAYER },
     enemy: { ...INITIAL_ENEMY },
+    enemyVel: { x: 0, y: 0 },
     treats: initialTreats.map((t) => ({ ...t })),
     ovens: initialOvens.map((o) => ({ ...o })),
     seasonings: initialSeasonings.map((s) => ({ ...s })),
@@ -548,34 +550,64 @@ const Game: React.FC = () => {
     });
   }
 
-  // Enemy AI Movement (Add blood trail)
+  // Enemy AI Movement (Add blood trail, inertia/momentum)
   useEffect(() => {
     // Ali moves only when: started, not gameOver, not during or after cutscene
     if (!state.started || state.gameOver || state.cutscenePlaying || state.cutsceneFinished) return;
     const interval = setInterval(() => {
       setState((prev) => {
-        // Only move if still actively running (double-check inside interval)
         if (!prev.started || prev.gameOver || prev.cutscenePlaying || prev.cutsceneFinished) return prev;
-        // Move enemy towards player
-        const { enemy, player, bloodTrail } = prev;
-        let dx = player.x - enemy.x;
-        let dy = player.y - enemy.y;
-        const step = 14;
-        let moveX = Math.abs(dx) > step ? (dx > 0 ? step : -step) : dx;
-        let moveY = Math.abs(dy) > step ? (dy > 0 ? step : -step) : dy;
-        // Enemy moves both axes for more challenge
-        let newEnemy = {
-          x: Math.max(0, Math.min(GAME_WIDTH - ENEMY_SIZE, enemy.x + moveX)),
-          y: Math.max(0, Math.min(GAME_HEIGHT - ENEMY_SIZE, enemy.y + moveY)),
-        };
+        const { enemy, player, enemyVel, bloodTrail } = prev;
+
+        // --- Momentum/inertia chase ---
+        // Parameters
+        const ACCEL = 2.5; // Maximum acceleration per tick
+        const MAX_SPEED = 15; // Maximum velocity per tick
+
+        // Vector to player
+        let toPlayerX = player.x - enemy.x;
+        let toPlayerY = player.y - enemy.y;
+        // Normalize toPlayer vector
+        const dist = Math.sqrt(toPlayerX * toPlayerX + toPlayerY * toPlayerY) || 1;
+        let dirX = toPlayerX / dist;
+        let dirY = toPlayerY / dist;
+
+        // Accelerate vx, vy toward player
+        let vx = enemyVel.x + dirX * ACCEL;
+        let vy = enemyVel.y + dirY * ACCEL;
+
+        // Clamp speed to max
+        const speed = Math.sqrt(vx * vx + vy * vy);
+        if (speed > MAX_SPEED) {
+          vx = (vx / speed) * MAX_SPEED;
+          vy = (vy / speed) * MAX_SPEED;
+        }
+
+        // If very close to player, slow down (to avoid jitter)
+        let stopDist = 8;
+        if (dist < stopDist) {
+          vx *= 0.7;
+          vy *= 0.7;
+        }
+
+        // Update position by velocity
+        let newX = Math.max(0, Math.min(GAME_WIDTH - ENEMY_SIZE, enemy.x + vx));
+        let newY = Math.max(0, Math.min(GAME_HEIGHT - ENEMY_SIZE, enemy.y + vy));
+
         // Leave a blood block trail behind Ali
         let newBloodTrail = [
           ...bloodTrail,
           { x: enemy.x + ENEMY_SIZE / 2 - 7, y: enemy.y + ENEMY_SIZE / 2 - 7, t: animFrame }
         ].filter((b) => animFrame - b.t < 60); // fade after 60 frames
-        return { ...prev, enemy: newEnemy, bloodTrail: newBloodTrail };
+
+        return {
+          ...prev,
+          enemy: { x: newX, y: newY },
+          enemyVel: { x: vx, y: vy },
+          bloodTrail: newBloodTrail
+        };
       });
-    }, 200);
+    }, 50); // Faster tick for smoother inertia
     return () => clearInterval(interval);
     // eslint-disable-next-line
   }, [state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished]);
@@ -703,7 +735,11 @@ const Game: React.FC = () => {
     cutsceneTimeouts.current = [];
     setState(getInitialState());
     setTimeout(() => {
-      setState((prev) => ({ ...prev, started: true }));
+      setState((prev) => ({
+        ...prev,
+        started: true,
+        enemyVel: { x: 0, y: 0 } // Reset Ali's velocity on start/restart
+      }));
       if (gameContainerRef.current) {
         gameContainerRef.current.focus();
       }
