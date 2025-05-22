@@ -47,7 +47,70 @@ const Player = ({ position }: { position: Vec2 }) => (
   </div>
 );
 
-const Enemy = ({ position }: { position: Vec2 }) => (
+const ALI_APPEARANCES = [
+  {
+    bg: "#b71c1c",
+    emoji: "👹",
+    face: "ಠ益ಠ",
+    blood: true,
+    border: "4px solid #820000",
+    label: "Ali-Evil1",
+  },
+  {
+    bg: "#311b92",
+    emoji: "💀",
+    face: "☠️",
+    blood: false,
+    border: "4px dashed #222",
+    label: "Ali-Evil2",
+  },
+  {
+    bg: "#212121",
+    emoji: "🦴",
+    face: "≋(͒•˛•͒)≋",
+    blood: false,
+    border: "4px double #ad1457",
+    label: "Ali-Evil3",
+  },
+  {
+    bg: "#880e4f",
+    emoji: "🩸",
+    face: "ಥ﹏ಥ",
+    blood: true,
+    border: "4px solid #ad1457",
+    label: "Ali-Evil4",
+  },
+  {
+    bg: "#263238",
+    emoji: "😈",
+    face: ">:) ",
+    blood: false,
+    border: "4px dotted #d32f2f",
+    label: "Ali-Evil5",
+  },
+];
+const ALI_TAUNTS = [
+  "I'm going to roast you, Arlo!",
+  "Prepare for seasoning!",
+  "Your treats are mine!",
+  "You'll be dog dinner soon!",
+  "No escape from my oven!",
+  "Blood will be spilled...",
+  "Run while you can!",
+  "I'll chew your bones!",
+  "My teeth are sharp tonight.",
+  "I'll turn you into stew!",
+  "You'll beg for salt!",
+  "The hunt is on, pup!",
+];
+
+const Enemy = ({
+  position,
+  appearance,
+}: {
+  position: Vec2;
+  appearance: typeof ALI_APPEARANCES[0];
+}) => (
   <div
     style={{
       position: "absolute",
@@ -55,20 +118,40 @@ const Enemy = ({ position }: { position: Vec2 }) => (
       top: position.y,
       width: ENEMY_SIZE,
       height: ENEMY_SIZE,
-      background: "#e53935",
+      background: appearance.bg,
       borderRadius: 6,
-      boxShadow: "0 1px 4px #3305",
+      boxShadow: "0 2px 10px #000a",
+      border: appearance.border,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       color: "#fff",
       fontWeight: "bold",
-      fontSize: 18,
+      fontSize: 20,
       userSelect: "none",
+      flexDirection: "column",
+      textShadow: appearance.blood ? "0 2px 8px #f00, 0 0px 2px #000" : "0 1px 2px #000",
+      positionLabel: "Ali-Enemy",
     }}
-    aria-label="Ali-Enemy"
+    aria-label={appearance.label}
   >
-    👾
+    <span style={{ fontSize: 24 }}>{appearance.emoji}</span>
+    <span style={{ fontFamily: "monospace", marginTop: -2 }}>
+      {appearance.face}
+    </span>
+    {appearance.blood && (
+      <span
+        style={{
+          fontSize: 18,
+          color: "#ff1744",
+          fontWeight: "bold",
+          marginTop: -6,
+          textShadow: "0 1px 6px #300",
+        }}
+      >
+        🩸
+      </span>
+    )}
   </div>
 );
 
