@@ -561,8 +561,9 @@ const Game: React.FC = () => {
 
         // --- Momentum/inertia chase ---
         // Parameters
-        const ACCEL = 2.5; // Maximum acceleration per tick
-        const MAX_SPEED = 15; // Maximum velocity per tick
+        // REDUCED: Ali's max speed and acceleration for less overwhelming pursuit
+        const ACCEL = 1.2; // Maximum acceleration per tick (was 2.5)
+        const MAX_SPEED = 7; // Maximum velocity per tick (was 15)
 
         // Vector to player
         let toPlayerX = player.x - enemy.x;
@@ -611,6 +612,61 @@ const Game: React.FC = () => {
     return () => clearInterval(interval);
     // eslint-disable-next-line
   }, [state.started, state.gameOver, state.cutscenePlaying, state.cutsceneFinished]);
+
+  // --- DeviceOrientation-based tilt controls for Arlo (mobile only) ---
+  useEffect(() => {
+    // Helper: Detect if device is mobile/touch capable
+    function isMobileOrTablet() {
+      return (
+        ("ontouchstart" in window) ||
+        (navigator.maxTouchPoints && navigator.maxTouchPoints > 1)
+      );
+    }
+
+    // Only enable on mobile/touch devices
+    if (!isMobileOrTablet()) return;
+
+    let lastMove = { x: 0, y: 0 };
+
+    // Deadzone (minimum tilt angle to trigger movement), in degrees
+    const DEADZONE = 15;
+    // Movement step per tilt event, in pixels (match arrow/swipe)
+    const STEP = 24;
+
+    // Prevent jitter: only move if tilt passes deadzone and direction changed
+    function handleOrientation(e: DeviceOrientationEvent) {
+      if (!state.started || state.cutscenePlaying || state.cutsceneFinished || state.gameOver) return;
+      // gamma: left/right tilt (-90 to 90), beta: front/back (-180 to 180)
+      const gamma = e.gamma ?? 0; // left/right
+      const beta = e.beta ?? 0;   // front/back
+
+      let dx = 0, dy = 0;
+      // Left/right tilt (gamma): move Arlo left/right
+      if (gamma > DEADZONE) dx = STEP;
+      else if (gamma < -DEADZONE) dx = -STEP;
+      // Forward/backward tilt (beta): move Arlo up/down
+      // On most phones, beta=90 is flat, so subtract 90 to get relative angle
+      const relBeta = beta - 90;
+      if (relBeta > DEADZONE) dy = STEP;
+      else if (relBeta < -DEADZONE) dy = -STEP;
+
+      // Only move if new direction, to avoid repeated moves on same tilt
+      if (dx !== lastMove.x || dy !== lastMove.y) {
+        lastMove = { x: dx, y: dy };
+        if (dx !== 0 || dy !== 0) {
+          movePlayer(dx, dy);
+        }
+      }
+      // If no tilt, reset lastMove so movement can resume when tilt resumes
+      if (dx === 0 && dy === 0) lastMove = { x: 0, y: 0 };
+    }
+
+    window.addEventListener("deviceorientation", handleOrientation, true);
+    return () => {
+      window.removeEventListener("deviceorientation", handleOrientation, true);
+    };
+    // eslint-disable-next-line
+  }, [state.started, state.cutscenePlaying, state.cutsceneFinished, state.gameOver]);
 
   // Main Game Loop (collisions, treat collection, hazards, game over)
   useEffect(() => {
