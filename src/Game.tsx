@@ -571,8 +571,8 @@ const Game: React.FC = () => {
         // Leave a blood block trail behind Ali
         let newBloodTrail = [
           ...bloodTrail,
-          { x: enemy.x + ENEMY_SIZE / 2 - 7, y: enemy.y + ENEMY_SIZE / 2 - 7, t: prev.animFrame }
-        ].filter((b) => prev.animFrame - b.t < 60); // fade after 60 frames
+          { x: enemy.x + ENEMY_SIZE / 2 - 7, y: enemy.y + ENEMY_SIZE / 2 - 7, t: animFrame }
+        ].filter((b) => animFrame - b.t < 60); // fade after 60 frames
         return { ...prev, enemy: newEnemy, bloodTrail: newBloodTrail };
       });
     }, 200);
