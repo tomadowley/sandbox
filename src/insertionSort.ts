@@ -1,33 +1,39 @@
 /**
  * insertionSort.ts
- * 
- * Implements the Insertion Sort algorithm.
- * 
- * Insertion Sort builds the sorted array one item at a time by repeatedly
- * taking the next element and inserting it into the correct position in the sorted part.
- * Efficient for small and nearly sorted datasets.
- * 
- * Time Complexity: O(n^2)
- * Space Complexity: O(1) (not accounting for the returned copy)
+ *
+ * Insertion Sort algorithm implementation.
+ *
+ * Insertion Sort builds the sorted array one element at a time, by inserting each
+ * new element into its correct position relative to the already sorted portion.
+ * It is efficient for small or nearly sorted datasets and is stable.
+ *
+ * - Time Complexity: O(n^2)
+ * - Space Complexity: O(1) (excluding the returned copy)
+ *
+ * This implementation is stable.
  */
 
-/**
- * Insertion Sort implementation.
- * @param arr Array of numbers to sort.
- * @returns Sorted array.
- */
+ /**
+  * Sorts an array of numbers using the Insertion Sort algorithm.
+  * @param arr Array of numbers to sort.
+  * @returns Sorted array (input is not mutated).
+  */
 export function insertionSort(arr: number[]): number[] {
-  // Make a shallow copy to avoid mutating the original array
+  // Copy input to avoid mutating the original array
   const result = [...arr];
+
+  // Start from the second element and insert into the sorted part
   for (let i = 1; i < result.length; i++) {
-    let key = result[i];
+    let key = result[i]; // Current element to insert
     let j = i - 1;
-    // Move elements greater than key one position ahead
+    // Move elements of result[0..i-1] that are greater than key to one position ahead
     while (j >= 0 && result[j] > key) {
       result[j + 1] = result[j];
       j--;
     }
+    // Place key after the last smaller element found (or at the start)
     result[j + 1] = key;
   }
+  // Return the sorted array
   return result;
 }
