@@ -38,25 +38,15 @@ function drawMandelbrot(
 
       const idx = 4 * (py * width + px);
       if (iteration === maxIter) {
+        // Inside Mandelbrot set: black
         data[idx] = 0;
         data[idx + 1] = 0;
         data[idx + 2] = 0;
       } else {
-        // Coloring: smooth, vivid
-        const c = 3 * Math.log(iteration) / Math.log(maxIter - 1.0);
-        if (c < 1) {
-          data[idx] = 255 * c;
-          data[idx + 1] = 0;
-          data[idx + 2] = 0;
-        } else if (c < 2) {
-          data[idx] = 255;
-          data[idx + 1] = 255 * (c - 1);
-          data[idx + 2] = 0;
-        } else {
-          data[idx] = 255;
-          data[idx + 1] = 255;
-          data[idx + 2] = 255 * (c - 2);
-        }
+        // Outside Mandelbrot set: white
+        data[idx] = 255;
+        data[idx + 1] = 255;
+        data[idx + 2] = 255;
       }
       data[idx + 3] = 255; // Opaque
     }
