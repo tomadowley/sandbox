@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./App.css";
 
-// Simple mobile-first game: Arlo (miniature deer) vs Ali (large man)
+// Insanely gruesome mobile-first game: Arlo (miniature deer) vs Ali (large man)
+// Now with ultra-gore and much smarter Ali!
 
 // Game constants
 const GAME_WIDTH = 360; // px (mobile width)
@@ -9,7 +10,10 @@ const GAME_HEIGHT = 600; // px (mobile height)
 const ARLO_SIZE = 40;
 const ALI_SIZE = 60;
 const MOVE_SPEED = 20; // px per move
-const ALI_SPEED = 8; // px per frame
+const BASE_ALI_SPEED = 8; // px per frame
+const ALI_SPEED_MAX = 16; // Ali can burst speed if close!
+const ALI_JITTER = 14; // How much random zig-zag Ali does per move
+const BLOOD_SPLASHES = 16; // How many blood splatters on kill
 
 // Helper for random position
 function randomPosition(size: number) {
@@ -22,6 +26,9 @@ function randomPosition(size: number) {
 // Emoji or colored divs as placeholders
 const ARLO_EMOJI = "🦌";
 const ALI_EMOJI = "🧔";
+const BLOOD_EMOJI = "🩸";
+const GORE_EMOJI = "🧠";
+const RIB_EMOJI = "🦴";
 
 function clamp(val: number, min: number, max: number) {
   return Math.max(min, Math.min(max, val));
@@ -36,48 +43,119 @@ function getDistance(a: Position, b: Position) {
 const initialArlo: Position = { x: 40, y: GAME_HEIGHT / 2 - ARLO_SIZE / 2 };
 const initialAli: Position = { x: GAME_WIDTH - ALI_SIZE - 40, y: GAME_HEIGHT / 2 - ALI_SIZE / 2 };
 
+function randomAngle() {
+  return Math.random() * Math.PI * 2;
+}
+
 function App() {
   const [arlo, setArlo] = useState<Position>(initialArlo);
   const [ali, setAli] = useState<Position>(initialAli);
   const [gameOver, setGameOver] = useState(false);
   const [message, setMessage] = useState("");
+  const [blood, setBlood] = useState<{ x: number; y: number; angle: number; key: number }[]>([]);
+  const [showGore, setShowGore] = useState(false);
+  const [shaking, setShaking] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
+  const [corpse, setCorpse] = useState<Position | null>(null);
 
-  // Move Ali: runs away from Arlo, random path, simple AI
+  // --- Smarter Ali AI ---
+  // Ali now:
+  // - Avoids corners by picking an escape angle if close to wall
+  // - Bursts with speed if Arlo is close (panic mode)
+  // - Zig-zags randomly
+  // - Sometimes "doubles back" (randomly reverses direction to fake out)
+
   useEffect(() => {
     if (gameOver) return;
+    let lastAngle = randomAngle();
+    let fakeoutTimer = 0;
+    let fakeout = false;
+
     const interval = setInterval(() => {
       setAli((prevAli) => {
-        // Move Ali away from Arlo
-        const dx = prevAli.x - arlo.x;
-        const dy = prevAli.y - arlo.y;
-        const dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        // Vector from Arlo to Ali
+        const dx = prevAli.x + ALI_SIZE / 2 - (arlo.x + ARLO_SIZE / 2);
+        const dy = prevAli.y + ALI_SIZE / 2 - (arlo.y + ARLO_SIZE / 2);
+        let dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
 
-        // Ali runs away, but stays on screen
-        let newX = prevAli.x + (ALI_SPEED * (dx / dist));
-        let newY = prevAli.y + (ALI_SPEED * (dy / dist));
+        // Panic: If Arlo is close, Ali sprints!
+        let speed = BASE_ALI_SPEED + (dist < 100 ? ALI_SPEED_MAX : 0);
 
-        // Add some randomness
-        newY += (Math.random() - 0.5) * 10;
+        // Ali's escape angle is away from Arlo, but not purely so: some randomness, and avoidance of corners.
+        let angle = Math.atan2(dy, dx);
+
+        // If Ali is close to wall, bias angle inward
+        const wallBuffer = 36;
+        if (prevAli.x < wallBuffer) angle = 0; // right
+        if (prevAli.x > GAME_WIDTH - ALI_SIZE - wallBuffer) angle = Math.PI; // left
+        if (prevAli.y < wallBuffer) angle = Math.PI / 2; // down
+        if (prevAli.y > GAME_HEIGHT - ALI_SIZE - wallBuffer) angle = -Math.PI / 2; // up
+
+        // Occasionally, Ali fakes out and reverses!
+        if (Math.random() < 0.01 && !fakeout && dist > 60) {
+          fakeout = true;
+          fakeoutTimer = Math.floor(Math.random() * 10 + 6);
+        }
+        if (fakeout) {
+          angle += Math.PI; // reverse!
+          fakeoutTimer -= 1;
+          if (fakeoutTimer <= 0) fakeout = false;
+        }
+
+        // Zig-zag: Add jitter
+        angle += (Math.random() - 0.5) * 0.7;
+
+        // Move
+        let newX = prevAli.x + Math.cos(angle) * speed + (Math.random() - 0.5) * ALI_JITTER;
+        let newY = prevAli.y + Math.sin(angle) * speed + (Math.random() - 0.5) * ALI_JITTER;
 
         newX = clamp(newX, 0, GAME_WIDTH - ALI_SIZE);
         newY = clamp(newY, 0, GAME_HEIGHT - ALI_SIZE);
 
+        lastAngle = angle;
+
         return { x: newX, y: newY };
       });
-    }, 40); // 25fps
+    }, 33); // ~30fps
     return () => clearInterval(interval);
     // eslint-disable-next-line
   }, [arlo, gameOver]);
 
   // Check for collision (Arlo catches Ali)
   useEffect(() => {
-    if (getDistance(
-      { x: arlo.x + ARLO_SIZE/2, y: arlo.y + ARLO_SIZE/2 },
-      { x: ali.x + ALI_SIZE/2, y: ali.y + ALI_SIZE/2 }
-    ) < (ARLO_SIZE + ALI_SIZE) / 2) {
+    if (
+      getDistance(
+        { x: arlo.x + ARLO_SIZE / 2, y: arlo.y + ARLO_SIZE / 2 },
+        { x: ali.x + ALI_SIZE / 2, y: ali.y + ALI_SIZE / 2 }
+      ) <
+      (ARLO_SIZE + ALI_SIZE) / 2
+    ) {
       setGameOver(true);
-      setMessage("You caught Ali! Arlo rips him to shreds! 🦌💥🧔");
+
+      // Blood splatter!
+      let splatters = [];
+      for (let i = 0; i < BLOOD_SPLASHES; ++i) {
+        const r = Math.random() * 50 + 24;
+        const angle = Math.random() * Math.PI * 2;
+        splatters.push({
+          x: ali.x + ALI_SIZE / 2 + Math.cos(angle) * r,
+          y: ali.y + ALI_SIZE / 2 + Math.sin(angle) * r,
+          angle,
+          key: i + Math.random(),
+        });
+      }
+      setBlood(splatters);
+
+      setShaking(true);
+      setTimeout(() => setShaking(false), 1000);
+
+      setTimeout(() => setShowGore(true), 350);
+      setTimeout(() => setCorpse({ ...ali }), 500);
+
+      // Ultra-gruesome message
+      setMessage(
+        "You caught Ali!\nArlo rips him apart with a sickening crunch!\nBlood sprays EVERYWHERE. 🦌🩸🦴🧠\n\nAli is now a pile of gore."
+      );
     }
   }, [arlo, ali]);
 
@@ -144,6 +222,9 @@ function App() {
     setAli(randomPosition(ALI_SIZE));
     setGameOver(false);
     setMessage("");
+    setBlood([]);
+    setShowGore(false);
+    setCorpse(null);
   }
 
   // On-screen controls for mobile
@@ -164,9 +245,30 @@ function App() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
+        transition: shaking ? "none" : "background 0.5s",
+        animation: shaking
+          ? "shake 0.2s cubic-bezier(.36,.07,.19,.97) both 5"
+          : undefined,
       }}
     >
-      <h2 style={{ margin: 10 }}>Arlo's Hunt: Mobile Game</h2>
+      <style>
+        {`
+        @keyframes shake {
+          0% { transform: translate(4px, 2px) rotate(0deg); }
+          10% { transform: translate(-2px, -4px) rotate(-1deg);}
+          20% { transform: translate(-6px, 0px) rotate(1deg);}
+          30% { transform: translate(6px, 4px) rotate(0deg);}
+          40% { transform: translate(4px, -2px) rotate(1deg);}
+          50% { transform: translate(-4px, 2px) rotate(-1deg);}
+          60% { transform: translate(-2px, 4px) rotate(0deg);}
+          70% { transform: translate(2px, -4px) rotate(-1deg);}
+          80% { transform: translate(6px, 0px) rotate(1deg);}
+          90% { transform: translate(-6px, 4px) rotate(0deg);}
+          100% { transform: translate(4px, -2px) rotate(-1deg);}
+        }
+        `}
+      </style>
+      <h2 style={{ margin: 10, color: "#911" }}>Arlo's Hunt: Gruesome Edition</h2>
       <div
         ref={gameRef}
         style={{
@@ -181,6 +283,45 @@ function App() {
           touchAction: "none",
         }}
       >
+        {/* Blood splatters */}
+        {blood.map((b, i) => (
+          <div
+            key={b.key}
+            style={{
+              position: "absolute",
+              left: b.x,
+              top: b.y,
+              fontSize: 26 + Math.random() * 18,
+              opacity: 0.82,
+              transform: `rotate(${b.angle}rad) scale(${1 + Math.random() * 0.6})`,
+              pointerEvents: "none",
+              userSelect: "none",
+              zIndex: 30 + i,
+              transition: "opacity 1.2s",
+              color: "#b10010",
+              textShadow: "2px 2px 4px #a00",
+            }}
+          >
+            {BLOOD_EMOJI}
+          </div>
+        ))}
+
+        {/* Gore and corpse */}
+        {showGore && corpse && (
+          <div
+            style={{
+              position: "absolute",
+              left: corpse.x + ALI_SIZE / 2 - 24,
+              top: corpse.y + ALI_SIZE / 2 - 24,
+              zIndex: 120,
+            }}
+          >
+            <span style={{ fontSize: 38 }}>{GORE_EMOJI}</span>
+            <span style={{ fontSize: 34, marginLeft: -8 }}>{RIB_EMOJI}</span>
+            <span style={{ fontSize: 28, marginLeft: -8 }}>{BLOOD_EMOJI}</span>
+          </div>
+        )}
+
         {/* Arlo (player) */}
         <div
           style={{
@@ -197,30 +338,34 @@ function App() {
             alignItems: "center",
             justifyContent: "center",
             transition: "left 0.08s, top 0.08s",
+            filter: gameOver ? "brightness(1.2) contrast(1.2) saturate(1.2)" : undefined,
           }}
         >
           {ARLO_EMOJI}
         </div>
         {/* Ali (target) */}
-        <div
-          style={{
-            position: "absolute",
-            left: ali.x,
-            top: ali.y,
-            width: ALI_SIZE,
-            height: ALI_SIZE,
-            fontSize: 38,
-            zIndex: 1,
-            userSelect: "none",
-            pointerEvents: "none",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            transition: "left 0.04s, top 0.04s",
-          }}
-        >
-          {ALI_EMOJI}
-        </div>
+        {!gameOver && (
+          <div
+            style={{
+              position: "absolute",
+              left: ali.x,
+              top: ali.y,
+              width: ALI_SIZE,
+              height: ALI_SIZE,
+              fontSize: 38,
+              zIndex: 1,
+              userSelect: "none",
+              pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "left 0.04s, top 0.04s",
+              filter: "brightness(0.95)",
+            }}
+          >
+            {ALI_EMOJI}
+          </div>
+        )}
         {/* Game Over overlay */}
         {gameOver && (
           <div
@@ -230,33 +375,40 @@ function App() {
               left: 0,
               width: GAME_WIDTH,
               height: GAME_HEIGHT,
-              background: "rgba(0,0,0,0.7)",
+              background: "rgba(70,0,0,0.82)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              zIndex: 10,
+              zIndex: 500,
               color: "#fff",
-              fontSize: 26,
+              fontSize: 23,
               fontWeight: "bold",
+              letterSpacing: 1,
+              textShadow: "2px 3px 12px #b20009, 1px 1px 0 #400",
+              animation: "bloodFadeIn 1.5s",
+              padding: 18,
+              whiteSpace: "pre-line"
             }}
           >
+            <div style={{ fontSize: 34, marginBottom: 16 }}>🦌🩸🦴🧠</div>
             <div>{message}</div>
             <button
               style={{
-                marginTop: 24,
+                marginTop: 28,
                 fontSize: 18,
-                padding: "10px 28px",
-                background: "#f8b400",
+                padding: "14px 34px",
+                background: "#b10010",
                 border: "none",
-                borderRadius: 12,
+                borderRadius: 15,
                 color: "#fff",
                 fontWeight: "bold",
                 cursor: "pointer",
+                boxShadow: "0 2px 8px #300",
               }}
               onClick={reset}
             >
-              Play Again
+              <span role="img" aria-label="reload">🔄</span> Play Again
             </button>
           </div>
         )}
@@ -314,10 +466,13 @@ function App() {
           </div>
         )}
       </div>
-      <div style={{ marginTop: 18, maxWidth: 340, fontSize: 15, color: "#664229", background: "#f4efe3", borderRadius: 7, padding: 10 }}>
-        Move Arlo (🦌) with swipe or arrows.<br />
-        Catch Ali (🧔) to win. <br />
-        <span style={{ fontSize: 13, color: "#888" }}>(Game is mobile-first! Try it on your phone.)</span>
+      <div style={{ marginTop: 18, maxWidth: 350, fontSize: 15, color: "#a00", background: "#f4efe3", borderRadius: 7, padding: 10, fontWeight: 700 }}>
+        Move Arlo (🦌) with swipe or arrows.
+        <br />
+        Catch Ali (🧔) to win.<br />
+        <span style={{ fontSize: 13, color: "#a00", fontWeight: 400 }}>
+          (Warning: Extremely violent. <b>Game is mobile-first!</b>)
+        </span>
       </div>
     </div>
   );
