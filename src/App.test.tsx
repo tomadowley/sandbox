@@ -7,3 +7,5 @@
 test("dummy test to satisfy Jest", () => {
   expect(true).toBe(true);
 });
+
+export {};
