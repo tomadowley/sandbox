@@ -1,16 +1,11 @@
 ```
-      __     _
-(\    /  \.-./ \
- \\  |   o o   |
-  \\ |   ._.   |
-   \\|   ___   |
-    \    \_/  /
-     `-.___.-'
-         |
-      ~"~"~"~"~
-       St Seal
+   ,_, 
+  (O,O) 
+  (   ) 
+   " "
+   St Owl
 ```
-*A very holy seal*
+*A wise and holy owl*
 
 # Getting Started with Create React App
 
