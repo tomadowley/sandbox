@@ -1,3 +1,4 @@
+// Performs bubble sort: repeatedly steps through the list, compares adjacent elements and swaps them if in the wrong order.
 export function bubbleSort(arr: number[]): number[] {
     const result = arr.slice();
     let n = result.length;

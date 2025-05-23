@@ -1,3 +1,4 @@
+// Performs quick sort: recursively partitions the array using a pivot and sorts subarrays.
 export function quickSort(arr: number[]): number[] {
     if (arr.length <= 1) return arr.slice();
 

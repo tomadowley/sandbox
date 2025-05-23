@@ -1,3 +1,4 @@
+// Performs selection sort: repeatedly selects the minimum element from the unsorted part and moves it to the beginning.
 export function selectionSort(arr: number[]): number[] {
     const result = arr.slice();
     for (let i = 0; i < result.length - 1; i++) {
