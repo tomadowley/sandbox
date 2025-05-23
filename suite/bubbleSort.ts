@@ -1,0 +1,17 @@
+// Performs bubble sort: repeatedly steps through the list, compares adjacent elements and swaps them if in the wrong order.
+export function bubbleSort(arr: number[]): number[] {
+    const result = arr.slice();
+    let n = result.length;
+    let swapped: boolean;
+    do {
+        swapped = false;
+        for (let i = 1; i < n; i++) {
+            if (result[i - 1] > result[i]) {
+                [result[i - 1], result[i]] = [result[i], result[i - 1]];
+                swapped = true;
+            }
+        }
+        n--;
+    } while (swapped);
+    return result;
+}
