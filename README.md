@@ -1,25 +1,16 @@
 ```
-        ___
-       /___\
-       (o o)
-       / V \
-      /  -  \
-     /_/^\_\
-      / | \
-     /  |  \
-       / \
-      /___\
-     /     \
-    |       |
-    |  ___  |
-    |_/   \_|
-   (_______)
-     /   \
-   _/     \_
-  (___|___)
-   Pope John
+      __     _
+(\    /  \.-./ \
+ \\  |   o o   |
+  \\ |   ._.   |
+   \\|   ___   |
+    \    \_/  /
+     `-.___.-'
+         |
+      ~"~"~"~"~
+       St Seal
 ```
-*His Holiness, St John the Pope*
+*A very holy seal*
 
 # Getting Started with Create React App
 
