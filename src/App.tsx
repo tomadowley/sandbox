@@ -51,20 +51,17 @@ function App() {
   const [arlo, setArlo] = useState<Position>(initialArlo);
   const [ali, setAli] = useState<Position>(initialAli);
   const [gameOver, setGameOver] = useState(false);
-  const [message, setMessage] = useState("");
-  const [blood, setBlood] = useState<{ x: number; y: number; angle: number; key: number }[]>([]);
+  const [winStage, setWinStage] = useState<"none"|"beg"|"attack"|"gore"|"aftermath">("none");
+  const [blood, setBlood] = useState<{ x: number; y: number; angle: number; key: number; stage: number }[]>([]);
   const [showGore, setShowGore] = useState(false);
   const [shaking, setShaking] = useState(false);
   const gameRef = useRef<HTMLDivElement>(null);
   const [corpse, setCorpse] = useState<Position | null>(null);
+  const [aliBegText, setAliBegText] = useState("");
+  const [arloText, setArloText] = useState("");
+  const [aliBegAnim, setAliBegAnim] = useState(false);
 
   // --- Smarter Ali AI ---
-  // Ali now:
-  // - Avoids corners by picking an escape angle if close to wall
-  // - Bursts with speed if Arlo is close (panic mode)
-  // - Zig-zags randomly
-  // - Sometimes "doubles back" (randomly reverses direction to fake out)
-
   useEffect(() => {
     if (gameOver) return;
     let lastAngle = randomAngle();
@@ -121,7 +118,7 @@ function App() {
     // eslint-disable-next-line
   }, [arlo, gameOver]);
 
-  // Check for collision (Arlo catches Ali)
+  // Multi-stage win sequence:
   useEffect(() => {
     if (
       getDistance(
@@ -131,32 +128,52 @@ function App() {
       (ARLO_SIZE + ALI_SIZE) / 2
     ) {
       setGameOver(true);
-
-      // Blood splatter!
-      let splatters = [];
-      for (let i = 0; i < BLOOD_SPLASHES; ++i) {
-        const r = Math.random() * 50 + 24;
-        const angle = Math.random() * Math.PI * 2;
-        splatters.push({
-          x: ali.x + ALI_SIZE / 2 + Math.cos(angle) * r,
-          y: ali.y + ALI_SIZE / 2 + Math.sin(angle) * r,
-          angle,
-          key: i + Math.random(),
+      setWinStage("beg");
+      setAliBegText("Please! Don't hurt me!\nI have a family!");
+      setAliBegAnim(true);
+      setArloText("");
+      setTimeout(() => {
+        setAliBegText("Mercy! I beg you! No, please, Arlo!");
+      }, 1100);
+      setTimeout(() => {
+        setAliBegAnim(false);
+        setArloText("NO MERCY.");
+      }, 2200);
+      setTimeout(() => {
+        setWinStage("attack");
+        setArloText("");
+        // Animate blood spurts, sequentially
+        let splatters: typeof blood = [];
+        for (let i = 0; i < BLOOD_SPLASHES; ++i) {
+          const r = Math.random() * 40 + 14;
+          const angle = Math.random() * Math.PI * 2;
+          splatters.push({
+            x: ali.x + ALI_SIZE / 2 + Math.cos(angle) * r,
+            y: ali.y + ALI_SIZE / 2 + Math.sin(angle) * r,
+            angle,
+            key: i + Math.random(),
+            stage: 0,
+          });
+        }
+        splatters.forEach((splat, idx) => {
+          setTimeout(() => {
+            setBlood((prev) => [...prev, { ...splat, stage: 1 }]);
+          }, 150 + idx * 60);
         });
-      }
-      setBlood(splatters);
-
-      setShaking(true);
-      setTimeout(() => setShaking(false), 1000);
-
-      setTimeout(() => setShowGore(true), 350);
-      setTimeout(() => setCorpse({ ...ali }), 500);
-
-      // Ultra-gruesome message
-      setMessage(
-        "You caught Ali!\nArlo rips him apart with a sickening crunch!\nBlood sprays EVERYWHERE. 🦌🩸🦴🧠\n\nAli is now a pile of gore."
-      );
+        setShaking(true);
+        setTimeout(() => setShaking(false), 950);
+      }, 3200);
+      setTimeout(() => {
+        setWinStage("gore");
+        setShowGore(true);
+        setCorpse({ ...ali });
+        setAliBegText("");
+      }, 4300);
+      setTimeout(() => {
+        setWinStage("aftermath");
+      }, 6000);
     }
+    // eslint-disable-next-line
   }, [arlo, ali]);
 
   // Keyboard controls (for desktop/dev)
@@ -221,10 +238,13 @@ function App() {
     setArlo(randomPosition(ARLO_SIZE));
     setAli(randomPosition(ALI_SIZE));
     setGameOver(false);
-    setMessage("");
+    setWinStage("none");
     setBlood([]);
     setShowGore(false);
     setCorpse(null);
+    setAliBegText("");
+    setArloText("");
+    setAliBegAnim(false);
   }
 
   // On-screen controls for mobile
@@ -291,15 +311,16 @@ function App() {
               position: "absolute",
               left: b.x,
               top: b.y,
-              fontSize: 26 + Math.random() * 18,
-              opacity: 0.82,
+              fontSize: 28 + ((b.stage || 0) ? Math.random() * 16 : 0),
+              opacity: (b.stage || 0) ? 0.91 : 0.01,
               transform: `rotate(${b.angle}rad) scale(${1 + Math.random() * 0.6})`,
               pointerEvents: "none",
               userSelect: "none",
               zIndex: 30 + i,
-              transition: "opacity 1.2s",
+              transition: "opacity 0.24s",
               color: "#b10010",
               textShadow: "2px 2px 4px #a00",
+              filter: "blur(0.5px) drop-shadow(0 2px 4px #a00)",
             }}
           >
             {BLOOD_EMOJI}
@@ -331,19 +352,21 @@ function App() {
             width: ARLO_SIZE,
             height: ARLO_SIZE,
             fontSize: 32,
-            zIndex: 2,
+            zIndex: winStage === "attack" ? 200 : 2,
             userSelect: "none",
             pointerEvents: "none",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             transition: "left 0.08s, top 0.08s",
-            filter: gameOver ? "brightness(1.2) contrast(1.2) saturate(1.2)" : undefined,
+            filter: (winStage === "attack" || winStage === "gore" || winStage === "aftermath") ? "brightness(1.2) contrast(1.2) saturate(1.2)" : undefined,
+            animation: winStage === "attack" ? "shake 0.12s cubic-bezier(.36,.07,.19,.97) both 4" : undefined,
           }}
         >
           {ARLO_EMOJI}
         </div>
-        {/* Ali (target) */}
+
+        {/* Ali (target, with multi-stage animation) */}
         {!gameOver && (
           <div
             style={{
@@ -366,8 +389,124 @@ function App() {
             {ALI_EMOJI}
           </div>
         )}
-        {/* Game Over overlay */}
-        {gameOver && (
+        {/* Ali, win sequence - Begging, Attack, Gore */}
+        {gameOver && winStage !== "none" && (
+          <div
+            style={{
+              position: "absolute",
+              left: ali.x,
+              top: ali.y,
+              width: ALI_SIZE,
+              height: ALI_SIZE,
+              fontSize: 38,
+              zIndex: 400,
+              userSelect: "none",
+              pointerEvents: "none",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              filter: winStage === "beg" ? "saturate(0.8) blur(0.5px)" : winStage === "attack" ? "contrast(0.7) opacity(0.7)" : "opacity(0.2)",
+              transition: "filter 0.4s, opacity 0.7s",
+              animation: aliBegAnim ? "shake 0.22s cubic-bezier(.36,.07,.19,.97) both 2" : undefined,
+            }}
+          >
+            {ALI_EMOJI}
+            {/* Speech bubble */}
+            {winStage === "beg" && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: -62,
+                  left: -30,
+                  width: 140,
+                  background: "#fff7",
+                  color: "#b00",
+                  border: "2px solid #b00",
+                  borderRadius: 16,
+                  padding: "5px 10px",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  boxShadow: "0 2px 8px #c83535",
+                  whiteSpace: "pre-line",
+                  zIndex: 800,
+                  pointerEvents: "none",
+                  textAlign: "center",
+                }}
+              >
+                {aliBegText}
+              </div>
+            )}
+            {winStage === "attack" && (
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: -62,
+                  left: -30,
+                  width: 140,
+                  background: "#fff7",
+                  color: "#b00",
+                  border: "2px solid #b00",
+                  borderRadius: 16,
+                  padding: "6px 11px",
+                  fontSize: 16,
+                  fontWeight: 700,
+                  boxShadow: "0 2px 8px #c83535",
+                  whiteSpace: "pre-line",
+                  zIndex: 800,
+                  pointerEvents: "none",
+                  textAlign: "center",
+                }}
+              >
+                {"ARRRGHH!!"}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Arlo's NO MERCY bubble */}
+        {gameOver && winStage === "beg" && arloText && (
+          <div
+            style={{
+              position: "absolute",
+              left: arlo.x,
+              top: arlo.y - 64,
+              width: 110,
+              background: "#fff7",
+              color: "#222",
+              border: "2px solid #222",
+              borderRadius: 16,
+              padding: "5px 10px",
+              fontSize: 15,
+              fontWeight: 700,
+              boxShadow: "0 2px 8px #444",
+              zIndex: 850,
+              pointerEvents: "none",
+              textAlign: "center",
+            }}
+          >
+            {arloText}
+          </div>
+        )}
+
+        {/* Gore and corpse */}
+        {showGore && corpse && (
+          <div
+            style={{
+              position: "absolute",
+              left: corpse.x + ALI_SIZE / 2 - 24,
+              top: corpse.y + ALI_SIZE / 2 - 24,
+              zIndex: 120,
+              animation: "shake 0.4s cubic-bezier(.36,.07,.19,.97) both 2",
+            }}
+          >
+            <span style={{ fontSize: 38 }}>{GORE_EMOJI}</span>
+            <span style={{ fontSize: 34, marginLeft: -8 }}>{RIB_EMOJI}</span>
+            <span style={{ fontSize: 28, marginLeft: -8 }}>{BLOOD_EMOJI}</span>
+          </div>
+        )}
+
+        {/* Aftermath overlay */}
+        {gameOver && winStage === "aftermath" && (
           <div
             style={{
               position: "absolute",
@@ -380,7 +519,7 @@ function App() {
               flexDirection: "column",
               alignItems: "center",
               justifyContent: "center",
-              zIndex: 500,
+              zIndex: 990,
               color: "#fff",
               fontSize: 23,
               fontWeight: "bold",
@@ -392,7 +531,9 @@ function App() {
             }}
           >
             <div style={{ fontSize: 34, marginBottom: 16 }}>🦌🩸🦴🧠</div>
-            <div>{message}</div>
+            <div>
+              {"Arlo rips Ali apart with a sickening crunch!\nBlood sprays EVERYWHERE. Ali is now a pile of gore."}
+            </div>
             <button
               style={{
                 marginTop: 28,
@@ -412,6 +553,7 @@ function App() {
             </button>
           </div>
         )}
+
         {/* Mobile controls */}
         {!gameOver && (
           <div
