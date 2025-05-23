@@ -1,3 +1,26 @@
+```
+        ___
+       /___\
+       (o o)
+       / V \
+      /  -  \
+     /_/^\_\
+      / | \
+     /  |  \
+       / \
+      /___\
+     /     \
+    |       |
+    |  ___  |
+    |_/   \_|
+   (_______)
+     /   \
+   _/     \_
+  (___|___)
+   Pope John
+```
+*His Holiness, St John the Pope*
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
