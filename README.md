@@ -1,5 +1,9 @@
 # Getting Started with Create React App
 
+_Code begins to bloom_  
+_Ideas dance in silence_  
+_React springs to life_
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
