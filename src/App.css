@@ -79,14 +79,13 @@ body, #root, .game-outer {
 
 .bat-zone {
   position: absolute;
-  top: 0;
-  height: 100%;
-  background: rgba(255, 255, 0, 0.15);
+  /* now styled inline for vertical zone, but keep fallback style for non-animated */
+  background: rgba(255, 255, 0, 0.13);
   border-left: 2px dashed #fff8;
   border-right: 2px dashed #fff8;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none;
-  transition: background 0.2s;
+  transition: background 0.2s, border 0.13s;
 }
 
 .bat-zone-highlight {
