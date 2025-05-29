@@ -21,13 +21,24 @@ function App() {
   const [showInstructions, setShowInstructions] = useState(true);
   const [ballKey, setBallKey] = useState(0); // rerender for new ball
 
+  // Refs for animation and state tracking
   const animationFrame = useRef<number | null>(null);
   const ballStartTime = useRef<number>(0);
+  const ballStateRef = useRef<BallState>(ballState);
+  const ballXRef = useRef<number>(ballX);
   const hitWindow = 0.17; // fraction of pitch where bat can hit
 
   // Responsive: Bat position and size (fixed to right side for mobile)
   const batZoneLeft = 68; // %
   const batZoneWidth = 14; // %
+
+  // Keep ballStateRef and ballXRef in sync with state
+  useEffect(() => {
+    ballStateRef.current = ballState;
+  }, [ballState]);
+  useEffect(() => {
+    ballXRef.current = ballX;
+  }, [ballX]);
 
   // Start game or replay
   const startGame = () => {
@@ -52,6 +63,7 @@ function App() {
     if (gameOver || ballState !== "ready") return;
     let timeout = setTimeout(() => {
       setBallState("flying");
+      ballStateRef.current = "flying";
       ballStartTime.current = performance.now();
       animateBall();
     }, 500);
@@ -61,16 +73,18 @@ function App() {
 
   // Ball animation
   const animateBall = () => {
-    const start = performance.now();
     const animate = (now: number) => {
       let elapsed = now - ballStartTime.current;
       let frac = Math.min(1, elapsed / BALL_SPEED);
-      setBallX(frac * 90); // Ball travels from 0% to 90% (left to right)
-      if (frac < 1 && ballState === "flying") {
+      const ballXVal = frac * 90; // Ball travels from 0% to 90%
+      setBallX(ballXVal);
+      ballXRef.current = ballXVal;
+      if (frac < 1 && ballStateRef.current === "flying") {
         animationFrame.current = requestAnimationFrame(animate);
-      } else if (ballState === "flying") {
+      } else if (ballStateRef.current === "flying") {
         // Ball missed if not hit in time
         setBallState("missed");
+        ballStateRef.current = "missed";
         setShowSwing(false);
         setTimeout(() => {
           setOuts((o) => {
@@ -82,6 +96,7 @@ function App() {
         }, 700);
       }
     };
+    if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
     animationFrame.current = requestAnimationFrame(animate);
   };
 
@@ -94,15 +109,16 @@ function App() {
 
   // Handle swing (tap/click)
   const handleSwing = () => {
-    if (gameOver || ballState !== "flying") return;
+    if (gameOver || ballStateRef.current !== "flying") return;
     setShowSwing(true);
     // Check if ball is in the bat zone
-    const frac = ballX / 90;
+    const frac = ballXRef.current / 90;
     const batZoneFracLeft = batZoneLeft / 100;
     const batZoneFracRight = (batZoneLeft + batZoneWidth) / 100;
     if (frac >= batZoneFracLeft && frac <= batZoneFracRight) {
       // Hit!
       setBallState("hit");
+      ballStateRef.current = "hit";
       setScore((s) => s + Math.ceil(Math.random() * 6)); // Random runs: 1-6
       setTimeout(() => {
         resetBall();
@@ -110,6 +126,7 @@ function App() {
     } else {
       // Missed
       setBallState("missed");
+      ballStateRef.current = "missed";
       setShowSwing(false);
       setTimeout(() => {
         setOuts((o) => {
@@ -133,7 +150,7 @@ function App() {
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
     // eslint-disable-next-line
-  }, [ballState, ballX, gameOver]);
+  }, [gameOver]);
 
   // Touch/click on pitch or "Swing!" button triggers swing
   const handlePitchClick = () => {
