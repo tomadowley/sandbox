@@ -97,73 +97,70 @@ function App() {
     hitRegistered.current = false;
   }
 
-  // Animate ball falling
-  useEffect(() => {
-    if (gameOver || ballState !== "ready") return;
-    let timeout = setTimeout(() => {
-      setBallState("falling");
-      ballStartTime.current = performance.now();
-      animateBallFall();
-    }, 400);
-    return () => clearTimeout(timeout);
-    // eslint-disable-next-line
-  }, [ballState, gameOver, outs, score, ballKey]);
+  // Animate ball falling: ensure animation starts when ballState becomes "falling"
+useEffect(() => {
+  if (gameOver || ballState !== "falling") return;
 
-  // Ball fall animation
-  const animateBallFall = () => {
-    // Use refs to ensure latest ball state and y-position
-    function animate(now: number) {
-      let elapsed = now - ballStartTime.current;
-      let frac = clamp(elapsed / BALL_FALL_SPEED, 0, 1);
-      const y = frac * (PITCH_HEIGHT - 58); // 58px above bottom for stumps
-      ballYRef.current = y;
-      setBallY(y);
+  ballStartTime.current = performance.now();
 
-      // If bat is swinging at right time and position, register hit
+  function animate(now: number) {
+    let elapsed = now - ballStartTime.current;
+    let frac = clamp(elapsed / BALL_FALL_SPEED, 0, 1);
+    const y = frac * (PITCH_HEIGHT - 58); // 58px above bottom for stumps
+    ballYRef.current = y;
+    setBallY(y);
+
+    // If bat is swinging at right time and position, register hit
+    if (
+      batSwinging &&
+      !hitRegistered.current &&
+      frac > 0.78 &&
+      frac < 0.94 &&
+      Math.abs(ballX - PITCH_WIDTH / 2) < BAT_WIDTH * 0.58
+    ) {
+      registerHit();
+      return;
+    }
+
+    if (frac < 1 && ballState === "falling") {
+      animationFrame.current = requestAnimationFrame(animate);
+    } else if (ballState === "falling") {
+      // Reached bottom, check for collision with stumps!
       if (
-        batSwinging &&
         !hitRegistered.current &&
-        frac > 0.78 &&
-        frac < 0.94 &&
-        Math.abs(ballX - PITCH_WIDTH / 2) < BAT_WIDTH * 0.58
+        Math.abs(ballX - PITCH_WIDTH / 2) < (STUMP_WIDTH / 2)
       ) {
-        registerHit();
-        return;
-      }
-
-      if (frac < 1 && ballState === "falling") {
-        animationFrame.current = requestAnimationFrame(animate);
-      } else if (ballState === "falling") {
-        // Reached bottom, check for collision with stumps!
-        if (
-          !hitRegistered.current &&
-          Math.abs(ballX - PITCH_WIDTH / 2) < (STUMP_WIDTH / 2)
-        ) {
-          // Bowled out!
-          setBallState("bowled");
-          setAnimState("bowled");
-          setShowBails(false);
-          setTimeout(() => {
-            setOuts((o) => {
-              const newOuts = o + 1;
-              if (newOuts >= OUTS_ALLOWED) setGameOver(true);
-              return newOuts;
-            });
-            resetBall();
-          }, 1400);
-        } else {
-          // Missed everything!
-          setBallState("missed");
-          setAnimState("missed");
-          setTimeout(() => {
-            resetBall();
-          }, 800);
-        }
+        // Bowled out!
+        setBallState("bowled");
+        setAnimState("bowled");
+        setShowBails(false);
+        setTimeout(() => {
+          setOuts((o) => {
+            const newOuts = o + 1;
+            if (newOuts >= OUTS_ALLOWED) setGameOver(true);
+            return newOuts;
+          });
+          resetBall();
+        }, 1400);
+      } else {
+        // Missed everything!
+        setBallState("missed");
+        setAnimState("missed");
+        setTimeout(() => {
+          resetBall();
+        }, 800);
       }
     }
+  }
+
+  if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
+  animationFrame.current = requestAnimationFrame(animate);
+
+  return () => {
     if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
-    animationFrame.current = requestAnimationFrame(animate);
   };
+  // eslint-disable-next-line
+}, [ballState, gameOver, batSwinging, ballX]);
 
   // Clean up animation frame
   useEffect(() => {
@@ -392,7 +389,7 @@ function App() {
             ></div>
             {/* Render ball */}
             {(ballState === "falling" || ballState === "hit" || ballState === "missed" || ballState === "bowled") && BallSVG}
-            {/* Render stumps & bat at bottom center */}
+            {/* Render stumps at bottom center */}
             <svg
               style={{
                 position: "absolute",
@@ -418,7 +415,23 @@ function App() {
               >
                 {StumpsSVG}
               </g>
-              {/* Bat (drawn after stumps, so always appears in front) */}
+            </svg>
+            {/* Render bat as a separate absolutely positioned SVG above the stumps */}
+            <svg
+              style={{
+                position: "absolute",
+                left: pitchSize.w / 2 - 27 * pitchSize.scale, // 27 centers the bat
+                top: pitchSize.h - (BAT_HEIGHT + 10) * pitchSize.scale, // Lower than stumps for visual overlap
+                width: 56 * pitchSize.scale,
+                height: BAT_HEIGHT * pitchSize.scale,
+                zIndex: 9, // Above stumps
+                pointerEvents: "none",
+                overflow: "visible",
+              }}
+              width={56}
+              height={BAT_HEIGHT}
+              viewBox="0 0 56 100"
+            >
               <g
                 style={{
                   transform: batSwinging
@@ -429,7 +442,6 @@ function App() {
                   filter: batSwinging
                     ? "drop-shadow(0 2px 9px #ffe44c7a)"
                     : "drop-shadow(0 1px 4px #2229)",
-                  zIndex: 9,
                 }}
               >
                 {BatSVG}
