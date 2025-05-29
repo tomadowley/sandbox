@@ -25,6 +25,8 @@ function App() {
   const [outs, setOuts] = useState(0);
   const [ballState, setBallState] = useState<BallState>("ready");
   const [ballY, setBallY] = useState(0);
+  // Ref for ballY to avoid stale closure in animation loop
+  const ballYRef = useRef(0);
   const [ballX, setBallX] = useState(PITCH_WIDTH / 2);
   const [batSwinging, setBatSwinging] = useState(false);
   const [animState, setAnimState] = useState<AnimState>("idle");
@@ -86,6 +88,7 @@ function App() {
     setBatSwinging(false);
     setAnimState("idle");
     setBallY(0);
+    ballYRef.current = 0;
     setBallX(getRandomBallX());
     setBallAngle(0);
     setBallFly({ x: 0, y: 0 });
@@ -108,10 +111,12 @@ function App() {
 
   // Ball fall animation
   const animateBallFall = () => {
-    const animate = (now: number) => {
+    // Use refs to ensure latest ball state and y-position
+    function animate(now: number) {
       let elapsed = now - ballStartTime.current;
       let frac = clamp(elapsed / BALL_FALL_SPEED, 0, 1);
       const y = frac * (PITCH_HEIGHT - 58); // 58px above bottom for stumps
+      ballYRef.current = y;
       setBallY(y);
 
       // If bat is swinging at right time and position, register hit
@@ -155,7 +160,7 @@ function App() {
           }, 800);
         }
       }
-    };
+    }
     if (animationFrame.current) cancelAnimationFrame(animationFrame.current);
     animationFrame.current = requestAnimationFrame(animate);
   };
@@ -176,7 +181,7 @@ function App() {
     setTimeout(() => {
       setBatSwinging(false);
       // If no hit was registered during swing, and ball already passed bat, treat as miss
-      if (!hitRegistered.current && ballY > PITCH_HEIGHT - 98) {
+      if (!hitRegistered.current && ballYRef.current > PITCH_HEIGHT - 98) {
         setAnimState("missed");
       }
     }, 260);
@@ -413,7 +418,7 @@ function App() {
               >
                 {StumpsSVG}
               </g>
-              {/* Bat (in front of stumps) */}
+              {/* Bat (drawn after stumps, so always appears in front) */}
               <g
                 style={{
                   transform: batSwinging
