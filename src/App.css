@@ -1,38 +1,203 @@
-.App {
-  text-align: center;
-}
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
+/* Mobile-first: full viewport, centered, vibrant, touch-friendly, clear text */
+body, #root, .game-outer {
   min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(180deg, #00b894 0%, #00a8ff 100%);
+  font-family: 'Segoe UI', 'Roboto', 'Arial', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.game-outer {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 94vw;
+  max-width: 500px;
+  margin: 0.5em auto 0.2em auto;
+  font-size: 1.5em;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 1px 2px 8px #0005;
+}
+
+.score, .outs {
+  background: #0007;
+  border-radius: 1em;
+  padding: 0.3em 1em;
+  margin: 0 0.2em;
+}
+
+.game-main {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  width: 100vw;
 }
 
-.App-link {
-  color: #61dafb;
+.pitch-area {
+  position: relative;
+  width: 94vw;
+  max-width: 500px;
+  height: 55vh;
+  min-height: 340px;
+  max-height: 500px;
+  margin: 0 auto 1.2em auto;
+  background: linear-gradient(90deg, #4caf50 80%, #d4af37 100%);
+  border: 4px solid #fff;
+  border-radius: 2.5vw;
+  box-shadow: 0 2px 18px #0003;
+  overflow: hidden;
+  touch-action: manipulation;
+  cursor: pointer;
+  outline: none;
+  transition: box-shadow 0.2s;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.pitch-area:active, .pitch-area:focus {
+  box-shadow: 0 2px 24px #fff8, 0 2px 18px #0003;
+}
+
+.pitch-bg {
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: repeating-linear-gradient(
+    180deg, #3e8e41 0px, #3e8e41 12px, #4caf50 12px, #4caf50 30px
+  );
+  opacity: 0.11;
+  z-index: 0;
+}
+
+.bat-zone {
+  position: absolute;
+  /* now styled inline for vertical zone, but keep fallback style for non-animated */
+  background: rgba(255, 255, 0, 0.13);
+  border-left: 2px dashed #fff8;
+  border-right: 2px dashed #fff8;
+  z-index: 2;
+  pointer-events: none;
+  transition: background 0.2s, border 0.13s;
+}
+
+.bat-zone-highlight {
+  background: #fff477;
+  padding: 0.1em 0.4em;
+  border-radius: 0.3em;
+  color: #333;
+  font-weight: bold;
+}
+
+.bat {
+  position: absolute;
+  z-index: 5;
+  transition: transform 0.12s cubic-bezier(.42,2,.58,1), filter 0.08s;
+  filter: drop-shadow(0 1px 4px #2229);
+}
+.bat.swinging {
+  transform: rotate(-32deg) scale(1.02) translateY(-1vw);
+  filter: drop-shadow(0 1px 12px #ffe44c7a);
+}
+
+.ball {
+  position: absolute;
+  z-index: 10;
+  transition: box-shadow 0.1s;
+  /* Ball shadow for realism */
+  filter: drop-shadow(0 3px 7px #0005);
+}
+
+.swing-btn, .start-btn {
+  display: inline-block;
+  margin: 1.1em auto 0 auto;
+  padding: 1em 2.3em;
+  font-size: 1.45em;
+  background: linear-gradient(90deg, #ffd700 65%, #ff9900 100%);
+  color: #333;
+  font-weight: bold;
+  border: none;
+  border-radius: 1.7em;
+  box-shadow: 0 3px 18px #0002;
+  cursor: pointer;
+  transition: background 0.13s, transform 0.13s;
+  outline: none;
+  letter-spacing: 0.01em;
+}
+.swing-btn:active, .start-btn:active {
+  background: linear-gradient(90deg, #ff9900 80%, #ffd700 100%);
+  transform: scale(0.97);
+}
+
+.instructions, .gameover {
+  padding: 1.9em 1.2em 2em 1.2em;
+  margin: 2em auto 2em auto;
+  max-width: 410px;
+  background: rgba(255,255,255,0.97);
+  border-radius: 1.6em;
+  box-shadow: 0 8px 30px #0001;
+  color: #222;
+  text-align: center;
+  font-size: 1.12em;
+}
+.instructions h1 {
+  margin-top: 0;
+  font-size: 2em;
+  color: #009688;
+  text-shadow: 1px 2px 0 #fff9;
+}
+.instructions ul {
+  padding-left: 0.5em;
+  margin: 1.3em auto 0.7em auto;
+  text-align: left;
+}
+.instructions li {
+  margin-bottom: 0.7em;
+  font-size: 1.07em;
+  line-height: 1.48em;
+}
+.footer-info {
+  text-align: center;
+  font-size: 1em;
+  color: #fff;
+  opacity: 0.67;
+  margin-bottom: 0.6em;
+  margin-top: 1em;
+  letter-spacing: 0.01em;
+}
+
+.gameover {
+  background: linear-gradient(180deg, #fffbe7 80%, #ffe6c1 100%);
+  color: #b12c2c;
+  font-weight: bold;
+  box-shadow: 0 6px 24px #0002;
+}
+.gameover h2 {
+  margin: 0 0 1.1em 0;
+  font-size: 2em;
+  color: #c62828;
+}
+.finalscore, .finalouts {
+  font-size: 1.4em;
+  margin: 0.45em 0 0.2em 0;
+  color: #222;
+}
+
+@media (max-width: 600px) {
+  .game-header { font-size: 1.13em; }
+  .pitch-area { min-height: 230px; }
+  .instructions, .gameover { font-size: 1em; padding: 1.1em 0.4em 1.7em 0.4em;}
+  .swing-btn, .start-btn { font-size: 1.09em; padding: 0.7em 1.2em;}
+}
+
+@media (max-width: 400px) {
+  .game-header { font-size: 1em; }
+  .pitch-area { min-height: 170px; }
 }
