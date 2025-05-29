@@ -38,3 +38,46 @@ If you aren’t satisfied with the build tool and configuration choices, you can
 Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
 You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+
+```
+
+---
+
+## ProjectService CRUD API
+
+This project includes a `ProjectService` class (in `src/ProjectService.ts`) providing asynchronous CRUD methods for managing "projects" in localStorage, simulating an API.
+
+### Project Type
+
+See `src/types.ts`:
+
+```ts
+export interface Project {
+  id: string;
+  name: string;
+  description: string;
+  createdAt: number;
+  updatedAt: number;
+}
+```
+
+### Methods
+
+- `ProjectService.getAll(): Promise<Project[]>` — Get all projects.
+- `ProjectService.getById(id: string): Promise<Project | null>` — Get a project by ID.
+- `ProjectService.create(data): Promise<Project>` — Create a project (data: `{ name, description }`).
+- `ProjectService.update(id, updates): Promise<Project | null>` — Update fields on a project.
+- `ProjectService.delete(id): Promise<boolean>` — Delete a project.
+- `ProjectService.clear(): Promise<void>` — Remove all projects (for testing/demo).
+
+All methods are asynchronous.
+
+### Testing
+
+Unit tests for ProjectService are in `src/ProjectService.test.ts` and can be run with:
+
+```bash
+npm test
+```
+
+---
