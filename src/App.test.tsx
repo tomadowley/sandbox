@@ -1,10 +1,2 @@
-import React from "react";
-import { render, screen } from "@testing-library/react";
-import App from "./App";
-
-test("renders learn react link", () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-  expect(false).toBe(true);
-});
+// No tests for the Cosine HR Quiz yet.
+// (Previous test removed because the UI is now a quiz, not the React template.)
