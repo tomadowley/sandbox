@@ -33,14 +33,26 @@ function App() {
   const numericSeed = getSeedNumber(seed);
   const rng = seededRNG(numericSeed);
 
-  // Decide dog vs human once per seed
-  const isDog = (() => {
-    // Use a separate rng so the face and name don't accidentally correlate with dog/human
-    const dogRng = seededRNG(numericSeed + 42);
-    return dogRng() < 0.1;
-  })();
+  // Special variant/dog/human selection logic
+  // r1: main variant selection
+  // r2: gaddafi/aladeen sub-variant
+  const r1 = rng();
+  let isDog = false;
+  let specialVariant: "gaddafi" | "aladeen" | undefined = undefined;
+  let name: string;
 
-  const name = getRandomName(rng);
+  if (r1 < 0.1) {
+    const subVariant = rng() < 0.5 ? "gaddafi" : "aladeen";
+    specialVariant = subVariant;
+    isDog = false;
+    name = subVariant === "gaddafi" ? "Muammar Gaddafi" : "Admiral General Aladeen";
+  } else if (r1 < 0.2) {
+    isDog = true;
+    name = getRandomName(rng);
+  } else {
+    isDog = false;
+    name = getRandomName(rng);
+  }
 
   const generate = React.useCallback(() => {
     setSeed(getRandomSeed());
@@ -49,7 +61,7 @@ function App() {
   return (
     <div className="FaceGeneratorApp">
       <div className="FaceCard">
-        <FaceCanvas seed={seed} isDog={isDog} />
+        <FaceCanvas seed={seed} isDog={isDog} specialVariant={specialVariant} />
         <div className="FaceName">{name}</div>
         <button
           className="GenerateButton"

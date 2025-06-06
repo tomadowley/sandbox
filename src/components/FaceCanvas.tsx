@@ -27,6 +27,7 @@ const EYE_COLORS = [
 type FaceCanvasProps = {
   seed: number | string;
   isDog?: boolean;
+  specialVariant?: "gaddafi" | "aladeen";
   className?: string;
 };
 
@@ -207,7 +208,7 @@ function drawDog(ctx: CanvasRenderingContext2D, rand: () => number) {
   }
 }
 
-export const FaceCanvas: React.FC<FaceCanvasProps> = ({ seed, isDog, className }) => {
+export const FaceCanvas: React.FC<FaceCanvasProps> = ({ seed, isDog, specialVariant, className }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -227,6 +228,14 @@ export const FaceCanvas: React.FC<FaceCanvasProps> = ({ seed, isDog, className }
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.clearRect(0, 0, 220, 220);
+
+    if (specialVariant === "gaddafi") {
+      drawGaddafi(ctx);
+      return;
+    } else if (specialVariant === "aladeen") {
+      drawAladeen(ctx);
+      return;
+    }
 
     if (isDog) {
       drawDog(ctx, rand);
@@ -518,16 +527,245 @@ export const FaceCanvas: React.FC<FaceCanvasProps> = ({ seed, isDog, className }
 
   }, [seed, isDog]);
 
+  // ARIA label logic
+  let ariaLabel = "Randomly generated face";
+  if (specialVariant === "gaddafi") {
+    ariaLabel = "Randomly generated Gaddafi";
+  } else if (specialVariant === "aladeen") {
+    ariaLabel = "Randomly generated Aladeen";
+  } else if (isDog) {
+    ariaLabel = "Randomly generated dog";
+  }
+
   return (
     <canvas
       ref={canvasRef}
       width={220}
       height={220}
       className={className ? "FaceCanvas " + className : "FaceCanvas"}
-      aria-label={isDog ? "Randomly generated dog" : "Randomly generated face"}
+      aria-label={ariaLabel}
       style={{ display: "block" }}
     />
   );
 };
+
+// --- Gaddafi and Aladeen Draw Functions ---
+
+function drawGaddafi(ctx: CanvasRenderingContext2D) {
+  // Head (brown/tan skin)
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(110, 120, 78, 92, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#d9aa87";
+  ctx.fill();
+  ctx.restore();
+
+  // Hair: thick curly dark halo
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(110, 82, 93, 58, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#2d1b10";
+  ctx.globalAlpha = 0.96;
+  ctx.shadowColor = "#000a";
+  ctx.shadowBlur = 6;
+  ctx.fill();
+  ctx.restore();
+
+  // Ears
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(34, 130, 15, 26, 0.1, 0, 2*Math.PI);
+  ctx.ellipse(186, 130, 15, 26, -0.1, 0, 2*Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#d9aa87";
+  ctx.globalAlpha = 0.93;
+  ctx.fill();
+  ctx.restore();
+
+  // Sunglasses: black rectangle across eyes
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(55, 98, 110, 34);
+  ctx.closePath();
+  ctx.fillStyle = "#181818";
+  ctx.globalAlpha = 0.89;
+  ctx.shadowColor = "#000b";
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.restore();
+
+  // Sunglasses reflection
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(65, 104, 25, 10);
+  ctx.rect(130, 104, 25, 10);
+  ctx.closePath();
+  ctx.fillStyle = "#fff";
+  ctx.globalAlpha = 0.13;
+  ctx.fill();
+  ctx.restore();
+
+  // Nose
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(110, 120);
+  ctx.lineTo(116, 155);
+  ctx.lineTo(104, 155);
+  ctx.closePath();
+  ctx.fillStyle = "#b47d56";
+  ctx.globalAlpha = 0.7;
+  ctx.fill();
+  ctx.restore();
+
+  // Thin moustache (under nose, above mouth)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(90, 170);
+  ctx.bezierCurveTo(110, 175, 110, 175, 130, 170);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = "#2d1b10";
+  ctx.globalAlpha = 0.98;
+  ctx.lineCap = "round";
+  ctx.stroke();
+  ctx.restore();
+
+  // Mouth (neutral)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(110, 185, 22, Math.PI*0.13, Math.PI*0.87, false);
+  ctx.lineWidth = 3.8;
+  ctx.strokeStyle = "#8b3f2f";
+  ctx.shadowColor = "#0003";
+  ctx.shadowBlur = 1.5;
+  ctx.stroke();
+  ctx.restore();
+}
+
+function drawAladeen(ctx: CanvasRenderingContext2D) {
+  // Head with dark olive skin
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(110, 120, 78, 92, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#d9aa87";
+  ctx.fill();
+  ctx.restore();
+
+  // Big beard (full, thick)
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(110, 185, 60, 38, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#2d1b10";
+  ctx.globalAlpha = 0.95;
+  ctx.shadowColor = "#000a";
+  ctx.shadowBlur = 3;
+  ctx.fill();
+  ctx.restore();
+
+  // Thick hair (top)
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(110, 64, 72, 38, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#2d1b10";
+  ctx.globalAlpha = 0.95;
+  ctx.shadowColor = "#000a";
+  ctx.shadowBlur = 5;
+  ctx.fill();
+  ctx.restore();
+
+  // Ears
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(34, 130, 15, 26, 0.1, 0, 2*Math.PI);
+  ctx.ellipse(186, 130, 15, 26, -0.1, 0, 2*Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#d9aa87";
+  ctx.globalAlpha = 0.93;
+  ctx.fill();
+  ctx.restore();
+
+  // Aviator sunglasses
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(77, 114, 28, 18, 0, 0, 2 * Math.PI);
+  ctx.ellipse(143, 114, 28, 18, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#222";
+  ctx.globalAlpha = 0.90;
+  ctx.shadowColor = "#000b";
+  ctx.shadowBlur = 8;
+  ctx.fill();
+  ctx.restore();
+
+  // Sunglasses reflection
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(77, 114, 13, 6, 0, 0, 2 * Math.PI);
+  ctx.ellipse(143, 114, 13, 6, 0, 0, 2 * Math.PI);
+  ctx.closePath();
+  ctx.fillStyle = "#fff";
+  ctx.globalAlpha = 0.15;
+  ctx.fill();
+  ctx.restore();
+
+  // Military hat: triangular green with orange star
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(73, 43);
+  ctx.lineTo(110, 10);
+  ctx.lineTo(147, 43);
+  ctx.closePath();
+  ctx.fillStyle = "#3e7e3a";
+  ctx.globalAlpha = 0.95;
+  ctx.shadowColor = "#0007";
+  ctx.shadowBlur = 4;
+  ctx.fill();
+  // Orange star
+  ctx.beginPath();
+  const starCenterX = 110, starCenterY = 29, starOuter = 9, starInner = 4;
+  for (let i = 0; i < 5; i++) {
+    const angle = Math.PI/2 + i*2*Math.PI/5;
+    const x = starCenterX + Math.cos(angle) * starOuter;
+    const y = starCenterY - Math.sin(angle) * starOuter;
+    ctx.lineTo(x, y);
+    const x2 = starCenterX + Math.cos(angle + Math.PI/5) * starInner;
+    const y2 = starCenterY - Math.sin(angle + Math.PI/5) * starInner;
+    ctx.lineTo(x2, y2);
+  }
+  ctx.closePath();
+  ctx.fillStyle = "#ff9800";
+  ctx.globalAlpha = 0.88;
+  ctx.shadowColor = "#0006";
+  ctx.shadowBlur = 2;
+  ctx.fill();
+  ctx.restore();
+
+  // Nose (triangle)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(110, 120);
+  ctx.lineTo(116, 155);
+  ctx.lineTo(104, 155);
+  ctx.closePath();
+  ctx.fillStyle = "#b47d56";
+  ctx.globalAlpha = 0.75;
+  ctx.fill();
+  ctx.restore();
+
+  // Mouth (neutral)
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(110, 185, 22, Math.PI*0.13, Math.PI*0.87, false);
+  ctx.lineWidth = 3.8;
+  ctx.strokeStyle = "#8b3f2f";
+  ctx.shadowColor = "#0003";
+  ctx.shadowBlur = 1.5;
+  ctx.stroke();
+  ctx.restore();
+}
 
 export default FaceCanvas;
