@@ -1,23 +1,27 @@
-const FIRST_NAMES = [
-  "James", "Mary", "John", "Patricia", "Robert", "Jennifer", "Michael", "Linda",
-  "William", "Elizabeth", "David", "Barbara", "Richard", "Susan", "Joseph", "Jessica",
-  "Thomas", "Sarah", "Charles", "Karen", "Christopher", "Nancy", "Daniel", "Lisa",
-  "Matthew", "Betty", "Anthony", "Margaret", "Mark", "Sandra", "Donald", "Ashley",
-  "Steven", "Kimberly", "Paul", "Emily", "Andrew", "Donna", "Joshua", "Michelle"
+const PREFIXES = [
+  "Captain", "Doctor", "Sir", "Lady", "Professor", "Chief", "Count", "Duchess", "Baron", "King", "Queen"
+];
+const ADJECTIVES = [
+  "Fuzzy", "Spicy", "Galactic", "Neon", "Turbo", "Cosmic", "Mystic", "Wacky", "Crimson", "Quantum", "Blazing", "Electric"
+];
+const NOUNS = [
+  "Sprocket", "Banana", "Stardust", "Raccoon", "Laser", "Thunder", "Pickle", "Dragon", "Marshmallow", "Cactus", "Noodle", "Pumpkin"
 ];
 
-const LAST_NAMES = [
-  "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis",
-  "Rodriguez", "Martinez", "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson",
-  "Thomas", "Taylor", "Moore", "Jackson", "Martin", "Lee", "Perez", "Thompson",
-  "White", "Harris", "Sanchez", "Clark", "Ramirez", "Lewis", "Robinson", "Walker",
-  "Young", "Allen", "King", "Wright", "Scott", "Torres", "Nguyen", "Hill"
-];
-
-export function getRandomName(rng?: () => number): string {
-  // Allows injecting a seeded random generator for reproducibility
-  const rand = rng ?? Math.random;
-  const first = FIRST_NAMES[Math.floor(rand() * FIRST_NAMES.length)];
-  const last = LAST_NAMES[Math.floor(rand() * LAST_NAMES.length)];
-  return `${first} ${last}`;
+/**
+ * Generates a crazy random name using injected RNG.
+ * @param rng - A seeded random number generator function.
+ */
+export function getRandomName(rng: () => number): string {
+  const prefix = PREFIXES[Math.floor(rng() * PREFIXES.length)];
+  const adj = ADJECTIVES[Math.floor(rng() * ADJECTIVES.length)];
+  const noun = NOUNS[Math.floor(rng() * NOUNS.length)];
+  const roll = rng();
+  if (roll < 0.33) {
+    return `${prefix} ${noun}`;
+  } else if (roll < 0.66) {
+    return `${adj} ${noun}`;
+  } else {
+    return `${prefix} ${adj} ${noun}`;
+  }
 }

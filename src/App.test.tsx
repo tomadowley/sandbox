@@ -7,7 +7,9 @@ test("renders App without crashing", () => {
   // Ensure the main button is present
   const button = screen.getByRole('button', { name: /generate random face/i });
   expect(button).toBeInTheDocument();
-  // Ensure a canvas is present for the face
-  const canvas = screen.getByLabelText(/randomly generated face/i);
+  // Ensure a canvas is present for the face or dog
+  const canvas =
+    screen.queryByLabelText(/randomly generated face/i) ||
+    screen.queryByLabelText(/randomly generated dog/i);
   expect(canvas).toBeInTheDocument();
 });
