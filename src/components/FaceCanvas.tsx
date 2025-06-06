@@ -393,12 +393,13 @@ export const FaceCanvas: React.FC<FaceCanvasProps> = ({ seed, isDog, className }
         ctx.save();
         ctx.beginPath();
         const browY = eyeY - 17 - arch*6;
+        const thickNum = Number(thick);
         if (arch < 0.5) {
           // Gentle arch
-          ctx.ellipse(eyeX, browY, 16, 3 + thick*2, 0.13 + (i ? -0.13 : 0.13), Math.PI*0.18, Math.PI*0.82);
+          ctx.ellipse(eyeX, browY, 16, 3 + thickNum*2, 0.13 + (i ? -0.13 : 0.13), Math.PI*0.18, Math.PI*0.82);
         } else {
           // Steep arch
-          ctx.ellipse(eyeX, browY, 13, 4 + thick*3, 0.23 + (i ? -0.16 : 0.16), Math.PI*0.06, Math.PI*0.94);
+          ctx.ellipse(eyeX, browY, 13, 4 + thickNum*3, 0.23 + (i ? -0.16 : 0.16), Math.PI*0.06, Math.PI*0.94);
         }
         ctx.lineWidth = thick ? 5 : 3;
         ctx.strokeStyle = hairColor;
