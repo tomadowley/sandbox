@@ -1,65 +1,40 @@
-import React from 'react';
-import './App.css';
+import React from "react";
+import "./App.css";
+import FaceCanvas from "./components/FaceCanvas";
+import { getRandomName } from "./utils/nameGenerator";
 
-const PLACEHOLDER =
-  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300"><circle cx="150" cy="150" r="140" fill="%23ccc"/><ellipse cx="150" cy="180" rx="80" ry="100" fill="%23eee"/><ellipse cx="150" cy="140" rx="55" ry="60" fill="%23ddd"/><circle cx="120" cy="130" r="15" fill="%23bbb"/><circle cx="180" cy="130" r="15" fill="%23bbb"/><ellipse cx="150" cy="200" rx="30" ry="15" fill="%23bbb"/></svg>';
+function getRandomSeed(): number {
+  // Use a large random int for seed
+  return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
+}
 
 function App() {
-  const [imageUrl, setImageUrl] = React.useState<string | undefined>(undefined);
-  const [loading, setLoading] = React.useState<boolean>(false);
+  const [seed, setSeed] = React.useState<number>(() => getRandomSeed());
+  const [name, setName] = React.useState<string>(() => getRandomName(() => Math.abs(Math.sin(seed)) % 1));
 
-  const fetchRandomFace = React.useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('https://randomuser.me/api/?inc=picture');
-      if (!response.ok) throw new Error('Network error');
-      const data = await response.json();
-      const url = data?.results?.[0]?.picture?.large;
-      if (url) {
-        setImageUrl(url);
-        setLoading(false);
-        return;
-      }
-      throw new Error('No image URL');
-    } catch (err) {
-      // Retry once
-      try {
-        const response = await fetch('https://randomuser.me/api/?inc=picture');
-        if (!response.ok) throw new Error('Network error');
-        const data = await response.json();
-        const url = data?.results?.[0]?.picture?.large;
-        if (url) {
-          setImageUrl(url);
-          setLoading(false);
-          return;
-        }
-        throw new Error('No image URL');
-      } catch (finalErr) {
-        setLoading(false);
-        window.alert('Failed to fetch random face. Please try again later.');
-      }
-    }
+  const generate = React.useCallback(() => {
+    const newSeed = getRandomSeed();
+    setSeed(newSeed);
+    // Use a deterministic RNG for name, so name matches face
+    setName(getRandomName(() => Math.abs(Math.sin(newSeed)) % 1));
   }, []);
 
+  // Generate on mount
   React.useEffect(() => {
-    fetchRandomFace();
-  }, [fetchRandomFace]);
+    generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="FaceGeneratorApp">
       <div className="FaceCard">
-        <img
-          src={loading || !imageUrl ? PLACEHOLDER : imageUrl}
-          alt={loading ? "Loading..." : "Random face"}
-          className="FaceImage"
-          style={{ opacity: loading ? 0.5 : 1 }}
-        />
+        <FaceCanvas seed={seed} />
+        <div className="FaceName">{name}</div>
         <button
           className="GenerateButton"
-          onClick={fetchRandomFace}
-          disabled={loading}
+          onClick={generate}
         >
-          {loading ? "Loading..." : "Generate Random Face"}
+          Generate Random Face
         </button>
       </div>
     </div>
