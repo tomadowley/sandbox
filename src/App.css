@@ -2,37 +2,80 @@
   text-align: center;
 }
 
+/* Add a neon glow to the logo and spin it faster for more energy */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  filter: drop-shadow(0 0 40px #39ff14) drop-shadow(0 0 80px #ff00cc);
+  animation: App-logo-spin 4s linear infinite, disco-glow 2s alternate infinite;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: App-logo-spin 4s linear infinite, disco-glow 2s alternate infinite;
   }
 }
 
+/* 80s neon animated gradient + disco lights */
 .App-header {
-  background-color: #282c34;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #fff;
+  /* Animated gradient background */
+  background: linear-gradient(-45deg, #ff00cc, #3333ff, #39ff14, #ffe600, #ff00cc, #ff0080, #00fff7);
+  background-size: 400% 400%;
+  animation: raveGradient 12s ease-in-out infinite;
+  box-shadow: 0 0 80px 10px #ff00cc44 inset;
 }
 
+/* Glowing, animated link */
 .App-link {
-  color: #61dafb;
+  color: #ffe600;
+  font-weight: bold;
+  text-shadow: 0 0 8px #ff00cc, 0 0 32px #39ff14;
+  transition: color 0.2s, text-shadow 0.2s;
+  animation: linkGlow 2s alternate infinite;
+}
+.App-link:hover {
+  color: #00fff7;
+  text-shadow: 0 0 20px #00fff7, 0 0 60px #ff00cc;
+}
+
+/* Keyframes for disco effect */
+@keyframes raveGradient {
+  0% {background-position: 0% 50%;}
+  25% {background-position: 100% 50%;}
+  50% {background-position: 100% 0%;}
+  75% {background-position: 0% 100%;}
+  100% {background-position: 0% 50%;}
 }
 
 @keyframes App-logo-spin {
+  from { transform: rotate(0deg);}
+  to { transform: rotate(360deg);}
+}
+
+@keyframes disco-glow {
+  0% {
+    filter: drop-shadow(0 0 10px #ff00cc) drop-shadow(0 0 5px #39ff14);
+  }
+  50% {
+    filter: drop-shadow(0 0 40px #00fff7) drop-shadow(0 0 20px #ffe600);
+  }
+  100% {
+    filter: drop-shadow(0 0 80px #ff00cc) drop-shadow(0 0 40px #39ff14);
+  }
+}
+
+@keyframes linkGlow {
   from {
-    transform: rotate(0deg);
+    text-shadow: 0 0 8px #ff00cc, 0 0 32px #39ff14;
   }
   to {
-    transform: rotate(360deg);
+    text-shadow: 0 0 24px #ffe600, 0 0 64px #00fff7;
   }
 }

@@ -1,13 +1,31 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  /* Funky 80s font stack */
+  font-family: 'Orbitron', 'Permanent Marker', 'Press Start 2P', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  background: linear-gradient(120deg, #ff00cc 10%, #3333ff 40%, #39ff14 80%, #ffe600 100%);
+  background-size: 300% 300%;
+  animation: bodyDisco 10s ease-in-out infinite;
+  color: #fff;
+  min-height: 100vh;
+  /* Add glow to everything */
+  text-shadow: 0 0 8px #ff00cc, 0 0 20px #39ff14;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+@keyframes bodyDisco {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+  font-family: 'Press Start 2P', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+  color: #ffe600;
+  background: #222;
+  padding: 2px 6px;
+  border-radius: 4px;
+  box-shadow: 0 0 12px #ff00cc, 0 0 40px #39ff14;
 }
