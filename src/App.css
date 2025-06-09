@@ -5,27 +5,51 @@
 .App-logo {
   height: 40vmin;
   pointer-events: none;
+  /* Add a pulsing + spinning effect for maximum rave */
+  animation: App-logo-spin 6s linear infinite, App-logo-pulse 1.2s infinite;
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+    animation: App-logo-spin 6s linear infinite, App-logo-pulse 1.2s infinite;
   }
 }
 
 .App-header {
-  background-color: #282c34;
+  /* Animated disco gradient background */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   font-size: calc(10px + 2vmin);
-  color: white;
+  color: #fff;
+  background: linear-gradient(270deg, #ff00cc, #3333ff, #00ff99, #fffb00, #ff00cc);
+  background-size: 1200% 1200%;
+  animation: disco-background 8s linear infinite;
+  box-shadow: 0 0 40px 10px #fff7, 0 0 80px 20px #ff00cc55;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Flashy animated text */
+.rave-text {
+  font-weight: bold;
+  font-size: 2.4rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  animation: rave-text-colors 1s infinite linear;
+  filter: drop-shadow(0 0 10px #fff) drop-shadow(0 0 20px #ff00cc);
+}
+
+.rave-music-control {
+  margin-top: 1em;
+  z-index: 2;
 }
 
 .App-link {
   color: #61dafb;
+  animation: rave-link-glow 1.2s infinite alternate;
 }
 
 @keyframes App-logo-spin {
@@ -35,4 +59,31 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+@keyframes App-logo-pulse {
+  0%, 100% { filter: brightness(1) drop-shadow(0 0 20px #fff); transform: scale(1);}
+  50% { filter: brightness(2) drop-shadow(0 0 60px #ff00cc); transform: scale(1.15);}
+}
+
+@keyframes disco-background {
+  0% {background-position:0% 50%}
+  25% {background-position:100% 50%}
+  50% {background-position:100% 0%}
+  75% {background-position:0% 100%}
+  100% {background-position:0% 50%}
+}
+
+@keyframes rave-text-colors {
+  0% {color: #fff; text-shadow: 0 0 10px #ff00cc, 0 0 30px #00ff99;}
+  20% {color: #ff00cc; text-shadow: 0 0 10px #00ff99, 0 0 30px #fffb00;}
+  40% {color: #3333ff; text-shadow: 0 0 10px #fffb00, 0 0 30px #ff00cc;}
+  60% {color: #00ff99; text-shadow: 0 0 10px #ff00cc, 0 0 30px #3333ff;}
+  80% {color: #fffb00; text-shadow: 0 0 10px #3333ff, 0 0 30px #00ff99;}
+  100% {color: #fff; text-shadow: 0 0 10px #ff00cc, 0 0 30px #00ff99;}
+}
+
+@keyframes rave-link-glow {
+  0% {text-shadow: 0 0 10px #00ff99;}
+  100% {text-shadow: 0 0 30px #ff00cc;}
 }
