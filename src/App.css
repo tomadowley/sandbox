@@ -7,12 +7,6 @@
   pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -23,6 +17,85 @@
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
+.App-link {
+  color: #61dafb;
+}
+
+/* --- KEWL KONAMI CONFETTI --- */
+
+.confetti-container {
+  pointer-events: none;
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.confetti {
+  position: absolute;
+  top: -2rem;
+  width: 1rem;
+  height: 1.5rem;
+  opacity: 0.8;
+  border-radius: 0.2rem;
+  animation: confetti-fall 3s linear forwards;
+  /* Randomize left, color, and delay with nth-child */
+}
+
+.confetti-message {
+  position: fixed;
+  top: 35vh;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #fffbe9;
+  font-size: 2.5rem;
+  font-weight: bold;
+  text-shadow: 0 2px 8px #222, 0 0 1px #f9c;
+  animation: konfetti-fade 3s cubic-bezier(0.7,0.1,0.3,1);
+  pointer-events: none;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  letter-spacing: 0.08em;
+}
+
+@keyframes confetti-fall {
+  to {
+    transform: translateY(110vh) rotateZ(360deg);
+    opacity: 0.2;
+  }
+}
+@keyframes konfetti-fade {
+  0%   { opacity: 0;  transform: translateX(-50%) scale(0.9);}
+  10%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0;  transform: translateX(-50%) scale(1.11);}
+}
+
+.confetti:nth-child(1)  { left: 5vw;   background: #ff69b4; animation-delay: 0s;}
+.confetti:nth-child(2)  { left: 10vw;  background: #ffec65; animation-delay: .1s;}
+.confetti:nth-child(3)  { left: 15vw;  background: #61dafb; animation-delay: .05s;}
+.confetti:nth-child(4)  { left: 20vw;  background: #ffa500; animation-delay: .13s;}
+.confetti:nth-child(5)  { left: 25vw;  background: #ee82ee; animation-delay: .05s;}
+.confetti:nth-child(6)  { left: 30vw;  background: #00ff7f; animation-delay: .21s;}
+.confetti:nth-child(7)  { left: 35vw;  background: #00bfff; animation-delay: .12s;}
+.confetti:nth-child(8)  { left: 40vw;  background: #ff4500; animation-delay: .03s;}
+.confetti:nth-child(9)  { left: 45vw;  background: #c71585; animation-delay: .17s;}
+.confetti:nth-child(10) { left: 50vw;  background: #ffd700; animation-delay: .09s;}
+.confetti:nth-child(11) { left: 55vw;  background: #00fa9a; animation-delay: .22s;}
+.confetti:nth-child(12) { left: 60vw;  background: #40e0d0; animation-delay: .07s;}
+.confetti:nth-child(13) { left: 65vw;  background: #adff2f; animation-delay: .18s;}
+.confetti:nth-child(14) { left: 70vw;  background: #ffb6c1; animation-delay: .04s;}
+.confetti:nth-child(15) { left: 75vw;  background: #8a2be2; animation-delay: .19s;}
+.confetti:nth-child(16) { left: 80vw;  background: #ff6347; animation-delay: .15s;}
+.confetti:nth-child(17) { left: 85vw;  background: #4682b4; animation-delay: .11s;}
+.confetti:nth-child(18) { left: 90vw;  background: #e9967a; animation-delay: .01s;}
+.confetti:nth-child(19) { left: 95vw;  background: #f0e68c; animation-delay: .2s;}
+.confetti:nth-child(20) { left: 98vw;  background: #7fffd4; animation-delay: .08s;}
+/* Repeat for all 40 confetti (or let them randomize further if desired) */
+.confetti:nth-child(n+21) { left: calc(var(--n) * 4vw); background: #fffbe9; animation-delay: .2s;}
 
 .App-link {
   color: #61dafb;
