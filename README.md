@@ -1,5 +1,7 @@
 # Getting Started with Create React App
 
+*Wow, you're actually reading the README? Hoping to find some hidden wisdom, are we? 📚🤠*
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
