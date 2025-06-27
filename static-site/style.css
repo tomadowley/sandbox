@@ -82,18 +82,19 @@ a:hover, .cta-btn:hover {
   letter-spacing: -0.04em;
   margin: 0 0 1.2rem 0;
   line-height: 1.08;
-  text-shadow: 0 2px 18px rgba(34,27,58,0.22);
+  color: #fff;
+  text-shadow: 0 3px 8px rgba(0,0,0,0.55);
 }
-.gradient-text {
+/* .gradient-text {
   background: var(--gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-}
+} */
 .subtitle {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 400;
   margin-bottom: 2.5rem;
-  color: #f7e2f2;
+  color: rgba(255,255,255,0.9);
   text-shadow: 0 2px 12px rgba(62, 13, 74, 0.25);
 }
 .cta-btn {
