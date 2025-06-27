@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sexy Static Site</title>
+  <!-- Google Fonts: Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Parallax Hero Section -->
+  <section class="hero" id="hero" aria-label="Hero Section">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-content">
+      <h1 class="headline">Welcome to Your Next-Level Web Presence</h1>
+      <p class="subtitle">Stunning, modern, and ultra-fast static site – make your brand unforgettable.</p>
+      <a href="#contact" class="cta-btn" aria-label="Contact Us">Contact Us</a>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features" aria-label="Features">
+    <h2 class="section-title">Features</h2>
+    <div class="features-grid">
+      <div class="feature-card glass" tabindex="0" aria-label="Lightning Fast">
+        <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+        <h3>Lightning Fast</h3>
+        <p>Blazing performance – instant loading and seamless experience.</p>
+      </div>
+      <div class="feature-card glass" tabindex="0" aria-label="Responsive Design">
+        <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+        <h3>Responsive</h3>
+        <p>Perfectly adapts to every device, from phones to desktops.</p>
+      </div>
+      <div class="feature-card glass" tabindex="0" aria-label="Beautiful Effects">
+        <div class="feature-icon"><i class="fas fa-magic"></i></div>
+        <h3>Beautiful Effects</h3>
+        <p>Modern gradients, glassmorphism, and subtle animations everywhere.</p>
+      </div>
+      <div class="feature-card glass" tabindex="0" aria-label="Accessible">
+        <div class="feature-icon"><i class="fas fa-universal-access"></i></div>
+        <h3>Accessible</h3>
+        <p>Keyboard navigation &amp; ARIA labels for an inclusive experience.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase Gallery Section -->
+  <section class="showcase" id="showcase" aria-label="Showcase Gallery">
+    <h2 class="section-title">Gallery</h2>
+    <div class="gallery">
+      <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&amp;fit=crop&amp;w=600&amp;q=80"
+           data-hires="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"
+           alt="Mountain lake" class="gallery-img" tabindex="0">
+      <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&amp;fit=crop&amp;w=600&amp;q=80"
+           data-hires="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"
+           alt="Forest path" class="gallery-img" tabindex="0">
+      <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&amp;fit=crop&amp;w=600&amp;q=80"
+           data-hires="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&amp;fit=crop&amp;w=1200&amp;q=80"
+           alt="Desert dunes" class="gallery-img" tabindex="0">
+    </div>
+    <!-- Modal for lightbox -->
+    <div class="modal" id="lightbox" aria-modal="true" aria-label="Image lightbox" tabindex="-1">
+      <div class="modal-content">
+        <button class="modal-close" id="lightbox-close" aria-label="Close gallery modal"><i class="fas fa-times"></i></button>
+        <img src="" alt="" id="modal-img">
+      </div>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section class="about" id="about" aria-label="About">
+    <h2 class="section-title">About</h2>
+    <p>
+      We craft visually stunning, high-performance static sites with thoughtful design, accessibility, and a sprinkle of magic. Built for brands who want to stand out and grow.
+    </p>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact" id="contact" aria-label="Contact">
+    <h2 class="section-title">Contact</h2>
+    <form id="contact-form" autocomplete="off" novalidate>
+      <div class="form-group">
+        <label for="name">Name<span aria-hidden="true">*</span></label>
+        <input type="text" id="name" name="name" aria-required="true" required>
+        <span class="error" id="name-error"></span>
+      </div>
+      <div class="form-group">
+        <label for="email">Email<span aria-hidden="true">*</span></label>
+        <input type="email" id="email" name="email" aria-required="true" required>
+        <span class="error" id="email-error"></span>
+      </div>
+      <div class="form-group">
+        <label for="message">Message<span aria-hidden="true">*</span></label>
+        <textarea id="message" name="message" rows="4" aria-required="true" required></textarea>
+        <span class="error" id="message-error"></span>
+      </div>
+      <button type="submit" class="submit-btn">Send Message</button>
+    </form>
+    <div class="thanks-modal" id="thanks-modal" aria-modal="true" role="dialog" tabindex="-1">
+      <div class="thanks-card glass">
+        <p>Thank you! We'll be in touch soon. 🚀</p>
+        <button id="thanks-close" aria-label="Close thank you message">Close</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-social">
+      <a href="https://twitter.com/" aria-label="Twitter" target="_blank"><i class="fab fa-twitter"></i></a>
+      <a href="https://facebook.com/" aria-label="Facebook" target="_blank"><i class="fab fa-facebook"></i></a>
+      <a href="https://instagram.com/" aria-label="Instagram" target="_blank"><i class="fab fa-instagram"></i></a>
+      <a href="https://github.com/" aria-label="GitHub" target="_blank"><i class="fab fa-github"></i></a>
+    </div>
+    <div class="footer-copy">
+      &copy; <span id="year"></span> Sexy Static Site. All rights reserved.
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
