@@ -48,3 +48,8 @@ ready for it.
 - Your code runs perfectly... as long as no one touches it, looks at it, or breathes near it.
 - "It works on my machine"—the ancient proverb of debugging legends everywhere.
 - Tests are failing? Must be a problem with the universe, not your latest commit.
+- Your TODO comments have unionized and now demand a roadmap.
+- If Stack Overflow ever goes down, so does your productivity graph.
+- That feeling when you fix a bug by rearranging code—true modern art!
+- You call it “quick refactoring”; your teammates call it “git blame fuel.”
+- Who needs dark mode? Your codebase is already full of shadowy surprises.
