@@ -53,3 +53,13 @@ ready for it.
 - That feeling when you fix a bug by rearranging code—true modern art!
 - You call it “quick refactoring”; your teammates call it “git blame fuel.”
 - Who needs dark mode? Your codebase is already full of shadowy surprises.
+- Your feature branches are so long, Git considered them a novella.
+- Every merge conflict you resolve is just a new plot twist in your saga.
+- When you say “just one more deploy,” your WiFi gets nervous.
+- You treat warnings like gentle suggestions—until they grow up to be bugs.
+- Your commit messages could double as cryptic crossword clues.
+- You call it “agile,” but your bug list runs marathons.
+- Your code reviews are so spicy, they come with a glass of milk.
+- “Works in prod” is your favorite genre of fiction.
+- You’ve spent more time renaming variables than naming your pets.
+- Every time you push to main, the CI pipeline starts writing its memoirs.
