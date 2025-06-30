@@ -53,3 +53,13 @@ ready for it.
 - That feeling when you fix a bug by rearranging code—true modern art!
 - You call it “quick refactoring”; your teammates call it “git blame fuel.”
 - Who needs dark mode? Your codebase is already full of shadowy surprises.
+- You thought `console.log` was temporary, but it's now your app’s main historian.
+- Your “one-liner” functions really push the limits of vertical scrolling.
+- Every merge conflict is just your code’s way of saying, “Notice me, senpai!”
+- Your CSS “fixes” are a masterclass in hide-and-seek for page elements.
+- You write comments like you’re leaving riddles for future generations.
+- Your “final_final” branch count is approaching Fibonacci numbers.
+- Every deployment is a mystery thriller: will it crash or just embarrass you?
+- You treat warnings like gentle suggestions, not flashing neon signs.
+- The only thing more recursive than your functions is your Google searches.
+- Your local repo is a safe haven for abandoned experiments and half-baked dreams.
