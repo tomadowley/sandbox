@@ -63,3 +63,5 @@ ready for it.
 - “Works in prod” is your favorite genre of fiction.
 - You’ve spent more time renaming variables than naming your pets.
 - Every time you push to main, the CI pipeline starts writing its memoirs.
+- You’ve mastered copy-paste so well, your mouse applied for overtime pay.
+- Your linter’s greatest wish? A long, peaceful vacation—far from your code.
