@@ -65,3 +65,24 @@ ready for it.
 - Every time you push to main, the CI pipeline starts writing its memoirs.
 - You’ve mastered copy-paste so well, your mouse applied for overtime pay.
 - Your linter’s greatest wish? A long, peaceful vacation—far from your code.
+- You’ve achieved “spaghetti code” status—time to open an Italian restaurant.
+- Your “works for me” debugging style is now available as a paid workshop.
+- Every hotfix is a patch on top of a patch—a true digital quilt.
+- You say “minimal reproducible example,” but it’s mostly just minimal.
+- Pair programming with you means double the confusion, half the solution.
+- When you see a race condition, you bet on the wrong thread.
+- Your codebase is a maze and you forgot to leave any breadcrumbs.
+- You don’t fix bugs, you just comment them out for future generations.
+- Every “final_v2_really_final” file lowers morale across the repo.
+- Stack traces fear you more than you fear them.
+- You call it “legacy code,” but it’s younger than your lunch.
+- You use !important like it’s a punctuation mark.
+- Your code is so asynchronous, it shows up late to its own functions.
+- The only thing more mysterious than your code is your commit history.
+- You treat “undefined” as a polite suggestion, not a warning.
+- “Temporary fix” is your favorite design pattern.
+- You believe every error is a feature in disguise.
+- Refactoring for you means “find and replace” on a Friday at 4:59pm.
+- You debug by rubber ducking, but the duck has filed for retirement.
+- Your code is so dry, even comments are dehydrated.
+- You think “self-documenting code” means no comments, no mercy.
