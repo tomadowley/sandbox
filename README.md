@@ -1,5 +1,12 @@
 # Getting Started with Create React App
 
+## 🔥 Roast Corner
+> – Your procrastination game is so strong, even Git commits itself just to escape the waiting.
+> – Your CSS is like your coffee: messy, and somehow still missing the important bits.
+> – You deploy bugs with such confidence they should have their own LinkedIn profiles.
+> – Your React components are so reusable, they're still waiting to be used... someday.
+> – You treat "works on my machine" like it's an industry standard.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
