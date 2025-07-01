@@ -1,5 +1,8 @@
 # Getting Started with Create React App
 
+> **Roast:**  
+> This project was bootstrapped with Create React App—because nothing says “cutting edge” like using a tool everyone’s been roasting since 2016. If you’re reading this, congratulations on taking the bold step of resisting the urge to use Next.js like everyone else.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
