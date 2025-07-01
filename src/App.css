@@ -1,38 +1,163 @@
-.App {
-  text-align: center;
+/* FunSite Animated Gradient Background */
+body, #root {
+  min-height: 100vh;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.funsite-bg {
+  min-height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: -1;
+  animation: gradientmove 10s ease-in-out infinite alternate;
+  background: linear-gradient(120deg, #ff6ec7, #00c9ff, #f9d423, #00ffb3, #f35588);
+  background-size: 400% 400%;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+@keyframes gradientmove {
+  0% {
+    background-position: 0 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
   }
 }
 
-.App-header {
-  background-color: #282c34;
+.main-content-container {
+  position: relative;
   min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  z-index: 1;
+  padding: 2rem 1rem;
 }
 
-.App-link {
-  color: #61dafb;
+h1, h2 {
+  font-family: 'Fredoka', sans-serif;
+  margin: 0;
+  text-align: center;
+  letter-spacing: -1px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #ff6ec7;
+  text-shadow: 0 4px 24px #00c9ff88, 0 2px 0 #fff;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  color: #00c9ff;
+  margin-bottom: 2rem;
+}
+
+.theme-toggle-btn {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: #fff;
+  color: #ff6ec7;
+  border: none;
+  border-radius: 999px;
+  padding: 0.7em 1.2em;
+  font-size: 1rem;
+  font-family: 'Fredoka', sans-serif;
+  box-shadow: 0 2px 16px #00c9ff33;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(.42,0,.58,1), box-shadow 0.15s;
+}
+.theme-toggle-btn:hover {
+  transform: scale(1.07) rotate(-3deg);
+  background: #ff6ec7;
+  color: #fff;
+  box-shadow: 0 4px 24px #ff6ec7aa;
+}
+
+.fun-btn {
+  margin-top: 1.8rem;
+  background: linear-gradient(90deg, #ff6ec7, #00c9ff);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 700;
+  font-size: 1.25rem;
+  padding: 1em 2.5em;
+  box-shadow: 0 4px 24px #00c9ff55, 0 2px 0 #fff;
+  cursor: pointer;
+  transition: transform 0.15s cubic-bezier(.42,0,.58,1), box-shadow 0.15s;
+}
+.fun-btn:hover {
+  transform: scale(1.10) rotate(2deg);
+  box-shadow: 0 6px 32px #ff6ec755, 0 2px 0 #fff;
+}
+
+.joke-section {
+  margin-top: 2.5rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.joke-btn {
+  background: linear-gradient(90deg, #00c9ff, #f9d423);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.8em 1.8em;
+  box-shadow: 0 2px 16px #00c9ff44;
+  cursor: pointer;
+  transition: transform 0.13s cubic-bezier(.42,0,.58,1), box-shadow 0.13s;
+  margin-bottom: 1.2rem;
+}
+.joke-btn:hover {
+  transform: scale(1.07) rotate(-2deg);
+  background: linear-gradient(90deg, #f35588, #ff6ec7);
+  color: #fff;
+  box-shadow: 0 4px 24px #ff6ec7aa;
+}
+
+/* Joke Card Styles */
+.joke-card {
+  background: linear-gradient(120deg, #fff4fa, #e5fafd, #fef6e0);
+  border-radius: 1.5rem;
+  box-shadow: 0 6px 36px #ff6ec722, 0 2px 0 #fff;
+  padding: 2.2rem 1.5rem 1.6rem 1.5rem;
+  max-width: 350px;
+  margin: 0 auto;
+  text-align: center;
+  color: #46255c;
+  font-size: 1.22rem;
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+  margin-bottom: 0.8rem;
+  position: relative;
+  border: 2px solid #ff6ec733;
+}
+
+@media (max-width: 600px) {
+  .main-content-container {
+    max-width: 95vw;
+    padding: 1.5rem 0.2rem;
   }
-  to {
-    transform: rotate(360deg);
-  }
+  .joke-card { font-size: 1rem; padding: 1rem 0.5rem 1rem 0.5rem; }
+  .theme-toggle-btn { top: 0.6rem; right: 0.7rem; font-size: 0.9rem; padding: 0.5em 1em; }
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff6ec7;
+  border-radius: 999px;
 }
