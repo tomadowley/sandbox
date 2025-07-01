@@ -3,7 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import "./App.css";
 import ConfettiWrapper from "./components/ConfettiWrapper";
 import JokeCard, { Joke } from "./components/JokeCard";
-import axios from "axios";
+// @ts-ignore
+const axios = require("axios");
 
 // Gradient theme sets for cycling
 const gradientThemes = [
