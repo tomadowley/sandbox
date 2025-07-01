@@ -1,5 +1,22 @@
 # Getting Started with Create React App
 
+## 🔥 Roast Corner
+
+> – Debugging your code is like a box of chocolates: you never know what you're gonna git.
+> – Your code's so 'agile', it sprints in circles.
+> – You call it a feature, users call it a scavenger hunt.
+> – Your stack traces have more drama than a soap opera.
+> – If copy-paste was an Olympic sport, you'd be on the podium.
+> – Your backlog is so bloated, even Jira asked for a diet plan.
+> – Your test coverage is like a summer tan—patchy and full of false confidence.
+> – You refactor like you clean your room: just shuffle the mess into different corners.
+> – Your procrastination game is so strong, even Git commits itself just to escape the waiting.
+> – Your CSS is like your coffee: messy, and somehow still missing the important bits.
+> – You deploy bugs with such confidence they should have their own LinkedIn profiles.
+> – Your React components are so reusable, they're still waiting to be used... someday.
+> – You treat "works on my machine" like it's an industry standard.
+> – Your code reviews are so slow, even Bitbucket sends a wellness check.
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
