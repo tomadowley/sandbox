@@ -3,8 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import "./App.css";
 import ConfettiWrapper from "./components/ConfettiWrapper";
 import JokeCard, { Joke } from "./components/JokeCard";
-// @ts-ignore
-const axios = require("axios");
+import axios from "axios";
 
 // Gradient theme sets for cycling
 const gradientThemes = [
@@ -40,10 +39,10 @@ function App() {
     setJokeLoading(true);
     setJoke(null);
     try {
-      const response = await axios.get<Joke>(
+      const response = await axios.get(
         "https://official-joke-api.appspot.com/random_joke"
       );
-      setJoke(response.data);
+      setJoke(response.data as Joke);
     } catch {
       setJoke({
         id: -1,
