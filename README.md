@@ -15,6 +15,7 @@
 > – You deploy bugs with such confidence they should have their own LinkedIn profiles.
 > – Your React components are so reusable, they're still waiting to be used... someday.
 > – You treat "works on my machine" like it's an industry standard.
+> – Your code reviews are so slow, even Bitbucket sends a wellness check.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
