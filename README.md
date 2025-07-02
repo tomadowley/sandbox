@@ -63,3 +63,13 @@ ready for it.
 - You treat warnings like gentle suggestions, not flashing neon signs.
 - The only thing more recursive than your functions is your Google searches.
 - Your local repo is a safe haven for abandoned experiments and half-baked dreams.
+- You debug for hours, then fix it by just closing and reopening your IDE.
+- Your “temporary” hacks have longer tenures than most CTOs.
+- You comment out code like you’re creating modern cave paintings.
+- You run `npm audit` for the thrill, not for the actual fixes.
+- When in doubt, you add another dependency and hope for the best.
+- Your `package.json` is a museum of libraries past and present.
+- You name variables like you’re encrypting secret messages for yourself.
+- You push straight to main because “YOLO” is a valid workflow, right?
+- Your “quick fixes” have a habit of sticking around for several sprints.
+- Your linter just gave up and started sending you inspirational quotes instead.
