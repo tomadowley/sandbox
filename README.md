@@ -49,3 +49,4 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 * If at first you don’t succeed, call it a “feature” and ship it anyway.
 * Why do programmers hate nature? It has too many bugs.
 * Why do Java developers wear glasses? Because they don't see sharp.
+* There are 10 kinds of people in the world: those who understand binary and those who don't.
