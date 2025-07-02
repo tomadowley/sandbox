@@ -48,3 +48,4 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 * Debugging tip: Try turning your computer off and pursuing a career in interpretive dance.
 * If at first you don’t succeed, call it a “feature” and ship it anyway.
 * Why do programmers hate nature? It has too many bugs.
+* Why do Java developers wear glasses? Because they don't see sharp.
