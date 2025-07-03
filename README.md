@@ -11,6 +11,7 @@
 * Welcome to programming: where the road to hell is paved with merge conflicts.
 * Why did the developer go broke? Because he used up all his cache.
 * Why do programmers prefer dark mode? Because light attracts bugs.
+* Why do Python programmers have low self-esteem? Because they're constantly comparing their self to others.
 
 ---
 
