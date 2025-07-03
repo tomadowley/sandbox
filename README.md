@@ -10,6 +10,7 @@
 * To err is human— to really foul things up you need a regex.
 * Welcome to programming: where the road to hell is paved with merge conflicts.
 * Why did the developer go broke? Because he used up all his cache.
+* Why do programmers prefer dark mode? Because light attracts bugs.
 
 ---
 
