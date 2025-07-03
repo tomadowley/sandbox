@@ -22,3 +22,4 @@
 * Your idea of code review is checking if it compiles before merging.
 * You use TODO comments as a long-term storage solution.
 * You still debug with console.log, but call it “observability.”
+* You asked an AI to roast you—because even your imposter syndrome needed a second opinion.
