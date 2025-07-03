@@ -13,6 +13,7 @@
 * Why do programmers prefer dark mode? Because light attracts bugs.
 * Why do Python programmers have low self-esteem? Because they're constantly comparing their self to others.
 * Why did the computer show up at work late? It had a hard drive.
+* Debugging is like being the detective in a crime movie where you are also the murderer.
 
 ---
 
