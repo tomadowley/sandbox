@@ -9,6 +9,7 @@
 * There are 10 kinds of people in the world: those who understand binary and those who don't.
 * To err is human— to really foul things up you need a regex.
 * Welcome to programming: where the road to hell is paved with merge conflicts.
+* Why did the developer go broke? Because he used up all his cache.
 
 ---
 
