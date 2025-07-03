@@ -1,8 +1,9 @@
 ## 🥊 Roast Corner
 
-* Why do programmers prefer dark mode? Because light attracts bugs.
-* To understand recursion, you must first understand recursion.
-* There are only two hard things in computer science: cache invalidation, naming things, and off-by-one errors.
+* Why do Java developers wear glasses? Because they don't C#.
+* A SQL query walks into a bar, walks up to two tables and asks, "Can I join you?"
+* There are 10 types of people in the world: those who understand binary and those who don't.
+* Why do programmers hate nature? It has too many bugs.
 * Debugging is like being the detective in a crime movie where you are also the murderer.
 
 ---
