@@ -1,9 +1,18 @@
 ## 🥊 Roast Corner
 
-* Why do Java developers wear glasses? Because they don't C#.
-* A SQL query walks into a bar, walks up to two tables and asks, "Can I join you?"
-* There are 10 types of people in the world: those who understand binary and those who don't.
+* You tried to `npm install` confidence, but the package was deprecated years ago.
+* Your code runs perfectly... right after you comment out half of it.
+* Debugging tip: Try turning your computer off and pursuing a career in interpretive dance.
+* If at first you don’t succeed, call it a “feature” and ship it anyway.
 * Why do programmers hate nature? It has too many bugs.
+* Why do Java developers wear glasses? Because they don't see sharp.
+* There are 10 kinds of people in the world: those who understand binary and those who don't.
+* To err is human— to really foul things up you need a regex.
+* Welcome to programming: where the road to hell is paved with merge conflicts.
+* Why did the developer go broke? Because he used up all his cache.
+* Why do programmers prefer dark mode? Because light attracts bugs.
+* Why do Python programmers have low self-esteem? Because they're constantly comparing their self to others.
+* Why did the computer show up at work late? It had a hard drive.
 * Debugging is like being the detective in a crime movie where you are also the murderer.
 
 ---
