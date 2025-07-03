@@ -12,6 +12,7 @@
 * Why did the developer go broke? Because he used up all his cache.
 * Why do programmers prefer dark mode? Because light attracts bugs.
 * Why do Python programmers have low self-esteem? Because they're constantly comparing their self to others.
+* Why did the computer show up at work late? It had a hard drive.
 
 ---
 
