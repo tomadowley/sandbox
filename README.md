@@ -13,6 +13,7 @@
 * Why do programmers prefer dark mode? Because light attracts bugs.
 * Why do Python programmers have low self-esteem? Because they're constantly comparing their self to others.
 * Why did the computer show up at work late? It had a hard drive.
+* Why do programmers always mix up Christmas and Halloween? Because Oct 31 == Dec 25.
 
 ---
 
