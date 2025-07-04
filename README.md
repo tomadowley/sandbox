@@ -26,3 +26,4 @@
 * You use TODO comments as a long-term storage solution.
 * You still debug with console.log, but call it “observability.”
 * You asked an AI to roast you—because even your imposter syndrome needed a second opinion.
+* Your README has more jokes than your test suite has assertions. Priorities, am I right?
