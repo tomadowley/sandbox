@@ -1,3 +1,17 @@
+## 🔥 Extra Spicy Roast Just for You
+
+* Your Git history is the only thriller you’ll ever write—full of suspense, horror, and unexplained disappearances.
+* If procrastination was a design pattern, you’d be the lead maintainer.
+* Your code is so "agile," it pivots straight into technical debt.
+* You use more “fix” commits than actual fixes.
+* Your rubber duck quit—said it couldn’t handle the emotional labor.
+* Your code reviews are like Schrödinger’s cat: nobody knows if the bugs are alive until prod.
+* You think “unit test” is an optional paid DLC.
+* You refactor by renaming variables from `foo` to `foo1`.
+* Your main branch is like your hopes and dreams: broken, but you keep pushing anyway.
+
+---
+
 ## 🥊 Roast Corner
 
 * You tried to `npm install` confidence, but the package was deprecated years ago.
