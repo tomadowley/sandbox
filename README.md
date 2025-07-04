@@ -26,3 +26,8 @@
 * You use TODO comments as a long-term storage solution.
 * You still debug with console.log, but call it “observability.”
 * You asked an AI to roast you—because even your imposter syndrome needed a second opinion.
+* You write code like you’re paid by the bug.
+* Even your rubber duck is considering a career change.
+* Your “quick fixes” are the stuff of future postmortems.
+* Your codebase is the only place where Schrödinger’s bugs exist—both fixed and not fixed until someone checks.
+* You refactor so much, your codebase qualifies as performance art.
